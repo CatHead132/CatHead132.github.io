@@ -1,1 +1,49 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Button Page</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    button {
+      background-color: #000;
+      color: #fff;
+      border: 1px solid #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <button onclick="redirectToPage('list.html')">Redirect to List</button>
+  <button>Other Button</button>
+
+  <script>
+    function redirectToPage(page) {
+      window.location.href = page;
+    }
+  </script>
+</body>
+
+</html>
