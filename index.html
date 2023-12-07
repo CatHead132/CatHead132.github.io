@@ -1,265 +1,263 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <script  type="text/javascript" src="https://codesandbox.io/public/sse-hooks/sse-hooks.ff25139602578cfc3b2826c5983e731d.js"></script>
-    <script  type="text/javascript" src="https://codesandbox.io/static/js/banner.d9cb10a38.js"></script>
-
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumber Tycoon 2 Axes</title>
     <style>
-      body {
-        background-color: #1a1a1a;
-        color: #fff;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-      }
+  body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
 
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
 
-      th,
-      td {
-        border: 1px solid #494949;
-        padding: 8px;
-        text-align: left;
-      }
+  th,
+  td {
+    border: 1px solid #494949;
+    padding: 8px;
+    text-align: left;
+  }
 
-      th {
-        background-color: #2d2d2d;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Lumber Tycoon 2 Axes</h2>
+  th {
+    background-color: #2d2d2d;
+  }
+</style>
 
-    <table>
-      <thead>
+</head>
+<body>
+
+<h2>Lumber Tycoon 2 Axes</h2>
+
+<table>
+    <thead>
         <tr>
-          <th>Axes</th>
-          <th>Value</th>
-          <th>Damage</th>
-          <th>Range</th>
-          <th>Cooldown</th>
-          <th>DPS</th>
+            <th>Axes</th>
+            <th>Cost</th>
+            <th>Damage</th>
+            <th>Range</th>
+            <th>Cooldown</th>
+            <th>DPS</th>
         </tr>
-      </thead>
-      <tbody>
+    </thead>
+    <tbody>
         <tr>
-          <td>Basic Hatchet</td>
-          <td>12</td>
-          <td>0.2</td>
-          <td>4.8</td>
-          <td>0.65</td>
-          <td>0.3</td>
-        </tr>
-        <tr>
-          <td>Plain Axe</td>
-          <td>90</td>
-          <td>0.55</td>
-          <td>6</td>
-          <td>0.73</td>
-          <td>0.75</td>
+            <td>Basic Hatchet</td>
+            <td>12</td>
+            <td>0.2</td>
+            <td>4.8</td>
+            <td>0.65</td>
+            <td>0.3</td>
         </tr>
         <tr>
-          <td>Steel Axe</td>
-          <td>190</td>
-          <td>0.93</td>
-          <td>8</td>
-          <td>0.7</td>
-          <td>1.33</td>
+            <td>Plain Axe</td>
+            <td>90</td>
+            <td>0.55</td>
+            <td>6</td>
+            <td>0.73</td>
+            <td>0.75</td>
         </tr>
         <tr>
-          <td>Hardened Axe</td>
-          <td>550</td>
-          <td>1.45</td>
-          <td>0.65</td>
-          <td>2.23</td>
-          <td>-</td>
+            <td>Steel Axe</td>
+            <td>190</td>
+            <td>0.93</td>
+            <td>8</td>
+            <td>0.7</td>
+            <td>1.33</td>
         </tr>
         <tr>
-          <td>Silver Axe</td>
-          <td>2040</td>
-          <td>1.6</td>
-          <td>10</td>
-          <td>0.48</td>
-          <td>3.33</td>
+            <td>Hardened Axe</td>
+            <td>550</td>
+            <td>1.45</td>
+            <td>0.65</td>
+            <td>2.23</td>
+            <td>-</td>
         </tr>
         <tr>
-          <td>Alpha Axe of Testing</td>
-          <td>500</td>
-          <td>1.45</td>
-          <td>10</td>
-          <td>0.3</td>
-          <td>4.83</td>
+            <td>Silver Axe</td>
+            <td>2040</td>
+            <td>1.6</td>
+            <td>10</td>
+            <td>0.48</td>
+            <td>3.33</td>
         </tr>
         <tr>
-          <td>Beta Axe of Bosses</td>
-          <td>1100</td>
-          <td>1.5</td>
-          <td>0.45</td>
-          <td>3.33</td>
-          <td>-</td>
+            <td>Alpha Axe of Testing</td>
+            <td>500</td>
+            <td>1.45</td>
+            <td>10</td>
+            <td>0.3</td>
+            <td>4.83</td>
         </tr>
         <tr>
-          <td>Rukiryaxe</td>
-          <td>7601</td>
-          <td>1.68</td>
-          <td>9</td>
-          <td>0.4</td>
-          <td>4.2</td>
+            <td>Beta Axe of Bosses</td>
+            <td>1100</td>
+            <td>1.5</td>
+            <td>0.45</td>
+            <td>3.33</td>
+            <td>-</td>
         </tr>
         <tr>
-          <td>Fire Axe</td>
-          <td>14400</td>
-          <td>8.12</td>
-          <td>Varies</td>
-          <td>0.3-0.45</td>
-          <td>Varies</td>
+            <td>Rukiryaxe</td>
+            <td>7601</td>
+            <td>1.68</td>
+            <td>9</td>
+            <td>0.4</td>
+            <td>4.2</td>
         </tr>
         <tr>
-          <td>End Times Axe</td>
-          <td>7601</td>
-          <td>Varies</td>
-          <td>Varies</td>
-          <td>0.3-0.4</td>
-          <td>Varies</td>
+            <td>Fire Axe</td>
+            <td>14400</td>
+            <td>8.12</td>
+            <td>Varies</td>
+            <td>0.3-0.45</td>
+            <td>Varies</td>
         </tr>
         <tr>
-          <td>Amber Axe</td>
-          <td>1100</td>
-          <td>3.73</td>
-          <td>1.25</td>
-          <td>2.98</td>
-          <td>-</td>
+            <td>End Times Axe</td>
+            <td>7601</td>
+            <td>Varies</td>
+            <td>Varies</td>
+            <td>0.3-0.4</td>
+            <td>Varies</td>
         </tr>
         <tr>
-          <td>Candy Cane Axe</td>
-          <td>6000</td>
-          <td>0.00</td>
-          <td>6</td>
-          <td>0.75</td>
-          <td>0.00</td>
+            <td>Amber Axe</td>
+            <td>1100</td>
+            <td>3.73</td>
+            <td>1.25</td>
+            <td>2.98</td>
+            <td>-</td>
         </tr>
         <tr>
-          <td>Beesaxe</td>
-          <td>Beesmas</td>
-          <td>1.4</td>
-          <td>10</td>
-          <td>0.5</td>
-          <td>2.8</td>
+            <td>Candy Cane Axe</td>
+            <td>6000</td>
+            <td>0.00</td>
+            <td>6</td>
+            <td>0.75</td>
+            <td>0.00</td>
         </tr>
         <tr>
-          <td>CHICKEN AXE</td>
-          <td>12000</td>
-          <td>0.75</td>
-          <td>0.54</td>
-          <td>1.39</td>
-          <td>-</td>
+            <td>Beesaxe</td>
+            <td>Beesmas</td>
+            <td>1.4</td>
+            <td>10</td>
+            <td>0.5</td>
+            <td>2.8</td>
         </tr>
         <tr>
-          <td>The Many Axe</td>
-          <td>38004</td>
-          <td>10.2</td>
-          <td>16</td>
-          <td>1.9</td>
-          <td>5.37</td>
+            <td>CHICKEN AXE</td>
+            <td>12000</td>
+            <td>0.75</td>
+            <td>0.54</td>
+            <td>1.39</td>
+            <td>-</td>
         </tr>
         <tr>
-          <td>Bird Axe</td>
-          <td>2840</td>
-          <td>Varies</td>
-          <td>Varies</td>
-          <td>0.4-0.5</td>
-          <td>Varies</td>
+            <td>The Many Axe</td>
+            <td>38004</td>
+            <td>10.2</td>
+            <td>16</td>
+            <td>1.9</td>
+            <td>5.37</td>
         </tr>
         <tr>
-          <td>Gingerbread Axe</td>
-          <td>62000</td>
-          <td>Varies</td>
-          <td>Varies</td>
-          <td>0.4-0.5</td>
-          <td>Varies</td>
+            <td>Bird Axe</td>
+            <td>2840</td>
+            <td>Varies</td>
+            <td>Varies</td>
+            <td>0.4-0.5</td>
+            <td>Varies</td>
         </tr>
         <tr>
-          <td>Rusty Axe</td>
-          <td>16004</td>
-          <td>0.55</td>
-          <td>7</td>
-          <td>0.4</td>
-          <td>1.38</td>
+            <td>Gingerbread Axe</td>
+            <td>62000</td>
+            <td>Varies</td>
+            <td>Varies</td>
+            <td>0.4-0.5</td>
+            <td>Varies</td>
         </tr>
         <tr>
-          <td>Candy Corn Axe</td>
-          <td>9400</td>
-          <td>1.75</td>
-          <td>16</td>
-          <td>0.6</td>
-          <td>2.92</td>
+            <td>Rusty Axe</td>
+            <td>16004</td>
+            <td>0.55</td>
+            <td>7</td>
+            <td>0.4</td>
+            <td>1.38</td>
         </tr>
         <tr>
-          <td>Cave Axe</td>
-          <td>32089</td>
-          <td>7.2</td>
-          <td>10</td>
-          <td>0.22-0.4</td>
-          <td>32.72</td>
+            <td>Candy Corn Axe</td>
+            <td>9400</td>
+            <td>1.75</td>
+            <td>16</td>
+            <td>0.6</td>
+            <td>2.92</td>
         </tr>
         <tr>
-          <td>Overgrown Axe</td>
-          <td>29500</td>
-          <td>7</td>
-          <td>Varies</td>
-          <td>0.46-0.55</td>
-          <td>Varies</td>
+            <td>Cave Axe</td>
+            <td>32089</td>
+            <td>7.2</td>
+            <td>10</td>
+            <td>0.22-0.4</td>
+            <td>32.72</td>
         </tr>
         <tr>
-          <td>Frost Axe</td>
-          <td>48080</td>
-          <td>6</td>
-          <td>Varies</td>
-          <td>0.31-0.4</td>
-          <td>Varies</td>
+            <td>Overgrown Axe</td>
+            <td>29500</td>
+            <td>7</td>
+            <td>Varies</td>
+            <td>0.46-0.55</td>
+            <td>Varies</td>
         </tr>
         <tr>
-          <td>Pie Axe</td>
-          <td>6700</td>
-          <td>Varies</td>
-          <td>Varies</td>
-          <td>0.3</td>
-          <td>Varies</td>
+            <td>Frost Axe</td>
+            <td>48080</td>
+            <td>6</td>
+            <td>Varies</td>
+            <td>0.31-0.4</td>
+            <td>Varies</td>
         </tr>
         <tr>
-          <td>Gold Axe</td>
-          <td>60</td>
-          <td>50</td>
-          <td>6</td>
-          <td>0.2</td>
-          <td>250</td>
+            <td>Pie Axe</td>
+            <td>6700</td>
+            <td>Varies</td>
+            <td>Varies</td>
+            <td>0.3</td>
+            <td>Varies</td>
         </tr>
         <tr>
-          <td>Stone Axe</td>
-          <td>12</td>
-          <td>5</td>
-          <td>2</td>
-          <td>0.3</td>
-          <td>-</td>
+            <td>Gold Axe</td>
+            <td>60</td>
+            <td>50</td>
+            <td>6</td>
+            <td>0.2</td>
+            <td>250</td>
         </tr>
         <tr>
-          <td>Lumberman's Axe</td>
-          <td>Unknown</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
-          <td>-</td>
+            <td>Stone Axe</td>
+            <td>12</td>
+            <td>5</td>
+            <td>2</td>
+            <td>0.3</td>
+            <td>-</td>
         </tr>
-      </tbody>
-    </table>
-    <script crossorigin type="text/javascript" src="https://codesandbox.io/static/js/watermark-button.eeb14a97b.js"></script>
-  </body>
+        <tr>
+            <td>Lumberman's Axe</td>
+            <td>Unknown</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
 </html>
