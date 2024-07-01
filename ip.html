@@ -11,6 +11,7 @@
         }
         #output {
             margin-top: 20px;
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -22,14 +23,16 @@
 
     <script>
         document.getElementById('fetchData').addEventListener('click', () => {
-            // Fetch IP address of the user
-            fetch('https://api.ipify.org?format=json')
+            const endpoint = 'https://api.ipify.org/?format=json';
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+
+            fetch(proxyUrl + endpoint)
                 .then(response => response.json())
                 .then(ipData => {
                     const ipAddress = ipData.ip;
-                    const endpoint = `http://ip-api.com/json/${ipAddress}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`;
+                    const geoEndpoint = `http://ip-api.com/json/${ipAddress}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`;
 
-                    fetch(endpoint)
+                    fetch(proxyUrl + geoEndpoint)
                         .then(response => response.json())
                         .then(data => {
                             if (data.status !== 'success') {
@@ -37,10 +40,24 @@
                                 return;
                             }
 
-                            document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+                            const formattedData = `
+                                IP Address: ${ipAddress}
+                                Country: ${data.country}
+                                Country Code: ${data.countryCode}
+                                Region: ${data.regionName}
+                                City: ${data.city}
+                                ZIP Code: ${data.zip}
+                                Latitude: ${data.lat}
+                                Longitude: ${data.lon}
+                                Timezone: ${data.timezone}
+                                ISP: ${data.isp}
+                                Organization: ${data.org}
+                                AS: ${data.as}
+                            `;
+                            document.getElementById('output').innerText = formattedData;
                         })
                         .catch(error => {
-                            document.getElementById('output').innerText = `Error: ${error}`;
+                            document.getElementById('output').innerText = `Error fetching geolocation data: ${error}`;
                         });
                 })
                 .catch(error => {
