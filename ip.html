@@ -23,16 +23,15 @@
 
     <script>
         document.getElementById('fetchData').addEventListener('click', () => {
-            const endpoint = 'https://api.ipify.org/?format=json';
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const endpoint = 'https://ipapi.co/json/';
 
-            fetch(proxyUrl + endpoint)
+            fetch(endpoint)
                 .then(response => response.json())
                 .then(ipData => {
                     const ipAddress = ipData.ip;
                     const geoEndpoint = `http://ip-api.com/json/${ipAddress}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`;
 
-                    fetch(proxyUrl + geoEndpoint)
+                    fetch(geoEndpoint)
                         .then(response => response.json())
                         .then(data => {
                             if (data.status !== 'success') {
