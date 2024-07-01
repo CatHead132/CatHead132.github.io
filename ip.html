@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Geolocation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>IP Geolocation</h1>
+    <p>Fetching geolocation data for your IP address.</p>
+    <button id="fetchData">Fetch Data</button>
+    <div id="output"></div>
+
+    <script>
+        document.getElementById('fetchData').addEventListener('click', () => {
+            // Fetch IP address of the user
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(ipData => {
+                    const ipAddress = ipData.ip;
+                    const endpoint = `http://ip-api.com/json/${ipAddress}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query`;
+
+                    fetch(endpoint)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status !== 'success') {
+                                document.getElementById('output').innerText = `Error: ${data.message}`;
+                                return;
+                            }
+
+                            document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+                        })
+                        .catch(error => {
+                            document.getElementById('output').innerText = `Error: ${error}`;
+                        });
+                })
+                .catch(error => {
+                    document.getElementById('output').innerText = `Error fetching IP address: ${error}`;
+                });
+        });
+    </script>
+</body>
+</html>
