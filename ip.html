@@ -1,65 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IP Geolocation</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    #output {
-      margin-top: 20px;
-      white-space: pre-wrap;
-    }
-  </style>
-</head>
-<body>
-  <h1>IP Geolocation</h1>
-  <p>Fetching geolocation data for your IP address.</p>
-  <div id="output"></div>
+const endpoint = 'https://ipapi.co/json/';
 
-  <script>
-    const endpoint = 'https://ipapi.co/json/';
+fetch(endpoint)
+  .then(response => response.json())
+  .then(ipData => {
+    const ipAddress = ipData.ip;
+    const geoEndpoint = `http://ip-api.com/json/${ipAddress}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as`;
 
-    fetch(endpoint)
+    fetch(geoEndpoint)
       .then(response => response.json())
-      .then(ipData => {
-        const ipAddress = ipData.ip;
-        const geoEndpoint = `http://ip-api.com/json/${ipAddress}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as`;
+      .then(data => {
+        if (data.status !== 'success') {
+          document.getElementById('output').innerText = `Error: ${data.message}`;
+          return;
+        }
 
-        fetch(geoEndpoint)
-          .then(response => response.json())
-          .then(data => {
-            if (data.status !== 'success') {
-              document.getElementById('output').innerText = `Error: ${data.message}`;
-              return;
-            }
-
-            const formattedData = `
-              IP Address: ${ipAddress}
-              Country: ${data.country}
-              Country Code: ${data.countryCode}
-              Region: ${data.regionName}
-              City: ${data.city}
-              ZIP Code: ${data.zip}
-              Latitude: ${data.lat}
-              Longitude: ${data.lon}
-              Timezone: ${data.timezone}
-              ISP: ${data.isp}
-              Organization: ${data.org}
-              AS: ${data.as}
-            `;
-            document.getElementById('output').innerText = formattedData;
-          })
-          .catch(error => {
-            document.getElementById('output').innerText = `Error fetching geolocation data: ${error}`;
-          });
+        const formattedData = `
+          IP Address: ${ipAddress}
+          Country: ${data.country}
+          Country Code: ${data.countryCode}
+          Region: ${data.regionName}
+          City: ${data.city}
+          ZIP Code: ${data.zip}
+          Latitude: ${data.lat}
+          Longitude: ${data.lon}
+          Timezone: ${data.timezone}
+          ISP: ${data.isp}
+          Organization: ${data.org}
+          AS: ${data.as}
+        `;
+        document.getElementById('output').innerText = formattedData;
       })
       .catch(error => {
-        document.getElementById('output').innerText = `Error fetching IP address: ${error}`;
+        document.getElementById('output').innerText = `Error fetching geolocation data: ${error.message || 'An unknown error occurred.'}`; // Provide a more informative message
       });
-  </script>
-</body>
-</html>
+  })
+  .catch(error => {
+    document.getElementById('output').innerText = `Error fetching IP address: ${error.message || 'An unknown error occurred.'}`; // Provide a more informative message
+  });
