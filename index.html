@@ -2,67 +2,89 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>60-Bar Smooth Audio Visualizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Useful Registration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #c7c7c7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .register-container {
+            background-color: #2e2e2e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 300px;
+        }
+        .register-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #c7c7c7;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #3e3e3e;
+            border: 1px solid #555;
+            color: #c7c7c7;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #4cae4c;
+        }
+    </style>
 </head>
-<body style="background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;">
-    <input type="file" accept="audio/*" onchange="loadAudio(this.files[0])" style="position: absolute; top: 10px; left: 10px;">
-    <canvas id="visualizer" width="1200" height="400"></canvas>
+<body>
+    <div class="register-container">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="submit-btn">Register</button>
+        </form>
+    </div>
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const canvas = document.getElementById('visualizer');
-        const canvasCtx = canvas.getContext('2d');
-        let analyser;
-        const smoothingFactor = 0.2;
-        const barCount = 1000;
-        let dataArray = new Uint8Array(barCount).fill(0);
-
-        function loadAudio(file) {
-            const reader = new FileReader();
-            reader.onload = e => audioCtx.decodeAudioData(e.target.result, playAudio);
-            reader.readAsArrayBuffer(file);
-        }
-
-        function playAudio(buffer) {
-            const source = audioCtx.createBufferSource();
-            source.buffer = buffer;
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 256;  // Increased for more frequency data
-            source.connect(analyser).connect(audioCtx.destination);
-            source.start(0);
-            draw();
-        }
-
-        function draw() {
-            requestAnimationFrame(draw);
-            const newData = new Uint8Array(analyser.frequencyBinCount);
-            analyser.getByteFrequencyData(newData);
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent form from submitting normally
             
-            for (let i = 0; i < barCount; i++) {
-                const dataIndex = Math.floor(i * newData.length / barCount);
-                const targetValue = newData[dataIndex];
-                dataArray[i] = dataArray[i] * smoothingFactor + targetValue * (1 - smoothingFactor);
-            }
-
-            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-            const barWidth = canvas.width / barCount;
-            const gradient = canvasCtx.createLinearGradient(0, canvas.height, 0, 0);
-            gradient.addColorStop(0, '#FF00FF');  // Magenta at the bottom
-            gradient.addColorStop(1, '#FFFFFF');  // White at the top
-
-            canvasCtx.fillStyle = gradient;
-            canvasCtx.beginPath();
-            canvasCtx.moveTo(0, canvas.height);
-
-            dataArray.forEach((v, i) => {
-                const x = i * barWidth;
-                const height = v / 255 * canvas.height;
-                canvasCtx.lineTo(x, canvas.height - height);
-            });
-
-            canvasCtx.lineTo(canvas.width, canvas.height);
-            canvasCtx.closePath();
-            canvasCtx.fill();
-        }
+            // Perform any additional actions here, e.g., sending data to your server.
+            
+            alert('Registration successful!');
+        });
     </script>
 </body>
 </html>
