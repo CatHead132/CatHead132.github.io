@@ -1,53 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Device Information</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    p {
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-  </style>
+  <title>Device and Browser Information</title>
 </head>
 <body>
-  <h1>Your Device Information</h1>
-  <p>Operating System: <span id="os"></span></p>
-  <p>Device Type: <span id="device"></span></p>
+  <h1>Your Device and Browser Information</h1>
+  <p>User Agent: <span id="user-agent"></span></p>
+  <p>Platform: <span id="platform"></span></p>
+  <p>Language: <span id="language"></span></p>
+  <p>Screen Resolution: <span id="screen-resolution"></span></p>
 
   <script>
-    // Function to detect the user's operating system
-    function getOS() {
-      var OSName = "Unknown OS";
-      if (navigator.appVersion.indexOf("Win") != -1) OSName = "Windows";
-      if (navigator.appVersion.indexOf("Linux") != -1) OSName = "Linux";
-      if (navigator.appVersion.indexOf("iPhone") != -1) OSName = "iPhone";
-      if (navigator.appVersion.indexOf("iPad") != -1) OSName = "iPad";
-      if (navigator.appVersion.indexOf("Android") != -1) OSName = "Android";
-      if (navigator.appVersion.indexOf("Mac") != -1) OSName = "Mac";
-      return OSName;
-    }
+    // Get device and browser information
+    const userAgent = navigator.userAgent;
+    const platform = navigator.platform;
+    const language = navigator.language;
+    const screenWidth = screen.width;
+    const screenHeight = screen.height;
 
-    // Function to detect the user's device type
-    function getDevice() {
-      var userAgent = navigator.userAgent;
-      if (userAgent.match(/mobile/i)) {
-        return "Mobile";
-      } else {
-        return "Desktop";
-      }
-    }
-
-    // Display the user's device information
-    document.getElementById("os").textContent = getOS();
-    document.getElementById("device").textContent = getDevice();
+    // Display the information
+    document.getElementById('user-agent').textContent = userAgent;
+    document.getElementById('platform').textContent = platform;
+    document.getElementById('language').textContent = language;
+    document.getElementById('screen-resolution').textContent = `${screenWidth} x ${screenHeight}`;
   </script>
 </body>
 </html>
