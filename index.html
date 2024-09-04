@@ -5,21 +5,34 @@
 </head>
 <body>
   <h1>Your Device and Browser Information</h1>
-  <p>User Agent: <span id="user-agent"></span></p>
+  <p>Device: <span id="device"></span></p>
+  <p>OS: <span id="os"></span></p>
+  <p>Browser: <span id="browser"></span></p>
   <p>Platform: <span id="platform"></span></p>
   <p>Language: <span id="language"></span></p>
   <p>Screen Resolution: <span id="screen-resolution"></span></p>
 
   <script>
+    // Function to parse the user agent string
+    function parseUserAgent(userAgent) {
+      const device = /\(([^)]+)\)/.exec(userAgent)[1];
+      const os = /(Windows|Linux|Mac OS|Android|iOS)/.exec(userAgent)[0];
+      const browser = /\s(\w+)\//.exec(userAgent)[1];
+      return { device, os, browser };
+    }
+
     // Get device and browser information
     const userAgent = navigator.userAgent;
+    const { device, os, browser } = parseUserAgent(userAgent);
     const platform = navigator.platform;
     const language = navigator.language;
     const screenWidth = screen.width;
     const screenHeight = screen.height;
 
     // Display the information
-    document.getElementById('user-agent').textContent = userAgent;
+    document.getElementById('device').textContent = device;
+    document.getElementById('os').textContent = os;
+    document.getElementById('browser').textContent = browser;
     document.getElementById('platform').textContent = platform;
     document.getElementById('language').textContent = language;
     document.getElementById('screen-resolution').textContent = `${screenWidth} x ${screenHeight}`;
