@@ -1,90 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Useful Registration Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e1e;
-            color: #c7c7c7;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .register-container {
-            background-color: #2e2e2e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 300px;
-        }
-        .register-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #c7c7c7;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            background-color: #3e3e3e;
-            border: 1px solid #555;
-            color: #c7c7c7;
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #5cb85c;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .submit-btn:hover {
-            background-color: #4cae4c;
-        }
-    </style>
+  <title>Location-Aware Website</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #location-info {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <div class="register-container">
-        <h2>Register</h2>
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="submit-btn">Register</button>
-        </form>
-    </div>
-    <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent form from submitting normally
-            
-            // Perform any additional actions here, e.g., sending data to your server.
-            
-            alert('Registration successful!');
-        });
-    </script>
+  <h1>Welcome to the Location-Aware Website</h1>
+  <p>This website will display your current location when you load the page.</p>
+  <div id="location-info"></div>
+
+  <script>
+    // Get the user's location using the Geolocation API
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      
+      // Update the location information on the page
+      var locationInfo = document.getElementById("location-info");
+      locationInfo.textContent = "Your location: " + latitude + ", " + longitude;
+    }, function() {
+      // Handle errors if the user doesn't allow location access
+      var locationInfo = document.getElementById("location-info");
+      locationInfo.textContent = "Unable to determine your location.";
+    });
+  </script>
 </body>
 </html>
