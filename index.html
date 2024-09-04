@@ -1,39 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Location-Aware Website</title>
+  <title>Device Information</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
     }
-    #location-info {
-      font-size: 24px;
-      font-weight: bold;
-      margin-top: 20px;
+    h1 {
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 18px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Welcome to the Location-Aware Website</h1>
-  <p>This website will display your current location when you load the page.</p>
-  <div id="location-info"></div>
+  <h1>Your Device Information</h1>
+  <p>Operating System: <span id="os"></span></p>
+  <p>Device Type: <span id="device"></span></p>
 
   <script>
-    // Get the user's location using the Geolocation API
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var latitude = position.coords.latitude;
-      var longitude = position.coords.longitude;
-      
-      // Update the location information on the page
-      var locationInfo = document.getElementById("location-info");
-      locationInfo.textContent = "Your location: " + latitude + ", " + longitude;
-    }, function() {
-      // Handle errors if the user doesn't allow location access
-      var locationInfo = document.getElementById("location-info");
-      locationInfo.textContent = "Unable to determine your location.";
-    });
+    // Function to detect the user's operating system
+    function getOS() {
+      var OSName = "Unknown OS";
+      if (navigator.appVersion.indexOf("Win") != -1) OSName = "Windows";
+      if (navigator.appVersion.indexOf("Linux") != -1) OSName = "Linux";
+      if (navigator.appVersion.indexOf("iPhone") != -1) OSName = "iPhone";
+      if (navigator.appVersion.indexOf("iPad") != -1) OSName = "iPad";
+      if (navigator.appVersion.indexOf("Android") != -1) OSName = "Android";
+      if (navigator.appVersion.indexOf("Mac") != -1) OSName = "Mac";
+      return OSName;
+    }
+
+    // Function to detect the user's device type
+    function getDevice() {
+      var userAgent = navigator.userAgent;
+      if (userAgent.match(/mobile/i)) {
+        return "Mobile";
+      } else {
+        return "Desktop";
+      }
+    }
+
+    // Display the user's device information
+    document.getElementById("os").textContent = getOS();
+    document.getElementById("device").textContent = getDevice();
   </script>
 </body>
 </html>
