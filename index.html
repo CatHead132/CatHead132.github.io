@@ -16,8 +16,15 @@
     // Function to parse the user agent string
     function parseUserAgent(userAgent) {
       const device = /\(([^)]+)\)/.exec(userAgent)[1];
-      const os = /(Windows|Linux|Mac OS|Android|iOS)/.exec(userAgent)[0];
+      let os = /(Windows|Linux|Mac OS|Android|iOS)/.exec(userAgent)[0];
       const browser = /\s(\w+)\//.exec(userAgent)[1];
+
+      // Check for iOS version
+      const iOSVersion = /OS (\d+)_/.exec(userAgent);
+      if (iOSVersion) {
+        os = `iOS ${iOSVersion[1]}`;
+      }
+
       return { device, os, browser };
     }
 
