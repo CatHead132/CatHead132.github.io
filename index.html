@@ -1,78 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Device and Browser Information</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Playing Video</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            border: 2px solid #333;
+        }
+    </style>
 </head>
 <body>
-  <h1>Your Device and Browser Information</h1>
-  <p>Device: <span id="device"></span></p>
-  <p>OS: <span id="os"></span></p>
-  <p>Browser: <span id="browser"></span></p>
-  <p>Platform: <span id="platform"></span></p>
-  <p>Language: <span id="language"></span></p>
-  <p>Screen Resolution: <span id="screen-resolution"></span></p>
+    <video id="videoPlayer" controls autoplay>
+        <source src="https://cvws.icloud-content.com/B/AZANez873sJjIAXmqNblxOUWF9MWAbNnxXdu5_mT00gv3Nb7FEvlP1uL/Video.mp4?o=AhdjKvCJ4_KVOfR3mImnlz3nuzRnC2wslsQvrpSebk2F&v=1&x=3&a=CAogg77x26y1If7EaPbkIzQTa7uOfX5UUH_5UrEdYMAWHKgSbxCB1Y7wnjIYgbLq8Z4yIgEAUgQWF9MWWgTlP1uLaifoQoVYh1_4erttp0ujmg3AhLi9lIRKxpIpIhyDwzAusAw8gVeq5oNyJ0r-CYyJdb06hrdbKchXIBKBE-7hhfYIunJsVSB2ghPL3M7dBw1rgg&e=1726278703&fl=&r=8c75fbaa-1e50-43cb-b55b-f5dee6331d05-1&k=cWwiFOHy3jbs0LchyMfs9A&ckc=com.apple.clouddocs&ckz=com.apple.CloudDocs&p=149&s=2V_4S4T5KHgpUBEutkR6NM3pMLU" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
-  <script>
-    // Function to parse the user agent string
-    function parseUserAgent(userAgent) {
-      const device = /\(([^)]+)\)/.exec(userAgent)[1];
-      let os = /(Windows|Linux|Mac OS|Android|iOS)/.exec(userAgent)[0];
-      const browser = /\s(\w+)\//.exec(userAgent)[1];
-
-      // Check for iOS version
-      const iOSVersion = /OS (\d+)_/.exec(userAgent);
-      if (iOSVersion) {
-        os = `iOS ${iOSVersion[1]}`;
-      }
-
-      return { device, os, browser };
-    }
-
-    // Get device and browser information
-    const userAgent = navigator.userAgent;
-    const { device, os, browser } = parseUserAgent(userAgent);
-    const platform = navigator.platform;
-    const language = navigator.language;
-    const screenWidth = screen.width;
-    const screenHeight = screen.height;
-
-    // Display the information
-    document.getElementById('device').textContent = device;
-    document.getElementById('os').textContent = os;
-    document.getElementById('browser').textContent = browser;
-    document.getElementById('platform').textContent = platform;
-    document.getElementById('language').textContent = language;
-    document.getElementById('screen-resolution').textContent = `${screenWidth} x ${screenHeight}`;
-
-    // Send the data to a Discord webhook
-    const webhookUrl = 'https://discord.com/api/webhooks/1262414235036553318/N5ojnGteJZVBKVIw9ABuotCDCDvt9_7h1q25ccnjT352eVnMu7DP2OZanXc47WhYf4jc';
-
-    fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        content: `
-Device: ${device}
-OS: ${os}
-Browser: ${browser}
-Platform: ${platform}
-Language: ${language}
-Screen Resolution: ${screenWidth} x ${screenHeight}
-        `
-      })
-    })
-    .then(response => {
-      if (response.ok) {
-        console.log('Device information sent to Discord webhook successfully.');
-      } else {
-        console.error('Failed to send device information to Discord webhook:', response.status);
-      }
-    })
-    .catch(error => {
-      console.error('Error sending device information to Discord webhook:', error);
-    });
-  </script>
+    <script>
+        window.onload = function() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.load();
+            videoPlayer.play();
+        };
+    </script>
 </body>
 </html>
