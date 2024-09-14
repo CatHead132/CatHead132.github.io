@@ -3,36 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Playing Video</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
-        video {
-            width: 100%;
-            max-width: 600px;
-            border: 2px solid #333;
-        }
-    </style>
+    <title>GitHub Pages URL Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
 </head>
-<body>
-    <video id="videoPlayer" controls autoplay>
-        <source src="https://cvws.icloud-content.com/B/AZANez873sJjIAXmqNblxOUWF9MWAbNnxXdu5_mT00gv3Nb7FEvlP1uL/Video.mp4?o=AhdjKvCJ4_KVOfR3mImnlz3nuzRnC2wslsQvrpSebk2F&v=1&x=3&a=CAogg77x26y1If7EaPbkIzQTa7uOfX5UUH_5UrEdYMAWHKgSbxCB1Y7wnjIYgbLq8Z4yIgEAUgQWF9MWWgTlP1uLaifoQoVYh1_4erttp0ujmg3AhLi9lIRKxpIpIhyDwzAusAw8gVeq5oNyJ0r-CYyJdb06hrdbKchXIBKBE-7hhfYIunJsVSB2ghPL3M7dBw1rgg&e=1726278703&fl=&r=8c75fbaa-1e50-43cb-b55b-f5dee6331d05-1&k=cWwiFOHy3jbs0LchyMfs9A&ckc=com.apple.clouddocs&ckz=com.apple.CloudDocs&p=149&s=2V_4S4T5KHgpUBEutkR6NM3pMLU" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+        <h1 class="text-2xl font-bold mb-4">GitHub Pages URL Viewer</h1>
+        <p class="mb-4 text-sm text-gray-600">Note: Some websites may not load due to security restrictions.</p>
+        <form id="urlForm" class="mb-4">
+            <input type="url" id="urlInput" placeholder="Enter a URL" required
+                   class="w-full p-2 border border-gray-300 rounded mb-2">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Load Website
+            </button>
+        </form>
+        <div id="frameContainer" class="hidden">
+            <iframe id="websiteFrame" src="about:blank" class="w-full h-96 border border-gray-300 rounded"></iframe>
+        </div>
+        <div id="errorMessage" class="mt-4 text-red-500 hidden"></div>
+    </div>
 
     <script>
-        window.onload = function() {
-            const videoPlayer = document.getElementById('videoPlayer');
-            videoPlayer.load();
-            videoPlayer.play();
-        };
+        document.getElementById('urlForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            const frame = document.getElementById('websiteFrame');
+            const container = document.getElementById('frameContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (url) {
+                frame.src = url;
+                container.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+
+                frame.onload = function() {
+                    try {
+                        // Try to access the frame content
+                        frame.contentWindow.location.href;
+                    } catch (e) {
+                        // If we can't access the content, it's likely due to CORS
+                        errorMessage.textContent = "Unable to load the website. It may be blocking display in iframes.";
+                        errorMessage.classList.remove('hidden');
+                    }
+                };
+            }
+        });
     </script>
 </body>
 </html>
