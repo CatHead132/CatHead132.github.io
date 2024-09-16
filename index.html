@@ -3,51 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Pages URL Viewer</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <title>CatHead - Personal Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 1rem;
+        }
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+            padding: 20px;
+        }
+        .logo {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .cat-icon {
+            font-size: 1.5em;
+        }
+        .section {
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .social-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #7289da;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+        .social-link:hover {
+            background-color: #5b6eae;
+        }
+        .github-link {
+            background-color: #333;
+        }
+        .github-link:hover {
+            background-color: #555;
+        }
+        .github-stats {
+            text-align: center;
+        }
+        .github-stats img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
-        <h1 class="text-2xl font-bold mb-4">GitHub Pages URL Viewer</h1>
-        <p class="mb-4 text-sm text-gray-600">Note: Some websites may not load due to security restrictions.</p>
-        <form id="urlForm" class="mb-4">
-            <input type="url" id="urlInput" placeholder="Enter a URL" required
-                   class="w-full p-2 border border-gray-300 rounded mb-2">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                Load Website
-            </button>
-        </form>
-        <div id="frameContainer" class="hidden">
-            <iframe id="websiteFrame" src="about:blank" class="w-full h-96 border border-gray-300 rounded"></iframe>
+<body>
+    <header>
+        <h1><span class="logo">CatHead</span> <span class="cat-icon">🐱</span></h1>
+    </header>
+    <div class="container">
+        <div class="section">
+            <h2>About Me</h2>
+            <p>Welcome to my personal website! I'm CatHead, a programmer and tech and mechanics enthusiast.</p>
         </div>
-        <div id="errorMessage" class="mt-4 text-red-500 hidden"></div>
+        <div class="section">
+            <h2>Programming Skills</h2>
+            <p>I code in the following languages:</p>
+            <ul>
+                <li>Luau</li>
+                <li>Python</li>
+                <li>HTML</li>
+                <li>C</li>
+                <li>JavaScript</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Languages</h2>
+            <p>I can speak in three languages:</p>
+            <ul>
+                <li>Turkish (primary language)</li>
+                <li>English</li>
+                <li>German</li>
+            </ul>
+        </div>
+        <div class="section">
+            <h2>Social Media</h2>
+            <p>Connect with me on Discord and GitHub:</p>
+            <a href="https://discord.com/users/929637984981094431" class="social-link" target="_blank">Discord Profile</a>
+            <a href="https://github.com/CatHead132" class="social-link github-link" target="_blank">GitHub Profile</a>
+        </div>
+        <div class="section github-stats">
+            <h3>My GitHub Stats:</h3>
+            <img src="http://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=cathead132&theme=dark" alt="Profile Summary Card">
+            <img src="https://github-readme-stats-eight-theta.vercel.app/api?username=cathead132&show_icons=true&theme=dark&include_all_commits=true&count_private=true" alt="GitHub Stats">
+            <img src="https://github-readme-stats-eight-theta.vercel.app/api/top-langs/?username=cathead132&layout=compact&langs_count=8&theme=dark" alt="Top Languages">
+        </div>
     </div>
-
-    <script>
-        document.getElementById('urlForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const url = document.getElementById('urlInput').value;
-            const frame = document.getElementById('websiteFrame');
-            const container = document.getElementById('frameContainer');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            if (url) {
-                frame.src = url;
-                container.classList.remove('hidden');
-                errorMessage.classList.add('hidden');
-
-                frame.onload = function() {
-                    try {
-                        // Try to access the frame content
-                        frame.contentWindow.location.href;
-                    } catch (e) {
-                        // If we can't access the content, it's likely due to CORS
-                        errorMessage.textContent = "Unable to load the website. It may be blocking display in iframes.";
-                        errorMessage.classList.remove('hidden');
-                    }
-                };
-            }
-        });
-    </script>
 </body>
 </html>
