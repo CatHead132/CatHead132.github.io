@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumber Tycoon 2 Wiki Speedrun</title>
+  <style>
+    :root {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --text-primary: #e0e0e0;
+      --accent-color: #0f3460;
+      --highlight-color: #533483;
+      --success-color: #6a5acd;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    #topbar {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      height: 50px;
+    }
+
+    #topbar p {
+      margin: 0;
+      font-size: 16px;
+      flex-grow: 1;
+      text-align: left;
+      padding-left: 20px;
+    }
+
+    #topbar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    #reset-btn, #refresh-btn {
+      background-color: var(--highlight-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #reset-btn:hover, #refresh-btn:hover {
+      background-color: #7a4f9d;
+      transform: scale(1.05);
+    }
+
+    #iframe-container {
+      display: none;
+      margin-top: 50px;
+      height: calc(100vh - 50px);
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 2px solid var(--accent-color);
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    #instructions {
+      display: block;
+      padding: 40px 20px;
+      background-color: var(--bg-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      color: var(--success-color);
+      margin-bottom: 20px;
+    }
+
+    #start-btn, #reset-btn, #refresh-btn {
+      background-color: var(--success-color);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 20px 0;
+      transition: all 0.3s ease;
+    }
+
+    #start-btn:hover {
+      transform: scale(1.05);
+      background-color: #5a4acd;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: var(--success-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="topbar">
+    <p id="status">Loading game...</p>
+    <div id="topbar-actions">
+      <button id="refresh-btn" onclick="findNewPages()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 4v6h-6"></path>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+        </svg>
+        Refresh
+      </button>
+      <button id="reset-btn" onclick="resetGame()">Reset</button>
+    </div>
+  </div>
+
+  <div id="instructions">
+    <h1>Lumber Tycoon 2 Wiki Speedrun</h1>
+    <p>Navigate from the randomly selected start page to the target page as quickly as possible!</p>
+    <button id="start-btn" onclick="startGame()">Start Speedrun</button>
+  </div>
+
+  <div id="iframe-container">
+    <iframe id="wiki-frame" src="" sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation"></iframe>
+  </div>
+
+  <script>
+    let startPage = null;
+    let targetPage = null;
+    const wikiBaseUrl = 'https://lumber-tycoon-2.fandom.com';
+
+    async function findNewPages() {
+      const topbarStatus = document.getElementById('status');
+      const iframe = document.getElementById('wiki-frame');
+      
+      // Reset iframe
+      iframe.src = '';
+      topbarStatus.innerHTML = '<div class="loading"></div>';
+
+      try {
+        const randomEndpoint = '/api.php?action=query&format=json&list=random&rnnamespace=0&rnlimit=2';
+        const response = await fetch(wikiBaseUrl + randomEndpoint + '&origin=*');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch random pages');
+        }
+
+        const data = await response.json();
+        const pages = data.query.random;
+
+        startPage = pages[0];
+        targetPage = pages[1];
+
+        // Set iframe source and status
+        iframe.src = `${wikiBaseUrl}/wiki/${encodeURIComponent(startPage.title)}`;
+        topbarStatus.textContent = `Target page: ${targetPage.title}`;
+      } catch (error) {
+        topbarStatus.textContent = `Error: ${error.message}`;
+      }
+    }
+
+    async function startGame() {
+      // Reset UI
+      document.getElementById('start-btn').style.display = 'none';
+      document.getElementById('topbar').style.display = 'flex';
+      document.getElementById('instructions').style.display = 'none';
+      document.getElementById('iframe-container').style.display = 'block';
+      
+      // Initial page finding
+      await findNewPages();
+    }
+
+    function resetGame() {
+      document.getElementById('topbar').style.display = 'none';
+      document.getElementById('start-btn').style.display = 'inline-block';
+      document.getElementById('instructions').style.display = 'block';
+      document.getElementById('iframe-container').style.display = 'none';
+      const iframe = document.getElementById('wiki-frame');
+      iframe.src = '';
+      document.getElementById('status').textContent = '';
+      startPage = null;
+      targetPage = null;
+    }
+  </script>
+</body>
+</html>
