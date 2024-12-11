@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lumber Tycoon 2 Wiki Speedrun</title>
+  <!-- Add Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
       --bg-primary: #1a1a2e;
@@ -75,6 +77,19 @@
     #reset-btn:hover, #refresh-btn:hover {
       background-color: #7a4f9d;
       transform: scale(1.05);
+    }
+
+    #reset-btn i, #refresh-btn i {
+      font-size: 20px;
+    }
+
+    @keyframes spin-reload {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #refresh-btn.spinning i {
+      animation: spin-reload 0.8s ease-in-out;
     }
 
     #iframe-container {
@@ -152,13 +167,11 @@
     <p id="status">Loading game...</p>
     <div id="topbar-actions">
       <button id="refresh-btn" onclick="findNewPages()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 4v6h-6"></path>
-          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-        </svg>
-        Refresh
+        <i class="fa-solid fa-rotate-right" style="color: #ffffff;"></i>
       </button>
-      <button id="reset-btn" onclick="resetGame()">Reset</button>
+      <button id="reset-btn" onclick="resetGame()">
+        <i class="fa-solid fa-house" style="color: #ffffff;"></i>
+      </button>
     </div>
   </div>
 
@@ -181,6 +194,15 @@
     async function findNewPages() {
       const topbarStatus = document.getElementById('status');
       const iframe = document.getElementById('wiki-frame');
+      const refreshBtn = document.getElementById('refresh-btn');
+      
+      // Add spinning class to the button
+      refreshBtn.classList.add('spinning');
+      
+      // Remove spinning class after animation completes
+      setTimeout(() => {
+        refreshBtn.classList.remove('spinning');
+      }, 800);
       
       iframe.src = '';
       topbarStatus.innerHTML = '<div class="loading"></div>';
@@ -228,3 +250,4 @@
     }
   </script>
 </body>
+</html>
