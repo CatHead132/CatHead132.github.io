@@ -56,39 +56,9 @@
     #topbar-actions {
       display: flex;
       gap: 10px;
-      align-items: center;
     }
 
-    #timer {
-      font-size: 18px;
-      font-weight: bold;
-      margin-right: 15px;
-    }
-
-    #reset-btn {
-      background-color: var(--highlight-color);
-      color: white;
-      border: none;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #reset-btn:hover, #refresh-btn:hover {
-      background-color: #7a4f9d;
-      transform: scale(1.05);
-    }
-
-    #reset-btn svg {
-      width: 24px;
-      height: 24px;
-    }
-
-    #refresh-btn {
+    #reset-btn, #refresh-btn {
       background-color: var(--highlight-color);
       color: white;
       border: none;
@@ -100,6 +70,11 @@
       display: flex;
       align-items: center;
       gap: 5px;
+    }
+
+    #reset-btn:hover, #refresh-btn:hover {
+      background-color: #7a4f9d;
+      transform: scale(1.05);
     }
 
     #iframe-container {
@@ -176,7 +151,6 @@
   <div id="topbar">
     <p id="status">Loading game...</p>
     <div id="topbar-actions">
-      <div id="timer">00:00:00</div>
       <button id="refresh-btn" onclick="findNewPages()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M23 4v6h-6"></path>
@@ -184,12 +158,7 @@
         </svg>
         Refresh
       </button>
-      <button id="reset-btn" onclick="resetGame()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-          <polyline points="9 22 9 12 15 12 15 22"></polyline>
-        </svg>
-      </button>
+      <button id="reset-btn" onclick="resetGame()">Reset</button>
     </div>
   </div>
 
@@ -207,24 +176,7 @@
   <script>
     let startPage = null;
     let targetPage = null;
-    let timerInterval = null;
-    let startTime = 0;
     const wikiBaseUrl = 'https://lumber-tycoon-2.fandom.com';
-
-    function formatTime(milliseconds) {
-      const totalSeconds = Math.floor(milliseconds / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }
-
-    function updateTimer() {
-      const currentTime = Date.now();
-      const elapsedTime = currentTime - startTime;
-      document.getElementById('timer').textContent = formatTime(elapsedTime);
-    }
 
     async function findNewPages() {
       const topbarStatus = document.getElementById('status');
@@ -260,19 +212,10 @@
       document.getElementById('instructions').style.display = 'none';
       document.getElementById('iframe-container').style.display = 'block';
       
-      // Start the timer
-      startTime = Date.now();
-      timerInterval = setInterval(updateTimer, 1000);
-      
       await findNewPages();
     }
 
     function resetGame() {
-      // Stop the timer
-      if (timerInterval) {
-        clearInterval(timerInterval);
-      }
-      
       document.getElementById('topbar').style.display = 'none';
       document.getElementById('start-btn').style.display = 'inline-block';
       document.getElementById('instructions').style.display = 'block';
@@ -280,10 +223,8 @@
       const iframe = document.getElementById('wiki-frame');
       iframe.src = '';
       document.getElementById('status').textContent = '';
-      document.getElementById('timer').textContent = '00:00:00';
       startPage = null;
       targetPage = null;
     }
   </script>
 </body>
-</html>
