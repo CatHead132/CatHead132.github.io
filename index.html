@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lumber Tycoon 2 Wiki Speedrun</title>
-  <!-- Add Font Awesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
@@ -34,53 +33,72 @@
     #topbar {
       background-color: var(--bg-secondary);
       color: var(--text-primary);
-      padding: 15px;
+      padding: 10px 15px;
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       z-index: 1000;
       display: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #topbar-content {
+      display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      height: 50px;
+      max-width: 69420px;
+      margin: 0 auto;
     }
 
-    #topbar p {
+    #status {
       margin: 0;
       font-size: 16px;
-      flex-grow: 1;
-      text-align: left;
-      padding-left: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 50%;
     }
 
-    #topbar-actions {
+    #controls {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .button-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     #reset-btn, #refresh-btn {
-      background-color: var(--highlight-color);
+      background-color: var(--success-color);
       color: white;
       border: none;
-      padding: 8px 15px;
+      padding: 8px 12px;
       cursor: pointer;
       border-radius: 5px;
       font-weight: bold;
-      text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 5px;
+      justify-content: center;
     }
 
     #reset-btn:hover, #refresh-btn:hover {
-      background-color: #7a4f9d;
+      background-color: #5a4acd;
       transform: scale(1.05);
     }
 
     #reset-btn i, #refresh-btn i {
-      font-size: 20px;
+      font-size: 18px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
     }
 
     @keyframes spin-reload {
@@ -117,6 +135,16 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
+    #how-to-play {
+      display: none;
+      background-color: var(--bg-secondary);
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: left;
+    }
+
     h1 {
       color: var(--success-color);
       margin-bottom: 20px;
@@ -129,7 +157,7 @@
       opacity: 0.7;
     }
 
-    #start-btn, #reset-btn, #refresh-btn {
+    #start-btn, #how-to-play-btn {
       background-color: var(--success-color);
       color: white;
       border: none;
@@ -137,23 +165,24 @@
       font-size: 16px;
       cursor: pointer;
       border-radius: 8px;
-      margin: 20px 0;
+      margin: 10px 0;
       transition: all 0.3s ease;
     }
 
-    #start-btn:hover {
+    #start-btn:hover, #how-to-play-btn:hover {
       transform: scale(1.05);
       background-color: #5a4acd;
     }
 
     .loading {
       display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 5px solid rgba(255,255,255,0.3);
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
       border-radius: 50%;
       border-top-color: var(--success-color);
       animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
     }
 
     @keyframes spin {
@@ -164,14 +193,22 @@
 </head>
 <body>
   <div id="topbar">
-    <p id="status">Loading game...</p>
-    <div id="topbar-actions">
-      <button id="refresh-btn" onclick="findNewPages()">
-        <i class="fa-solid fa-rotate-right" style="color: #ffffff;"></i>
-      </button>
-      <button id="reset-btn" onclick="resetGame()">
-        <i class="fa-solid fa-house" style="color: #ffffff;"></i>
-      </button>
+    <div id="topbar-content">
+      <p id="status">Loading game...</p>
+      <div id="controls">
+        <div class="button-group">
+          <div class="stat-item">
+            <i class="fas fa-stopwatch"></i>
+            <span id="timer">00:00.000</span>
+          </div>
+        </div>
+        <button id="refresh-btn" onclick="findNewPages()">
+          <i class="fa-solid fa-rotate-right" style="color: #ffffff;"></i>
+        </button>
+        <button id="reset-btn" onclick="resetGame()">
+          <i class="fa-solid fa-house" style="color: #ffffff;"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -179,6 +216,24 @@
     <h1>Lumber Tycoon 2 Wiki Speedrun</h1>
     <p>Navigate from the randomly selected start page to the target page as quickly as possible!</p>
     <button id="start-btn" onclick="startGame()">Start Speedrun</button>
+    <button id="how-to-play-btn" onclick="toggleHowToPlay()">How to Play</button>
+    <div id="how-to-play">
+      <h2>Game Rules:</h2>
+      <ol>
+        <li>When you click "Start Speedrun", you'll be given a random start page from the Lumber Tycoon 2 Wiki.</li>
+        <li>A target page will also be randomly selected.</li>
+        <li>Your goal is to navigate from the start page to the target page using only the wiki links on the pages.</li>
+        <li>Try to reach the target page in as few clicks as possible!</li>
+        <li>Use the refresh button to get a new set of start and target pages.</li>
+        <li>Use the home button to reset the game and start over.</li>
+      </ol>
+      <h2>Tips:</h2>
+      <ul>
+        <li>Look for link connections between pages.</li>
+        <li>Use the wiki's navigation and search features.</li>
+        <li>Be strategic about which links you click.</li>
+      </ul>
+    </div>
     <div id="credits">Created by Discord user @cathead132</div>
   </div>
 
@@ -190,37 +245,91 @@
     let startPage = null;
     let targetPage = null;
     const wikiBaseUrl = 'https://lumber-tycoon-2.fandom.com';
+    let startTime = 0;
+    let timerInterval = null;
+    const blacklistedPages = [
+      'Lumber Tycoon 2 Wiki/News',
+      'Lumber Tycoon 2 Wiki/Links',
+      'Grey Box', 
+      'Lumber Tycoon 2 Wiki:Wiki Guidelines', 
+      'Lumber Tycoon 2 Wiki:Content Guidelines', 
+      'Lumber Tycoon 2 Wiki:Manual of Style', 
+      'Lumber Tycoon 2 Wiki:Wiki Staff', 
+      'Lumber Tycoon 2 Wiki:Discord',
+      'Server Initialization',
+      'Lumber Tycoon 2 Wiki/About'
+    ];
+
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(updateTimer, 10);
+    }
+
+    function updateTimer() {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      const minutes = Math.floor(elapsedTime / 60000);
+      const seconds = Math.floor((elapsedTime % 60000) / 1000);
+      const milliseconds = Math.floor((elapsedTime % 1000));
+      const formattedMinutes = minutes.toString().padStart(2, '0');
+      const formattedSeconds = seconds.toString().padStart(2, '0');
+      const formattedMilliseconds = milliseconds.toString().padStart(3, '0');
+      document.getElementById('timer').textContent = `${formattedMinutes}:${formattedSeconds}.${formattedMilliseconds}`;
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function resetTimer() {
+      stopTimer();
+      document.getElementById('timer').textContent = '00:00.000';
+    }
+
+    function toggleHowToPlay() {
+      const howToPlay = document.getElementById('how-to-play');
+      const howToPlayBtn = document.getElementById('how-to-play-btn');
+      if (howToPlay.style.display === 'block') {
+        howToPlay.style.display = 'none';
+        howToPlayBtn.textContent = 'How to Play';
+      } else {
+        howToPlay.style.display = 'block';
+        howToPlayBtn.textContent = 'Hide Instructions';
+      }
+    }
 
     async function findNewPages() {
       const topbarStatus = document.getElementById('status');
       const iframe = document.getElementById('wiki-frame');
       const refreshBtn = document.getElementById('refresh-btn');
-      
-      // Add spinning class to the button
+      resetTimer();
+      startTimer();
       refreshBtn.classList.add('spinning');
-      
-      // Remove spinning class after animation completes
       setTimeout(() => {
         refreshBtn.classList.remove('spinning');
       }, 800);
-      
       iframe.src = '';
       topbarStatus.innerHTML = '<div class="loading"></div>';
 
       try {
-        const randomEndpoint = '/api.php?action=query&format=json&list=random&rnnamespace=0&rnlimit=2';
+        const randomEndpoint = '/api.php?action=query&format=json&list=random&rnnamespace=0&rnlimit=10';
         const response = await fetch(wikiBaseUrl + randomEndpoint + '&origin=*');
-
         if (!response.ok) {
           throw new Error('Failed to fetch random pages');
         }
-
         const data = await response.json();
         const pages = data.query.random;
-
-        startPage = pages[0];
-        targetPage = pages[1];
-
+        const validPages = pages.filter(page => 
+          !blacklistedPages.includes(page.title)
+        );
+        if (validPages.length < 2) {
+          throw new Error('Not enough valid pages found');
+        }
+        startPage = validPages[0];
+        targetPage = validPages[1];
         iframe.src = `${wikiBaseUrl}/wiki/${encodeURIComponent(startPage.title)}`;
         topbarStatus.textContent = `Target page: ${targetPage.title}`;
       } catch (error) {
@@ -230,23 +339,29 @@
 
     async function startGame() {
       document.getElementById('start-btn').style.display = 'none';
-      document.getElementById('topbar').style.display = 'flex';
+      document.getElementById('how-to-play-btn').style.display = 'none';
+      document.getElementById('topbar').style.display = 'block';
       document.getElementById('instructions').style.display = 'none';
       document.getElementById('iframe-container').style.display = 'block';
-      
+      startTimer();
       await findNewPages();
     }
 
     function resetGame() {
+      stopTimer();
       document.getElementById('topbar').style.display = 'none';
       document.getElementById('start-btn').style.display = 'inline-block';
+      document.getElementById('how-to-play-btn').style.display = 'inline-block';
       document.getElementById('instructions').style.display = 'block';
       document.getElementById('iframe-container').style.display = 'none';
+      document.getElementById('how-to-play').style.display = 'none';
       const iframe = document.getElementById('wiki-frame');
       iframe.src = '';
       document.getElementById('status').textContent = '';
+      document.getElementById('how-to-play-btn').textContent = 'How to Play';
       startPage = null;
       targetPage = null;
+      resetTimer();
     }
   </script>
 </body>
