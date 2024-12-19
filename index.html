@@ -7,6 +7,12 @@
   <link rel="icon" href="icon.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+    @property --gradient-angle {
+      syntax: "<angle>";
+      initial-value: 0turn;
+      inherits: false;
+    }
+
     :root {
       --bg-primary: #1a1a2e;
       --bg-secondary: #16213e;
@@ -158,7 +164,35 @@
       opacity: 0.7;
     }
 
-    #start-btn, #how-to-play-btn {
+    #start-btn {
+      background-image: linear-gradient(var(--success-color), var(--success-color)),
+        conic-gradient(
+          from var(--gradient-angle),
+          var(--success-color) 0%,
+          #9f94f5 37%,
+          #e0e0e0 30%,
+          #9f94f5 33%,
+          var(--success-color) 40%,
+          var(--success-color) 50%,
+          #9f94f5 77%,
+          #e0e0e0 80%,
+          #9f94f5 83%,
+          var(--success-color) 90%
+        );
+      background-clip: padding-box, border-box;
+      background-origin: padding-box, border-box;
+      border: 2px solid transparent;
+      color: white;
+      padding: 12px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      margin: 10px 0;
+      position: relative;
+      animation: 2s gradient-angle infinite linear;
+    }
+
+    #how-to-play-btn {
       background-color: var(--success-color);
       color: white;
       border: none;
@@ -172,7 +206,12 @@
 
     #start-btn:hover, #how-to-play-btn:hover {
       transform: scale(1.05);
-      background-color: #5a4acd;
+    }
+
+    @keyframes gradient-angle {
+      to {
+        --gradient-angle: 1turn;
+      }
     }
 
     .loading {
@@ -258,7 +297,8 @@
       'Lumber Tycoon 2 Wiki:Wiki Staff', 
       'Lumber Tycoon 2 Wiki:Discord',
       'Server Initialization',
-      'Lumber Tycoon 2 Wiki/About'
+      'Lumber Tycoon 2 Wiki/About',
+      'Music'
     ];
 
     function startTimer() {
