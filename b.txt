@@ -1,23 +1,10 @@
 async function checkCode(code) {
-    const url = `https://fb.blooket.com/c/firebase/id?id=${code}`;
-    const response = await fetch(url, { method: 'GET', credentials: 'include' });
-    if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-            console.log(`Valid code: ${code}`);
-            return true;
-        }
-    } else if (response.status === 429) {
-        console.log(`Error 429: Retrying...`);
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        return checkCode(code);
-    }
-    console.log(`Invalid code or error: ${response.status}`);
-    return false;
+    const res = await fetch(`https://fb.blooket.com/c/firebase/id?id=${code}`, { method: 'GET', credentials: 'include' });
+    if (!res.ok) return res.status === 429 ? (await new Promise(r => setTimeout(r, 5000)), checkCode(code)) : false;
+    const data = await res.json();
+    return data.success ? (console.log(`✅ Valid code: ${code}`), true) : (console.log(`❌ Invalid: ${code}`), false);
 }
 
-async function generateCodes() {
-    while (!(await checkCode(Math.floor(Math.random() * 9000000) + 1000000))) {}
-}
-
-generateCodes();
+(async function generateCodes() {
+    while (!(await checkCode(Math.floor(Math.random() * 9000000) + 1000000)));
+})();
