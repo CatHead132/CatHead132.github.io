@@ -22,7 +22,7 @@
       s = parseInt(a.value, 10),
       i = o.value;
     if (!c || !d || isNaN(s) || s <= 0) return;
-    const r = 10,
+    const r = 30,
       l = 1e3;
     for (let t = 1; t <= s; t += r) {
       const n = [];
