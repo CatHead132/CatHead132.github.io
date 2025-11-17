@@ -22,22 +22,10 @@
       height: auto;
       object-fit: cover;
     }
-    .info {
-      position: fixed;
-      bottom: 20px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      color: white;
-      font-family: Arial, sans-serif;
-      font-size: 16px;
-      opacity: 0.8;
-    }
   </style>
 </head>
 <body>
-  <video id="v" src="https://assets.codepen.io/3364143/720.mp4" muted loop></video>
-  <div class="info">Press 'F' for fullscreen | Press 'M' to toggle sound</div>
+  <video id="v" src="http://cathead132.github.io/rick.mp4" muted loop></video>
   
   <script>
     const v = document.getElementById('v');
@@ -49,10 +37,6 @@
           await (d.requestFullscreen?.() || d.webkitRequestFullscreen?.() || d.msRequestFullscreen?.());
           v.play();
         }
-      }
-      
-      if (e.key.toLowerCase() === 'm') {
-        v.muted = !v.muted;
       }
     });
     
