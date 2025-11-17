@@ -1,49 +1,62 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fullscreen Video</title>
   <style>
-    html,body{
-      height:100%;
-      margin:0;
-      background:#000;
-      overflow:hidden;
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #000;
+      overflow: hidden;
     }
-    video{
-      position:fixed;
-      top:50%;
-      left:50%;
-      transform:translate(-50%,-50%);
-      min-width:100%;
-      min-height:100%;
-      width:auto;
-      height:auto;
-      object-fit:cover;
-      background:#000;
+    video {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: cover;
+    }
+    .info {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: white;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
-  <video id="v" src="Untitled design.mp4" autoplay playsinline loop preload="auto"></video>
+  <video id="v" src="https://assets.codepen.io/3364143/720.mp4" muted loop></video>
+  <div class="info">Press 'F' for fullscreen | Press 'M' to toggle sound</div>
+  
   <script>
-    const v=document.getElementById('v');
-
-    window.addEventListener('keydown',async e=>{
-      if(e.key.toLowerCase()==='f'){
-        const d=document.documentElement;
-        if(!document.fullscreenElement){
-          if(d.requestFullscreen) await d.requestFullscreen();
-          else if(d.webkitRequestFullscreen) await d.webkitRequestFullscreen();
-          else if(d.msRequestFullscreen) await d.msRequestFullscreen();
+    const v = document.getElementById('v');
+    
+    window.addEventListener('keydown', async e => {
+      if (e.key.toLowerCase() === 'f') {
+        const d = document.documentElement;
+        if (!document.fullscreenElement) {
+          await (d.requestFullscreen?.() || d.webkitRequestFullscreen?.() || d.msRequestFullscreen?.());
+          v.play();
         }
       }
+      
+      if (e.key.toLowerCase() === 'm') {
+        v.muted = !v.muted;
+      }
     });
-
-    v.muted=false;
-    v.volume=1.0;
-    v.play();
+    
+    v.play().catch(e => console.log("Autoplay blocked:", e));
   </script>
 </body>
 </html>
