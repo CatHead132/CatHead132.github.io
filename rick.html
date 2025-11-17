@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fullscreen Autoplay Video</title>
+  <title>Fullscreen Video</title>
   <style>
     html,body{
       height:100%;
@@ -11,7 +11,7 @@
       background:#000;
       overflow:hidden;
     }
-    video#bg{
+    video{
       position:fixed;
       top:50%;
       left:50%;
@@ -21,73 +21,29 @@
       width:auto;
       height:auto;
       object-fit:cover;
-      z-index:0;
       background:#000;
     }
-    .fallback{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:2;
-      pointer-events:none;
-    }
-    .fallback button{
-      pointer-events:auto;
-      padding:14px 22px;
-      font-size:18px;
-      border-radius:10px;
-      border:0;
-      background:#111;
-      color:#fff;
-      box-shadow:0 6px 18px rgba(0,0,0,0.5);
-      cursor:pointer;
-      opacity:0.95;
-    }
-    .hidden{display:none;}
   </style>
 </head>
 <body>
-  <video id="bg" src="Untitled design.mp4" playsinline autoplay muted loop preload="auto"></video>
-  <div class="fallback" id="fallback">
-    <button id="enterBtn">Play fullscreen</button>
-  </div>
+  <video id="v" src="Untitled design.mp4" autoplay playsinline loop preload="auto"></video>
   <script>
-    const video=document.getElementById('bg');
-    const fallback=document.getElementById('fallback');
-    const enterBtn=document.getElementById('enterBtn');
+    const v=document.getElementById('v');
 
-    async function startFullscreenPlayback(){
-      try{
-        await video.play();
+    window.addEventListener('keydown',async e=>{
+      if(e.key.toLowerCase()==='f'){
         const d=document.documentElement;
-        if(d.requestFullscreen) await d.requestFullscreen();
-        else if(d.webkitRequestFullscreen) await d.webkitRequestFullscreen();
-        else if(d.msRequestFullscreen) await d.msRequestFullscreen();
-        fallback.classList.add('hidden');
-      }catch(e){
-        fallback.classList.remove('hidden');
+        if(!document.fullscreenElement){
+          if(d.requestFullscreen) await d.requestFullscreen();
+          else if(d.webkitRequestFullscreen) await d.webkitRequestFullscreen();
+          else if(d.msRequestFullscreen) await d.msRequestFullscreen();
+        }
       }
-    }
-
-    if(document.readyState==="complete"||document.readyState==="interactive") startFullscreenPlayback();
-    else window.addEventListener('DOMContentLoaded',startFullscreenPlayback);
-
-    enterBtn.addEventListener('click',async()=>{
-      try{
-        await video.play();
-        const d=document.documentElement;
-        if(d.requestFullscreen) await d.requestFullscreen();
-        else if(d.webkitRequestFullscreen) await d.webkitRequestFullscreen();
-        else if(d.msRequestFullscreen) await d.msRequestFullscreen();
-        fallback.classList.add('hidden');
-      }catch(e){}
     });
 
-    document.addEventListener('fullscreenchange',()=>{
-      if(!document.fullscreenElement) fallback.classList.remove('hidden');
-    });
+    v.muted=false;
+    v.volume=1.0;
+    v.play();
   </script>
 </body>
 </html>
