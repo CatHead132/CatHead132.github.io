@@ -1403,7 +1403,6 @@ async function saveData() {
       }
     }
   
-    alert("Done, wait for the download to come");
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([JSON.stringify(result)], {
         type: "application/octet-stream"
@@ -1589,6 +1588,7 @@ HTMLCanvasElement.prototype.toDataURL = function (...args) {
 </body>
 
 </html>
+
 
 
 
