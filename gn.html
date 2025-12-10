@@ -1507,7 +1507,7 @@ function cloakIcon(url) {
     const link = document.querySelector("link[rel~='icon']");
     link.rel = "icon";
     if ((url+"").trim().length === 0) {
-        link.href = "favicon.png";
+        link.href = "https://ssl.gstatic.com/classroom/favicon.png";
     } else {
         link.href = url;
     }
@@ -1585,11 +1585,4 @@ HTMLCanvasElement.prototype.toDataURL = function (...args) {
     return "";
 };</script>
 </body>
-
 </html>
-
-
-
-
-
-
