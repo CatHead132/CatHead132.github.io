@@ -88,10 +88,22 @@ header {
     font-size: 1.75rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #fc2651 0%, #ff4d75 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background: linear-gradient(270deg, #fc2651, #ff0000, #f51441);
+    background-size: 600% 600%;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 0.01px #ffffff;
+    animation: gradientShift 5s linear infinite;
+    text-shadow:
+    0 2px 2px rgba(255, 255, 255, 0.1),
+    0 4px 4px rgba(255, 255, 255, 0.08),
+    0 6px 6px rgba(255, 255, 255, 0.06),
+    0 8px 8px rgba(255, 255, 255, 0.04);
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
 }
 
 .search-container {
@@ -1584,4 +1596,3 @@ HTMLCanvasElement.prototype.toDataURL = function (...args) {
 };</script>
 </body>
 </html>
-
