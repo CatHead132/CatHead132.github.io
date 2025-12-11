@@ -13,6 +13,7 @@
     <meta property="og:type" content="website">
     <style>
         :root {
+    --grid-columns: 8;
     --primary: #fc2651;
     --primary-hover: #ff4d75;
     --primary-light: rgba(252, 38, 81, 0.15);
@@ -88,12 +89,12 @@ header {
     font-size: 1.75rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    background: linear-gradient(270deg, #fc2651, #ff0000, #f51441);
+    background: linear-gradient(270deg, #fc2651, #ffffff, #f51441);
     background-size: 600% 600%;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     -webkit-text-stroke: 0.01px #ffffff;
-    animation: gradientShift 5s linear infinite;
+    animation: gradientShift 6s linear infinite;
     text-shadow:
     0 2px 2px rgba(255, 255, 255, 0.1),
     0 4px 4px rgba(255, 255, 255, 0.08),
@@ -105,6 +106,7 @@ header {
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }
 }
+
 
 .search-container {
     display: flex;
@@ -215,7 +217,7 @@ main {
 #featuredZones,
 #favoritesContainer {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(var(--grid-columns), 1fr);
     gap: 1.5rem;
 }
 
@@ -702,7 +704,6 @@ footer {
 }
 
 .favorites-has-content {
-    border-left: 4px solid var(--primary);
     background: var(--primary-lighter);
 }
 
@@ -868,6 +869,10 @@ async function listZones() {
         const response = await fetch(zonesURL+"?t="+Date.now());
         const json = await response.json();
         zones = json;
+
+        const blockedGameIds = [-1, 596, 253, 76, 75];
+        zones = zones.filter(zone => !blockedGameIds.includes(zone.id));
+
         zones[0].featured = true;
         await fetchPopularity();
         sortZones();
@@ -897,7 +902,7 @@ async function listZones() {
                             popup.style.boxShadow = "0px 0px 10px rgba(0,0,0,0.1)";
                             popup.style.fontFamily = "Arial, sans-serif";
                             
-                            popup.innerHTML = `Play more games at <a href="https://gn-math.github.io" target="_blank" style="color:#004085; font-weight:bold;">https://gn-math.github.io</a>!`;
+                            popup.innerHTML = `Play more games at Turkish Playground!`;
                             
                             const closeBtn = document.createElement("button");
                             closeBtn.innerText = "✖";
@@ -1043,6 +1048,16 @@ function displayFeaturedZones(featuredZones) {
     });
 }
 
+function setGridColumns(columns) {
+    document.documentElement.style.setProperty('--grid-columns', columns);
+    localStorage.setItem('turkishPlaygroundGridColumns', columns);
+}
+
+const savedGridColumns = localStorage.getItem('turkishPlaygroundGridColumns');
+if (savedGridColumns) {
+    setGridColumns(savedGridColumns);
+}
+
 function displayZones(zones) {
     container.innerHTML = "";
     zones.forEach((file, index) => {
@@ -1133,6 +1148,7 @@ function displayFavorites() {
     if (!favoritesContainer) return;
     
     const favoriteZones = zones.filter(zone => favorites.includes(zone.id));
+    const hasActiveSearch = searchBar.value.toLowerCase().length > 0;
     
     if (favoriteZones.length === 0) {
         favoritesContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No favorites yet. Click the star icon on any zone to add it here!</p>';
@@ -1174,7 +1190,9 @@ function displayFavorites() {
         document.getElementById('favoritesSummary').innerHTML = `Favorites <span class="favorites-count">${favoriteZones.length}</span>`;
         
         favoritesWrapper.classList.add('favorites-has-content');
-        favoritesWrapper.setAttribute('open', 'open');
+        if (!hasActiveSearch) {
+            favoritesWrapper.setAttribute('open', 'open');
+        }
         
         const lazyImages = favoritesContainer.querySelectorAll('img.lazy-zone-img');
         const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -1205,6 +1223,7 @@ function filterZones2() {
         const filteredZones = zones.filter(zone => zone.special?.includes(query));
         if (query.length !== 0) {
             document.getElementById("featuredZonesWrapper").removeAttribute("open");
+            document.getElementById("favoritesWrapper").removeAttribute("open");
         }
         displayZones(filteredZones);
     }
@@ -1242,6 +1261,7 @@ function openZone(file) {
                 document.getElementById('zoneAuthor').href = file.authorLink;
             }
             zoneViewer.style.display = "block";
+            startPlaytimeTracking();
             const url = new URL(window.location);
             url.searchParams.set('id', file.id);
             history.pushState(null, '', url.toString());
@@ -1263,6 +1283,7 @@ function aboutBlank() {
 }
 
 function closeZone() {
+    stopPlaytimeTracking(); 
     zoneViewer.hidden = false;
     zoneViewer.style.display = "none";
     zoneViewer.removeChild(zoneFrame);
@@ -1548,10 +1569,54 @@ function tabCloak() {
 }
 
 const settings = document.getElementById('settings');
+
+let playStartTime = null;
+let totalPlaytime = parseInt(localStorage.getItem('turkishPlaygroundPlaytime') || '0');
+
+function startPlaytimeTracking() {
+    playStartTime = Date.now();
+}
+
+function stopPlaytimeTracking() {
+    if (playStartTime) {
+        const sessionTime = Math.floor((Date.now() - playStartTime) / 1000);
+        totalPlaytime += sessionTime;
+        localStorage.setItem('turkishPlaygroundPlaytime', totalPlaytime);
+        playStartTime = null;
+    }
+}
+
+function formatPlaytime(seconds) {
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${days}d:${hours}h:${minutes}m:${secs}s`;
+}
+
 settings.addEventListener('click', () => {
     document.getElementById('popupTitle').textContent = "Settings";
     const popupBody = document.getElementById('popupBody');
+    const currentColumns = localStorage.getItem('turkishPlaygroundGridColumns') || '8';
+    const playtimeDisplay = formatPlaytime(totalPlaytime);
+    
     popupBody.innerHTML = `
+    <div style="background: var(--primary-lighter); border: 1px solid var(--primary); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
+        <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 0.5rem;">Total Playtime</div>
+        <div style="font-size: 24px; font-weight: bold; color: var(--primary); font-family: 'Courier New', monospace;">${playtimeDisplay}</div>
+    </div>
+    
+    <label for="grid-columns" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Grid Columns:</label>
+    <select id="grid-columns" onchange="setGridColumns(this.value)" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--text); font-size: 15px; margin-bottom: 1.5rem;">
+        <option value="4" ${currentColumns === '4' ? 'selected' : ''}>4 Columns</option>
+        <option value="5" ${currentColumns === '5' ? 'selected' : ''}>5 Columns</option>
+        <option value="6" ${currentColumns === '6' ? 'selected' : ''}>6 Columns</option>
+        <option value="7" ${currentColumns === '7' ? 'selected' : ''}>7 Columns</option>
+        <option value="8" ${currentColumns === '8' ? 'selected' : ''}>8 Columns (Default)</option>
+        <option value="9" ${currentColumns === '9' ? 'selected' : ''}>9 Columns</option>
+        <option value="10" ${currentColumns === '10' ? 'selected' : ''}>10 Columns</option>
+    </select>
+    
     <button class="settings-button" onclick="tabCloak()">Tab Cloak</button>
     <br><br>
     <button class="settings-button" onclick="clearFavorites()">Clear All Favorites</button>
@@ -1566,7 +1631,7 @@ function closePopup() {
 }
 listZones();
 
-const schoolList = ["deledao", "goguardian", "lightspeed", "linewize", "securly", ".edu/"];
+const schoolList = ["deledao", "goguardian", "lightspeed", "linewize", "securly"];
 
 function isBlockedDomain(url) {
     const domain = new URL(url, location.origin).hostname + "/";
@@ -1593,6 +1658,9 @@ XMLHttpRequest.prototype.open = function (method, url) {
 
 HTMLCanvasElement.prototype.toDataURL = function (...args) {
     return "";
-};</script>
+};
+
+window.addEventListener('beforeunload', stopPlaytimeTracking);
+</script>
 </body>
 </html>
