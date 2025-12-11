@@ -1227,7 +1227,6 @@ function filterZones2() {
         }
         displayZones(filteredZones);
     }
-    displayFavorites();
 }
 
 function filterZones() {
@@ -1235,9 +1234,9 @@ function filterZones() {
     const filteredZones = zones.filter(zone => zone.name.toLowerCase().includes(query));
     if (query.length !== 0) {
         document.getElementById("featuredZonesWrapper").removeAttribute("open");
+        document.getElementById("favoritesWrapper").removeAttribute("open");
     }
     displayZones(filteredZones);
-    displayFavorites();
 }
 
 function openZone(file) {
@@ -1664,3 +1663,4 @@ window.addEventListener('beforeunload', stopPlaytimeTracking);
 </script>
 </body>
 </html>
+
