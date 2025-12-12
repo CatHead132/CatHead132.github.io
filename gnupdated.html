@@ -272,9 +272,9 @@ main {
     background: transparent;
     color: var(--text);
     border: 0;
-    padding: 1.25rem 1rem;
+    padding: 0.75rem 0.5rem;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 525;
     font-size: 14px;
     line-height: 1.4;
     text-align: center;
@@ -285,6 +285,20 @@ main {
     justify-content: center;
     position: relative;
     z-index: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    line-height: 1.3;
+    flex-grow: 1;
+    min-height: 60px;
+    max-height: 80px;
+}
+
+.zone-item img {
+    flex-shrink: 0;
 }
 
 .zone-item:hover button {
@@ -839,6 +853,58 @@ function toTitleCase(str) {
     text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
   );
 }
+
+function updateClassTimer() {
+    const now = new Date();
+    const day = now.getDay();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const currentTime = hours * 60 + minutes;
+    
+    if (day === 0 || day === 6) {
+        return { period: 'Weekend', remaining: 'No school today' };
+    }
+    
+    const schedule = [
+        { name: '1st Period', start: 7*60+50, end: 8*60+42 },
+        { name: '2nd Period', start: 8*60+47, end: 9*60+36 },
+        { name: '3rd Period', start: 9*60+41, end: 10*60+30 },
+        { name: '4th Period', start: 10*60+35, end: 11*60+24 },
+        { name: 'Lunch A/Class A', start: 11*60+29, end: 11*60+56 },
+        { name: 'Lunch B/Class B', start: 12*60+1, end: 12*60+28 },
+        { name: '5th Period', start: 12*60+33, end: 13*60+22 },
+        { name: '6th Period', start: 13*60+27, end: 14*60+16 },
+        { name: '7th Period', start: 14*60+21, end: 15*60+12 }
+    ];
+    
+    for (let period of schedule) {
+        if (currentTime >= period.start && currentTime < period.end) {
+            const remaining = period.end - currentTime;
+            const mins = Math.floor(remaining);
+            const secs = Math.floor((remaining % 1) * 60);
+            return { 
+                period: period.name, 
+                remaining: `${mins}:${secs.toString().padStart(2, '0')}` 
+            };
+        }
+    }
+    
+    if (currentTime < 7*60+50) {
+        return { period: 'Before School', remaining: 'School starts at 7:50 AM' };
+    }
+    
+    return { period: 'After School', remaining: 'School day ended' };
+}
+
+setInterval(() => {
+    const timerDiv = document.getElementById('class-timer');
+    if (timerDiv && timerDiv.offsetParent !== null) {
+        const { period, remaining } = updateClassTimer();
+        document.getElementById('current-period').textContent = period;
+        document.getElementById('time-remaining').textContent = remaining;
+    }
+}, 500);
+
 async function listZones() {
     try {
       let sharesponse;
@@ -1599,10 +1665,16 @@ settings.addEventListener('click', () => {
     const currentColumns = localStorage.getItem('turkishPlaygroundGridColumns') || '8';
     const playtimeDisplay = formatPlaytime(totalPlaytime);
     
-    popupBody.innerHTML = `
+popupBody.innerHTML = `
     <div style="background: var(--primary-lighter); border: 1px solid var(--primary); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
         <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 0.5rem;">Total Playtime</div>
         <div style="font-size: 24px; font-weight: bold; color: var(--primary); font-family: 'Courier New', monospace;">${playtimeDisplay}</div>
+    </div>
+    
+    <div id="class-timer" style="background: var(--accent-light); border: 1px solid var(--accent); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
+        <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 0.5rem;">Current Period</div>
+        <div id="current-period" style="font-size: 18px; font-weight: bold; color: var(--accent); margin-bottom: 0.5rem;">Calculating...</div>
+        <div id="time-remaining" style="font-size: 24px; font-weight: bold; color: var(--accent); font-family: 'Courier New', monospace;">--:--</div>
     </div>
     
     <label for="grid-columns" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Grid Columns:</label>
