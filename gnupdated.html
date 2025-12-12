@@ -859,40 +859,41 @@ function updateClassTimer() {
     const day = now.getDay();
     const hours = now.getHours();
     const minutes = now.getMinutes();
-    const currentTime = hours * 60 + minutes;
-    
+    const seconds = now.getSeconds();
+    const currentTime = hours * 3600 + minutes * 60 + seconds;
+
     if (day === 0 || day === 6) {
         return { period: 'Weekend', remaining: 'No school today' };
     }
-    
+
     const schedule = [
-        { name: '1st Period', start: 7*60+50, end: 8*60+42 },
-        { name: '2nd Period', start: 8*60+47, end: 9*60+36 },
-        { name: '3rd Period', start: 9*60+41, end: 10*60+30 },
-        { name: '4th Period', start: 10*60+35, end: 11*60+24 },
-        { name: 'Lunch A/Class A', start: 11*60+29, end: 11*60+56 },
-        { name: 'Lunch B/Class B', start: 12*60+1, end: 12*60+28 },
-        { name: '5th Period', start: 12*60+33, end: 13*60+22 },
-        { name: '6th Period', start: 13*60+27, end: 14*60+16 },
-        { name: '7th Period', start: 14*60+21, end: 15*60+12 }
+        { name: '1st Period', start: 7*3600+50*60, end: 8*3600+42*60 },
+        { name: '2nd Period', start: 8*3600+47*60, end: 9*3600+36*60 },
+        { name: '3rd Period', start: 9*3600+41*60, end: 10*3600+30*60 },
+        { name: '4th Period', start: 10*3600+35*60, end: 11*3600+24*60 },
+        { name: 'Lunch A/Class A', start: 11*3600+29*60, end: 11*3600+56*60 },
+        { name: 'Lunch B/Class B', start: 12*3600+1*60, end: 12*3600+28*60 },
+        { name: '5th Period', start: 12*3600+33*60, end: 13*3600+22*60 },
+        { name: '6th Period', start: 13*3600+27*60, end: 14*3600+16*60 },
+        { name: '7th Period', start: 14*3600+21*60, end: 15*3600+12*60 }
     ];
-    
-    for (let period of schedule) {
-        if (currentTime >= period.start && currentTime < period.end) {
-            const remaining = period.end - currentTime;
-            const mins = Math.floor(remaining);
-            const secs = Math.floor((remaining % 1) * 60);
+
+    for (let p of schedule) {
+        if (currentTime >= p.start && currentTime < p.end) {
+            const remaining = p.end - currentTime;
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
             return { 
-                period: period.name, 
-                remaining: `${mins}:${secs.toString().padStart(2, '0')}` 
+                period: p.name,
+                remaining: `${mins}:${secs.toString().padStart(2, '0')}`
             };
         }
     }
-    
-    if (currentTime < 7*60+50) {
+
+    if (currentTime < 7*3600+50*60) {
         return { period: 'Before School', remaining: 'School starts at 7:50 AM' };
     }
-    
+
     return { period: 'After School', remaining: 'School day ended' };
 }
 
