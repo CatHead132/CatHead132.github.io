@@ -878,18 +878,35 @@ function updateClassTimer() {
         { name: '7th Period', start: 14*3600+21*60, end: 15*3600+12*60 }
     ];
 
-    for (let p of schedule) {
-        if (currentTime >= p.start && currentTime < p.end) {
-            const remaining = p.end - currentTime;
-            const mins = Math.floor(remaining / 60);
-            const secs = remaining % 60;
-            return { 
-                period: p.name,
-                remaining: `${mins}:${secs.toString().padStart(2, '0')}`
-            };
+for (let i = 0; i < schedule.length; i++) {
+    const p = schedule[i];
+    if (currentTime >= p.start && currentTime < p.end) {
+        const remaining = p.end - currentTime;
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+
+        if (remaining === 60) {
+            alert('1 minute left in ' + p.name + '!');
+        }   
+        return { 
+            period: p.name,
+            remaining: `${mins}:${secs.toString().padStart(2, '0')}`
+        };
+    }
+    
+        if (i < schedule.length - 1) {
+            const nextPeriod = schedule[i + 1];
+            if (currentTime >= p.end && currentTime < nextPeriod.start) {
+                const remaining = nextPeriod.start - currentTime;
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                return {
+                    period: 'Passing Period',
+                    remaining: `${mins}:${secs.toString().padStart(2, '0')}`
+                };
+            }
         }
     }
-
     if (currentTime < 7*3600+50*60) {
         return { period: 'Before School', remaining: 'School starts at 7:50 AM' };
     }
