@@ -1336,7 +1336,31 @@ function filterZones() {
 }
 
 function openZone(file) {
-    if (file.url.startsWith("http")) {
+    if (file.id === 27 || file.url.includes("gitlab.com")) {
+        const url = file.url;
+        fetch(url+"?t="+Date.now()).then(response => response.text()).then(html => {
+            if (zoneFrame.contentDocument === null) {
+                zoneFrame = document.createElement("iframe");
+                zoneFrame.id = "zoneFrame";
+                zoneViewer.appendChild(zoneFrame);
+            }
+            zoneFrame.contentDocument.open();
+            zoneFrame.contentDocument.write(html);
+            zoneFrame.contentDocument.close();
+            document.getElementById('zoneName').textContent = file.name;
+            document.getElementById('zoneId').textContent = file.id;
+            document.getElementById('zoneAuthor').textContent = "by " + file.author;
+            if (file.authorLink) {
+                document.getElementById('zoneAuthor').href = file.authorLink;
+            }
+            zoneViewer.style.display = "block";
+            startPlaytimeTracking();
+            const url = new URL(window.location);
+            url.searchParams.set('id', file.id);
+            history.pushState(null, '', url.toString());
+            zoneViewer.hidden = true;
+        }).catch(error => alert("Failed to load zone: " + error));
+    } else if (file.url.startsWith("http")) {
         window.open(file.url, "_blank");
     } else {
         const url = file.url.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
