@@ -826,21 +826,56 @@ footer {
         </div>
     </footer>
     <script>
-        (function(){
-        if(!/e=true/.test(location.href))return;
-        var d=document,w=d.write.bind(d);
-        w('<script src=//cdn.jsdelivr.net/npm/eruda></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-monitor></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-features></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-timing></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-code></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-benchmark></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-geolocation></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-orientation></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-touches></scr'+'ipt>');
-        w('<script src=//cdn.jsdelivr.net/npm/eruda-vue></scr'+'ipt>');
-        w('<script>eruda.init();eruda.add(erudaMonitor);eruda.add(erudaFeatures);eruda.add(erudaTiming);eruda.add(erudaCode);eruda.add(erudaBenchmark);eruda.add(erudaGeolocation);eruda.add(erudaOrientation);eruda.add(erudaTouches);eruda.add(erudaVue);</scr'+'ipt>');
-        })();
+(function(){
+    if(!/[?&]e=true/.test(location.href)) return;
+    
+    const scripts = [
+        '//cdn.jsdelivr.net/npm/eruda',
+        '//cdn.jsdelivr.net/npm/eruda-monitor',
+        '//cdn.jsdelivr.net/npm/eruda-features',
+        '//cdn.jsdelivr.net/npm/eruda-timing',
+        '//cdn.jsdelivr.net/npm/eruda-code',
+        '//cdn.jsdelivr.net/npm/eruda-benchmark',
+        '//cdn.jsdelivr.net/npm/eruda-geolocation',
+        '//cdn.jsdelivr.net/npm/eruda-orientation',
+        '//cdn.jsdelivr.net/npm/eruda-touches',
+        '//cdn.jsdelivr.net/npm/eruda-vue'
+    ];
+    
+    let index = 0;
+    function loadNext() {
+        if (index >= scripts.length) {
+            if (window.eruda) {
+                eruda.init();
+                if (window.erudaMonitor) eruda.add(erudaMonitor);
+                if (window.erudaFeatures) eruda.add(erudaFeatures);
+                if (window.erudaTiming) eruda.add(erudaTiming);
+                if (window.erudaCode) eruda.add(erudaCode);
+                if (window.erudaBenchmark) eruda.add(erudaBenchmark);
+                if (window.erudaGeolocation) eruda.add(erudaGeolocation);
+                if (window.erudaOrientation) eruda.add(erudaOrientation);
+                if (window.erudaTouches) eruda.add(erudaTouches);
+                if (window.erudaVue) eruda.add(erudaVue);
+            }
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = scripts[index];
+        script.onload = () => {
+            index++;
+            loadNext();
+        };
+        script.onerror = () => {
+            console.warn('Failed to load:', scripts[index]);
+            index++;
+            loadNext();
+        };
+        document.head.appendChild(script);
+    }
+    
+    loadNext();
+    })();
     </script>
     <script>const container = document.getElementById('container');
 const zoneViewer = document.getElementById('zoneViewer');
