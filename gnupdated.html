@@ -1157,7 +1157,7 @@ function displayFeaturedZones(featuredZones) {
         const img = document.createElement("img");
         img.dataset.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
         img.alt = file.name;
-        img.loading = "lazy";
+        img.loading = "auto";
         img.className = "lazy-zone-img";
         zoneItem.appendChild(img);
         
@@ -1223,7 +1223,7 @@ function displayZones(zones) {
         const img = document.createElement("img");
         img.dataset.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
         img.alt = file.name;
-        img.loading = "lazy";
+        img.loading = "auto";
         img.className = "lazy-zone-img";
         zoneItem.appendChild(img);
         
@@ -1320,7 +1320,7 @@ function displayFavorites() {
             const img = document.createElement("img");
             img.dataset.src = zone.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
             img.alt = zone.name;
-            img.loading = "lazy";
+            img.loading = "auto";
             img.className = "lazy-zone-img";
             zoneItem.appendChild(img);
             
