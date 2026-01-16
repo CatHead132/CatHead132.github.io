@@ -1483,12 +1483,19 @@ function downloadZone() {
 function fullscreenZone() {
     if (zoneFrame.requestFullscreen) {
         zoneFrame.requestFullscreen();
+        // Source - https://stackoverflow.com/a/65413565
+        // Posted by Michiel Dral, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-01-16, License - CC BY-SA 4.0
+        navigator.keyboard.lock(["Escape"]);
     } else if (zoneFrame.mozRequestFullScreen) {
         zoneFrame.mozRequestFullScreen();
+        navigator.keyboard.lock(["Escape"]);
     } else if (zoneFrame.webkitRequestFullscreen) {
         zoneFrame.webkitRequestFullscreen();
+        navigator.keyboard.lock(["Escape"]);
     } else if (zoneFrame.msRequestFullscreen) {
         zoneFrame.msRequestFullscreen();
+        navigator.keyboard.lock(["Escape"]);
     }
 }
 
