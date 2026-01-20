@@ -7,11 +7,25 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 20px auto;
+      margin: 0;
       padding: 20px;
       background: #1a1a1a;
       color: #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      margin: 0 0 20px 0;
     }
     .controls {
       margin-bottom: 20px;
@@ -19,6 +33,7 @@
       gap: 10px;
       flex-wrap: wrap;
       align-items: center;
+      justify-content: center;
     }
     .controls input, .controls button {
       padding: 8px;
@@ -33,19 +48,32 @@
     .controls button:hover {
       background: #3a3a3a;
     }
+    .canvas-wrapper {
+      width: 90vw;
+      max-width: 1200px;
+      height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #444;
+      background: #2a2a2a;
+      box-sizing: border-box;
+    }
     #canvas {
       display: grid;
       gap: 0;
-      background: #2a2a2a;
-      border: 2px solid #444;
       width: fit-content;
-      margin-bottom: 20px;
+      height: fit-content;
     }
     .pixel {
-      width: 30px;
-      height: 30px;
       background: white;
       cursor: pointer;
+      box-sizing: border-box;
+    }
+    .pixel.lines {
+      border: 1px solid #333;
+    }
+    .pixel.no-lines {
       border: none;
     }
     #colorPicker {
@@ -55,6 +83,11 @@
       border: 2px solid #444;
       background: #2a2a2a;
     }
+    .link-section {
+      margin-top: 20px;
+      width: 90%;
+      max-width: 1000px;
+    }
     #link {
       width: 100%;
       padding: 10px;
@@ -63,25 +96,33 @@
       background: #2a2a2a;
       color: #e0e0e0;
       border: 1px solid #444;
+      box-sizing: border-box;
     }
   </style>
 </head>
 <body>
-  <h1>Pixel Art Drawer</h1>
-  
-  <div class="controls">
-    <label>Width: <input type="number" id="width" value="8" min="1" max="50"></label>
-    <label>Height: <input type="number" id="height" value="8" min="1" max="50"></label>
-    <button onclick="createCanvas()">Create Canvas</button>
-    <button onclick="clearCanvas()">Clear</button>
-    <button onclick="fillAll()">Fill All</button>
-    <label>Color: <input type="color" id="colorPicker" value="#000000"></label>
-  </div>
+  <div class="container">
+    <h1>Pixel Art Drawer</h1>
 
-  <div id="canvas"></div>
-  
-  <h3>Your Link:</h3>
-  <input type="text" id="link" readonly onclick="this.select()">
+    <div class="controls">
+      <label>Width: <input type="number" id="width" value="8" min="1" max="40"></label>
+      <label>Height: <input type="number" id="height" value="8" min="1" max="40"></label>
+      <button onclick="createCanvas()">Create Canvas</button>
+      <button onclick="clearCanvas()">Clear</button>
+      <button onclick="fillAll()">Fill All</button>
+      <button onclick="toggleLines()">Toggle Lines</button>
+      <label>Color: <input type="color" id="colorPicker" value="#000000"></label>
+    </div>
+
+    <div class="canvas-wrapper">
+      <div id="canvas"></div>
+    </div>
+
+    <div class="link-section">
+      <h3>Your Link:</h3>
+      <input type="text" id="link" readonly onclick="this.select()">
+    </div>
+  </div>
 
   <script>
     let currentColor = '#000000';
@@ -89,9 +130,10 @@
     const colorToNum = {};
     const numToColor = {};
     let nextColorNum = 1;
+    let showLines = true;
 
     function getColorNum(hexColor) {
-      if (hexColor === 'transparent' || hexColor === '') return '0';
+      if (hexColor === 'transparent' || hexColor === '' || hexColor === '#ffffff') return '0';
       if (!colorToNum[hexColor]) {
         colorToNum[hexColor] = String(nextColorNum);
         numToColor[String(nextColorNum)] = hexColor;
@@ -100,40 +142,62 @@
       return colorToNum[hexColor];
     }
 
+    function calculatePixelSize() {
+      const width = Math.min(parseInt(document.getElementById('width').value), 50);
+      const height = Math.min(parseInt(document.getElementById('height').value), 50);
+      const wrapper = document.querySelector('.canvas-wrapper');
+      const wrapperWidth = wrapper.clientWidth - 40;
+      const wrapperHeight = wrapper.clientHeight - 40;
+
+      const maxPixelWidth = Math.floor(wrapperWidth / width);
+      const maxPixelHeight = Math.floor(wrapperHeight / height);
+
+      const size = Math.min(maxPixelWidth, maxPixelHeight);
+
+      return Math.max(size, 3);
+    }
+
     function createCanvas() {
-      const width = parseInt(document.getElementById('width').value);
-      const height = parseInt(document.getElementById('height').value);
+      const width = Math.min(parseInt(document.getElementById('width').value), 50);
+      const height = Math.min(parseInt(document.getElementById('height').value), 50);
       const canvas = document.getElementById('canvas');
-      
+
+      document.getElementById('width').value = width;
+      document.getElementById('height').value = height;
+
+      const pixelSize = calculatePixelSize();
+
       canvas.innerHTML = '';
-      canvas.style.gridTemplateColumns = `repeat(${width}, 30px)`;
-      
+      canvas.style.gridTemplateColumns = `repeat(${width}, ${pixelSize}px)`;
+
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           const pixel = document.createElement('div');
-          pixel.className = 'pixel';
+          pixel.className = showLines ? 'pixel lines' : 'pixel no-lines';
+          pixel.style.width = pixelSize + 'px';
+          pixel.style.height = pixelSize + 'px';
           pixel.dataset.color = '0';
           pixel.dataset.x = x;
           pixel.dataset.y = y;
-          
+
           pixel.addEventListener('mousedown', (e) => {
             e.preventDefault();
             isDrawing = true;
             paintPixel(pixel);
           });
-          
+
           pixel.addEventListener('mouseenter', () => {
             if (isDrawing) paintPixel(pixel);
           });
-          
+
           pixel.addEventListener('dragstart', (e) => {
             e.preventDefault();
           });
-          
+
           canvas.appendChild(pixel);
         }
       }
-      
+
       updateLink();
     }
 
@@ -157,7 +221,7 @@
     function clearCanvas() {
       document.querySelectorAll('.pixel').forEach(pixel => {
         pixel.dataset.color = '0';
-        pixel.style.background = 'transparent';
+        pixel.style.background = '#ffffff';
       });
       updateLink();
     }
@@ -173,11 +237,18 @@
       updateLink();
     }
 
+    function toggleLines() {
+      showLines = !showLines;
+      document.querySelectorAll('.pixel').forEach(pixel => {
+        pixel.className = showLines ? 'pixel lines' : 'pixel no-lines';
+      });
+    }
+
     function updateLink() {
       const width = parseInt(document.getElementById('width').value);
       const height = parseInt(document.getElementById('height').value);
       const pixels = document.querySelectorAll('.pixel');
-      
+
       let rows = [];
       for (let y = 0; y < height; y++) {
         let row = '';
@@ -187,18 +258,22 @@
         }
         rows.push(row);
       }
-      
+
       const imgData = rows.join('|');
-      
+
       let colorPairs = [];
       for (const [hex, num] of Object.entries(colorToNum)) {
         const hexClean = hex.replace('#', '');
         colorPairs.push(`${num}:${hexClean}`);
       }
-      
+
       const colorParam = colorPairs.length > 0 ? `&colors=${colorPairs.join(',')}` : '';
       document.getElementById('link').value = `https://pixels.cathead1323.workers.dev/draw.png?img=${imgData}${colorParam}`;
     }
+
+    window.addEventListener('resize', () => {
+      createCanvas();
+    });
 
     createCanvas();
   </script>
