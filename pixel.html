@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Art Drawer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+    .controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .controls input, .controls button {
+      padding: 8px;
+      font-size: 14px;
+      background: #2a2a2a;
+      color: #e0e0e0;
+      border: 1px solid #444;
+    }
+    .controls button {
+      cursor: pointer;
+    }
+    .controls button:hover {
+      background: #3a3a3a;
+    }
+    #canvas {
+      display: grid;
+      gap: 0;
+      background: #2a2a2a;
+      border: 2px solid #444;
+      width: fit-content;
+      margin-bottom: 20px;
+    }
+    .pixel {
+      width: 30px;
+      height: 30px;
+      background: white;
+      cursor: pointer;
+      border: none;
+    }
+    #colorPicker {
+      width: 60px;
+      height: 40px;
+      cursor: pointer;
+      border: 2px solid #444;
+      background: #2a2a2a;
+    }
+    #link {
+      width: 100%;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 12px;
+      background: #2a2a2a;
+      color: #e0e0e0;
+      border: 1px solid #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pixel Art Drawer</h1>
+  
+  <div class="controls">
+    <label>Width: <input type="number" id="width" value="8" min="1" max="50"></label>
+    <label>Height: <input type="number" id="height" value="8" min="1" max="50"></label>
+    <button onclick="createCanvas()">Create Canvas</button>
+    <button onclick="clearCanvas()">Clear</button>
+    <button onclick="fillAll()">Fill All</button>
+    <label>Color: <input type="color" id="colorPicker" value="#000000"></label>
+  </div>
+
+  <div id="canvas"></div>
+  
+  <h3>Your Link:</h3>
+  <input type="text" id="link" readonly onclick="this.select()">
+
+  <script>
+    let currentColor = '#000000';
+    let isDrawing = false;
+    const colorToNum = {};
+    const numToColor = {};
+    let nextColorNum = 1;
+
+    function getColorNum(hexColor) {
+      if (hexColor === 'transparent' || hexColor === '') return '0';
+      if (!colorToNum[hexColor]) {
+        colorToNum[hexColor] = String(nextColorNum);
+        numToColor[String(nextColorNum)] = hexColor;
+        nextColorNum++;
+      }
+      return colorToNum[hexColor];
+    }
+
+    function createCanvas() {
+      const width = parseInt(document.getElementById('width').value);
+      const height = parseInt(document.getElementById('height').value);
+      const canvas = document.getElementById('canvas');
+      
+      canvas.innerHTML = '';
+      canvas.style.gridTemplateColumns = `repeat(${width}, 30px)`;
+      
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const pixel = document.createElement('div');
+          pixel.className = 'pixel';
+          pixel.dataset.color = '0';
+          pixel.dataset.x = x;
+          pixel.dataset.y = y;
+          
+          pixel.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            paintPixel(pixel);
+          });
+          
+          pixel.addEventListener('mouseenter', () => {
+            if (isDrawing) paintPixel(pixel);
+          });
+          
+          pixel.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+          });
+          
+          canvas.appendChild(pixel);
+        }
+      }
+      
+      updateLink();
+    }
+
+    document.addEventListener('mouseup', () => {
+      isDrawing = false;
+    });
+
+    document.addEventListener('mouseleave', () => {
+      isDrawing = false;
+    });
+
+    function paintPixel(pixel) {
+      const pickedColor = document.getElementById('colorPicker').value;
+      currentColor = pickedColor;
+      const colorNum = getColorNum(currentColor);
+      pixel.dataset.color = colorNum;
+      pixel.style.background = currentColor;
+      updateLink();
+    }
+
+    function clearCanvas() {
+      document.querySelectorAll('.pixel').forEach(pixel => {
+        pixel.dataset.color = '0';
+        pixel.style.background = 'transparent';
+      });
+      updateLink();
+    }
+
+    function fillAll() {
+      const pickedColor = document.getElementById('colorPicker').value;
+      currentColor = pickedColor;
+      const colorNum = getColorNum(currentColor);
+      document.querySelectorAll('.pixel').forEach(pixel => {
+        pixel.dataset.color = colorNum;
+        pixel.style.background = currentColor;
+      });
+      updateLink();
+    }
+
+    function updateLink() {
+      const width = parseInt(document.getElementById('width').value);
+      const height = parseInt(document.getElementById('height').value);
+      const pixels = document.querySelectorAll('.pixel');
+      
+      let rows = [];
+      for (let y = 0; y < height; y++) {
+        let row = '';
+        for (let x = 0; x < width; x++) {
+          const pixel = pixels[y * width + x];
+          row += pixel.dataset.color;
+        }
+        rows.push(row);
+      }
+      
+      const imgData = rows.join('|');
+      
+      let colorPairs = [];
+      for (const [hex, num] of Object.entries(colorToNum)) {
+        const hexClean = hex.replace('#', '');
+        colorPairs.push(`${num}:${hexClean}`);
+      }
+      
+      const colorParam = colorPairs.length > 0 ? `&colors=${colorPairs.join(',')}` : '';
+      document.getElementById('link').value = `https://pixels.cathead1323.workers.dev/draw.png?img=${imgData}${colorParam}`;
+    }
+
+    createCanvas();
+  </script>
+</body>
+</html>
