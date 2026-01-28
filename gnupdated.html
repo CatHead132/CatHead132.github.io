@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <base href="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/">
+        <base href="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/"> // me stole
     <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png">
     <link rel="apple-touch-icon" href="https://ssl.gstatic.com/classroom/favicon.png">
-    <script src="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/gnmath.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
@@ -776,13 +775,13 @@ footer {
             <div id="favoritesContainer" class="zone-container"></div>
         </details>
         <br><hr><br>
-        
+
         <details id="featuredZonesWrapper" open>
             <summary id="allZonesSummary" style="font-size: 1.2rem; font-weight: bold; cursor: pointer;">Featured Zones</summary>
             <div id="featuredZones" class="zone-container"></div>
         </details>
         <br><hr><br>
-        
+
         <details id="allZonesWrapper" open>
             <summary id="allSummary" style="font-size: 1.2rem; font-weight: bold; cursor: pointer;">All Zones</summary>
             <div id="container">Loading...</div>
@@ -828,7 +827,7 @@ footer {
     <script>
 (function(){
     if(!/[?&]e=true/.test(location.href)) return;
-    
+
     const scripts = [
         '//cdn.jsdelivr.net/npm/eruda',
         '//cdn.jsdelivr.net/npm/eruda-monitor',
@@ -841,7 +840,7 @@ footer {
         '//cdn.jsdelivr.net/npm/eruda-touches',
         '//cdn.jsdelivr.net/npm/eruda-vue'
     ];
-    
+
     let index = 0;
     function loadNext() {
         if (index >= scripts.length) {
@@ -859,7 +858,7 @@ footer {
             }
             return;
         }
-        
+
         const script = document.createElement('script');
         script.src = scripts[index];
         script.onload = () => {
@@ -873,7 +872,7 @@ footer {
         };
         document.head.appendChild(script);
     }
-    
+
     loadNext();
     })();
     </script>
@@ -939,13 +938,13 @@ for (let i = 0; i < schedule.length; i++) {
 
         if (remaining === 60) {
             alert('1 minute left in ' + p.name + '!');
-        }   
-        return { 
+        }
+        return {
             period: p.name,
             remaining: `${mins}:${secs.toString().padStart(2, '0')}`
         };
     }
-    
+
         if (i < schedule.length - 1) {
             const nextPeriod = schedule[i + 1];
             if (currentTime >= p.end && currentTime < nextPeriod.start) {
@@ -1049,9 +1048,9 @@ async function listZones() {
                             popup.style.borderRadius = "5px";
                             popup.style.boxShadow = "0px 0px 10px rgba(0,0,0,0.1)";
                             popup.style.fontFamily = "Arial, sans-serif";
-                            
+
                             popup.innerHTML = `Play more games at Turkish Playground!`;
-                            
+
                             const closeBtn = document.createElement("button");
                             closeBtn.innerText = "✖";
                             closeBtn.style.marginLeft = "10px";
@@ -1060,7 +1059,7 @@ async function listZones() {
                             closeBtn.style.cursor = "pointer";
                             closeBtn.style.color = "#004085";
                             closeBtn.style.fontWeight = "bold";
-                            
+
                             closeBtn.onclick = () => popup.remove();
                             popup.appendChild(closeBtn);
                             document.body.appendChild(popup);
@@ -1147,20 +1146,20 @@ function displayFeaturedZones(featuredZones) {
         zoneItem.className = "zone-item";
         zoneItem.dataset.zoneId = file.id;
         zoneItem.onclick = () => openZone(file);
-        
+
         const star = document.createElement("div");
         star.className = "favorite-star";
         if (favorites.includes(file.id)) star.classList.add('favorited');
         star.onclick = (event) => toggleFavorite(file.id, event);
         zoneItem.appendChild(star);
-        
+
         const img = document.createElement("img");
         img.dataset.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
         img.alt = file.name;
         img.loading = "auto";
         img.className = "lazy-zone-img";
         zoneItem.appendChild(img);
-        
+
         const button = document.createElement("button");
         button.textContent = file.name;
         button.onclick = (event) => {
@@ -1187,7 +1186,7 @@ function displayFeaturedZones(featuredZones) {
             }
         });
     }, {
-        rootMargin: "100px", 
+        rootMargin: "100px",
         threshold: 0.1
     });
 
@@ -1213,20 +1212,20 @@ function displayZones(zones) {
         zoneItem.className = "zone-item";
         zoneItem.dataset.zoneId = file.id;
         zoneItem.onclick = () => openZone(file);
-        
+
         const star = document.createElement("div");
         star.className = "favorite-star";
         if (favorites.includes(file.id)) star.classList.add('favorited');
         star.onclick = (event) => toggleFavorite(file.id, event);
         zoneItem.appendChild(star);
-        
+
         const img = document.createElement("img");
         img.dataset.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
         img.alt = file.name;
         img.loading = "auto";
         img.className = "lazy-zone-img";
         zoneItem.appendChild(img);
-        
+
         const button = document.createElement("button");
         button.textContent = file.name;
         button.onclick = (event) => {
@@ -1253,7 +1252,7 @@ function displayZones(zones) {
             }
         });
     }, {
-        rootMargin: "100px", 
+        rootMargin: "100px",
         threshold: 0.1
     });
 
@@ -1264,14 +1263,14 @@ function displayZones(zones) {
 
 function toggleFavorite(zoneId, event) {
     if (event) event.stopPropagation();
-    
+
     const index = favorites.indexOf(zoneId);
     if (index > -1) {
         favorites.splice(index, 1);
     } else {
         favorites.push(zoneId);
     }
-    
+
     localStorage.setItem('turkishPlaygroundFavorites', JSON.stringify(favorites));
     updateFavoriteStars();
     displayFavorites();
@@ -1294,14 +1293,14 @@ function updateFavoriteStars() {
 function displayFavorites() {
     const favoritesContainer = document.getElementById('favoritesContainer');
     if (!favoritesContainer) return;
-    
+
     const favoriteZones = zones.filter(zone => favorites.includes(zone.id));
     const hasActiveSearch = searchBar.value.toLowerCase().length > 0;
-    
+
     if (favoriteZones.length === 0) {
         favoritesContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No favorites yet. Click the star icon on any zone to add it here!</p>';
         document.getElementById('favoritesSummary').innerHTML = 'Favorites <span class="favorites-count">0</span>';
-        
+
         favoritesWrapper.classList.remove('favorites-has-content');
         favoritesWrapper.removeAttribute('open');
     } else {
@@ -1311,19 +1310,19 @@ function displayFavorites() {
             zoneItem.className = "zone-item";
             zoneItem.dataset.zoneId = zone.id;
             zoneItem.onclick = () => openZone(zone);
-            
+
             const star = document.createElement("div");
             star.className = "favorite-star favorited";
             star.onclick = (event) => toggleFavorite(zone.id, event);
             zoneItem.appendChild(star);
-            
+
             const img = document.createElement("img");
             img.dataset.src = zone.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
             img.alt = zone.name;
             img.loading = "auto";
             img.className = "lazy-zone-img";
             zoneItem.appendChild(img);
-            
+
             const button = document.createElement("button");
             button.textContent = zone.name;
             button.onclick = (event) => {
@@ -1331,17 +1330,17 @@ function displayFavorites() {
                 openZone(zone);
             };
             zoneItem.appendChild(button);
-            
+
             favoritesContainer.appendChild(zoneItem);
         });
-        
+
         document.getElementById('favoritesSummary').innerHTML = `Favorites <span class="favorites-count">${favoriteZones.length}</span>`;
-        
+
         favoritesWrapper.classList.add('favorites-has-content');
         if (!hasActiveSearch) {
             favoritesWrapper.setAttribute('open', 'open');
         }
-        
+
         const lazyImages = favoritesContainer.querySelectorAll('img.lazy-zone-img');
         const imageObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
@@ -1356,7 +1355,7 @@ function displayFavorites() {
             rootMargin: "100px",
             threshold: 0.1
         });
-        
+
         lazyImages.forEach(img => {
             imageObserver.observe(img);
         });
@@ -1454,7 +1453,7 @@ function aboutBlank() {
 }
 
 function closeZone() {
-    stopPlaytimeTracking(); 
+    stopPlaytimeTracking();
     zoneViewer.hidden = false;
     zoneViewer.style.display = "none";
     zoneViewer.removeChild(zoneFrame);
@@ -1513,18 +1512,18 @@ function sanitizeData(obj, maxStringLen = 1000, maxArrayLen = 10000) {
     if (typeof obj === 'string') {
       return obj.length > maxStringLen ? obj.slice(0, maxStringLen) + '...[truncated]' : obj;
     }
-    
+
     if (obj instanceof Uint8Array) {
       if (obj.length > maxArrayLen) {
         return `[Uint8Array too large (${obj.length} bytes), truncated]`;
       }
       return obj;
     }
-    
+
     if (Array.isArray(obj)) {
       return obj.map(item => sanitizeData(item, maxStringLen, maxArrayLen));
     }
-    
+
     if (obj && typeof obj === 'object') {
       const newObj = {};
       for (const key in obj) {
@@ -1534,7 +1533,7 @@ function sanitizeData(obj, maxStringLen = 1000, maxArrayLen = 10000) {
       }
       return newObj;
     }
-    
+
     return obj;
   }
 
@@ -1610,7 +1609,7 @@ async function saveData() {
         });
       }
     }
-  
+
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([JSON.stringify(result)], {
         type: "application/octet-stream"
@@ -1620,7 +1619,7 @@ async function saveData() {
     link.click();
     document.body.removeChild(link);
   }
-  
+
   async function loadData(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1632,19 +1631,19 @@ async function saveData() {
               document.cookie = cookie.trim();
             });
           }
-        
+
           if (data.localStorage) {
             for (const key in data.localStorage) {
               localStorage.setItem(key, data.localStorage[key]);
             }
           }
-        
+
           if (data.sessionStorage) {
             for (const key in data.sessionStorage) {
               sessionStorage.setItem(key, data.sessionStorage[key]);
             }
           }
-        
+
           if (data.indexedDB) {
             for (const dbName in data.indexedDB) {
               const stores = data.indexedDB[dbName];
@@ -1663,7 +1662,7 @@ async function saveData() {
                   const transaction = db.transaction(Object.keys(stores), 'readwrite');
                   transaction.onerror = () => reject(transaction.error);
                   let pendingStores = Object.keys(stores).length;
-        
+
                   for (const storeName in stores) {
                     const objectStore = transaction.objectStore(storeName);
                     objectStore.clear().onsuccess = () => {
@@ -1679,12 +1678,12 @@ async function saveData() {
               });
             }
           }
-        
+
           if (data.caches) {
             for (const cacheName in data.caches) {
               const cache = await caches.open(cacheName);
               await cache.keys().then(keys => Promise.all(keys.map(k => cache.delete(k))));
-        
+
               for (const entry of data.caches[cacheName]) {
                 let responseBody;
                 if (entry.contentType.includes('application/json')) {
@@ -1777,19 +1776,19 @@ settings.addEventListener('click', () => {
     const popupBody = document.getElementById('popupBody');
     const currentColumns = localStorage.getItem('turkishPlaygroundGridColumns') || '8';
     const playtimeDisplay = formatPlaytime(totalPlaytime);
-    
+
 popupBody.innerHTML = `
     <div style="background: var(--primary-lighter); border: 1px solid var(--primary); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
         <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 0.5rem;">Total Playtime</div>
         <div style="font-size: 24px; font-weight: bold; color: var(--primary); font-family: 'Courier New', monospace;">${playtimeDisplay}</div>
     </div>
-    
+
     <div id="class-timer" style="background: var(--accent-light); border: 1px solid var(--accent); border-radius: var(--radius); padding: 1rem; margin-bottom: 1.5rem; text-align: center;">
         <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 0.5rem;">Current Period</div>
         <div id="current-period" style="font-size: 18px; font-weight: bold; color: var(--accent); margin-bottom: 0.5rem;">Calculating...</div>
         <div id="time-remaining" style="font-size: 24px; font-weight: bold; color: var(--accent); font-family: 'Courier New', monospace;">--:--</div>
     </div>
-    
+
     <label for="grid-columns" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Grid Columns:</label>
     <select id="grid-columns" onchange="setGridColumns(this.value)" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--text); font-size: 15px; margin-bottom: 1.5rem;">
         <option value="4" ${currentColumns === '4' ? 'selected' : ''}>4 Columns</option>
@@ -1799,8 +1798,13 @@ popupBody.innerHTML = `
         <option value="8" ${currentColumns === '8' ? 'selected' : ''}>8 Columns (Default)</option>
         <option value="9" ${currentColumns === '9' ? 'selected' : ''}>9 Columns</option>
         <option value="10" ${currentColumns === '10' ? 'selected' : ''}>10 Columns</option>
+        <option value="11" ${currentColumns === '11' ? 'selected' : ''}>11 Columns</option>
+        <option value="12" ${currentColumns === '12' ? 'selected' : ''}>12 Columns</option>
+        <option value="13" ${currentColumns === '13' ? 'selected' : ''}>13 Columns</option>
+        <option value="14" ${currentColumns === '14' ? 'selected' : ''}>14 Columns</option>
+        <option value="15" ${currentColumns === '15' ? 'selected' : ''}>15 Columns</option>
     </select>
-    
+
     <button class="settings-button" onclick="tabCloak()">Tab Cloak</button>
     <br><br>
     <button class="settings-button" onclick="clearFavorites()">Clear All Favorites</button>
@@ -1818,13 +1822,18 @@ listZones();
 const schoolList = ["deledao", "goguardian", "lightspeed", "linewize", "securly"];
 
 function isBlockedDomain(url) {
-    const domain = new URL(url, location.origin).hostname + "/";
-    return schoolList.some(school => domain.includes(school));
+    if (!url || typeof url !== 'string') return false;
+    try {
+        const domain = new URL(url, location.origin).hostname + "/";
+        return schoolList.some(school => domain.includes(school));
+    } catch (e) {
+        return false;
+    }
 }
 
 const originalFetch = window.fetch;
 window.fetch = function (url, options) {
-    if (isBlockedDomain(url)) {
+    if (url && isBlockedDomain(url)) {
         console.warn(`lam`);
         return Promise.reject(new Error("lam"));
     }
@@ -1833,7 +1842,7 @@ window.fetch = function (url, options) {
 
 const originalOpen = XMLHttpRequest.prototype.open;
 XMLHttpRequest.prototype.open = function (method, url) {
-    if (isBlockedDomain(url)) {
+    if (url && isBlockedDomain(url)) {
         console.warn(`lam`);
         return;
     }
