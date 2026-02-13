@@ -1005,7 +1005,7 @@ async function listZones() {
         const json = await response.json();
         zones = json;
 
-        const blockedGameIds = [-1, 253];
+        const blockedGameIds = [-1, 253, 596];
         zones = zones.filter(zone => !blockedGameIds.includes(zone.id));
 
         zones[0].featured = true;
