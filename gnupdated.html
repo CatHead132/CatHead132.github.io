@@ -1166,7 +1166,7 @@ function displayFeaturedZones(featuredZones) {
     const lazyImages = document.querySelectorAll('#featuredZones img.lazy-zone-img');
     const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting && !zoneViewer.hidden) {
+            if (entry.isIntersecting) {
                 const img = entry.target;
                 img.src = img.dataset.src;
                 img.classList.remove("lazy-zone-img");
