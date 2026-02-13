@@ -1005,19 +1005,7 @@ async function listZones() {
         const json = await response.json();
         zones = json;
 
-        const game27Index = zones.findIndex(zone => zone.id === 27);
-        if (game27Index !== -1) {
-            zones[game27Index] = {
-                "id": 27,
-                "name": "Geometry Dash Lite",
-                "cover": "{COVER_URL}/27.png",
-                "url": "https://cdn.statically.io/gh/CatHead132/google-class@main/gdlite/index.html",
-                "author": "RobTop Games",
-                "authorLink": "RobTop Games"
-            };
-        }
-
-        const blockedGameIds = [-1, 596, 253, 76, 75];
+        const blockedGameIds = [-1, 253];
         zones = zones.filter(zone => !blockedGameIds.includes(zone.id));
 
         zones[0].featured = true;
