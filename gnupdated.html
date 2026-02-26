@@ -751,7 +751,7 @@ footer {
                 <select id="sortOptions" onchange="sortZones()">
                     <option value="name">Name</option>
                     <option value="id">ID (Date)</option>
-                    <option value="popular">Popular</option>
+                    <option value="popular" selected>Popular</option>
                 </select>
                 <select id="filterOptions" onchange="filterZones2()">
                     <option value="none">All</option>
@@ -1129,6 +1129,27 @@ function sortZones() {
 
 function displayFeaturedZones(featuredZones) {
     featuredContainer.innerHTML = "";
+
+    // Random game card
+    const randomItem = document.createElement("div");
+    randomItem.className = "zone-item";
+    randomItem.onclick = () => openZone(zones[Math.floor(Math.random() * zones.length)]);
+
+    const randomImg = document.createElement("img");
+    randomImg.src = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/hmmm.png";
+    randomImg.style.objectFit = "contain";
+    randomImg.style.padding = "1rem";
+    randomItem.appendChild(randomImg);
+
+    const randomBtn = document.createElement("button");
+    randomBtn.textContent = "🎲 Random Game";
+    randomBtn.onclick = (event) => {
+        event.stopPropagation();
+        openZone(zones[Math.floor(Math.random() * zones.length)]);
+    };
+    randomItem.appendChild(randomBtn);
+    featuredContainer.appendChild(randomItem);
+
     featuredZones.forEach((file, index) => {
         const zoneItem = document.createElement("div");
         zoneItem.className = "zone-item";
@@ -1157,7 +1178,8 @@ function displayFeaturedZones(featuredZones) {
         zoneItem.appendChild(button);
         featuredContainer.appendChild(zoneItem);
     });
-    if (featuredContainer.innerHTML === "") {
+
+    if (featuredContainer.children.length <= 1) {
         featuredContainer.innerHTML = "No featured zones found.";
     } else {
         document.getElementById("allZonesSummary").textContent = `Featured Zones (${featuredZones.length})`;
@@ -1232,7 +1254,7 @@ function displayZones(zones) {
     const lazyImages = document.querySelectorAll('img.lazy-zone-img');
     const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting && !zoneViewer.hidden) {
+            if (entry.isIntersecting) {
                 const img = entry.target;
                 img.src = img.dataset.src;
                 img.classList.remove("lazy-zone-img");
@@ -1370,8 +1392,18 @@ function filterZones() {
     if (query.length !== 0) {
         document.getElementById("featuredZonesWrapper").removeAttribute("open");
         document.getElementById("favoritesWrapper").removeAttribute("open");
+    } else {
+        document.getElementById("featuredZonesWrapper").setAttribute("open", "open");
+        if (favorites.length > 0) {
+            document.getElementById("favoritesWrapper").setAttribute("open", "open");
+        }
     }
     displayZones(filteredZones);
+}
+
+function openRandomZone() {
+    const randomZone = zones[Math.floor(Math.random() * zones.length)];
+    openZone(randomZone);
 }
 
 function openZone(file) {
@@ -1386,6 +1418,7 @@ function openZone(file) {
             zoneFrame.contentDocument.open();
             zoneFrame.contentDocument.write(html);
             zoneFrame.contentDocument.close();
+            zoneFrame.contentDocument.querySelectorAll('[id^="sidebarad"]').forEach(el => el.remove());
             document.getElementById('zoneName').textContent = file.name;
             document.getElementById('zoneId').textContent = file.id;
             document.getElementById('zoneAuthor').textContent = "by " + file.author;
@@ -1397,7 +1430,7 @@ function openZone(file) {
             const url = new URL(window.location);
             url.searchParams.set('id', file.id);
             history.pushState(null, '', url.toString());
-            zoneViewer.hidden = true;
+            zoneViewer.hidden = false;
         }).catch(error => alert("Failed to load zone: " + error));
     } else if (file.url.startsWith("http")) {
         window.open(file.url, "_blank");
@@ -1412,6 +1445,7 @@ function openZone(file) {
             zoneFrame.contentDocument.open();
             zoneFrame.contentDocument.write(html);
             zoneFrame.contentDocument.close();
+            zoneFrame.contentDocument.querySelectorAll('[id^="sidebarad"]').forEach(el => el.remove());
             document.getElementById('zoneName').textContent = file.name;
             document.getElementById('zoneId').textContent = file.id;
             document.getElementById('zoneAuthor').textContent = "by " + file.author;
@@ -1423,7 +1457,7 @@ function openZone(file) {
             const url = new URL(window.location);
             url.searchParams.set('id', file.id);
             history.pushState(null, '', url.toString());
-            zoneViewer.hidden = true;
+            zoneViewer.hidden = false;
         }).catch(error => alert("Failed to load zone: " + error));
     }
 }
@@ -1779,18 +1813,12 @@ popupBody.innerHTML = `
 
     <label for="grid-columns" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Grid Columns:</label>
     <select id="grid-columns" onchange="setGridColumns(this.value)" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--text); font-size: 15px; margin-bottom: 1.5rem;">
-        <option value="4" ${currentColumns === '4' ? 'selected' : ''}>4 Columns</option>
-        <option value="5" ${currentColumns === '5' ? 'selected' : ''}>5 Columns</option>
-        <option value="6" ${currentColumns === '6' ? 'selected' : ''}>6 Columns</option>
-        <option value="7" ${currentColumns === '7' ? 'selected' : ''}>7 Columns</option>
         <option value="8" ${currentColumns === '8' ? 'selected' : ''}>8 Columns (Default)</option>
         <option value="9" ${currentColumns === '9' ? 'selected' : ''}>9 Columns</option>
         <option value="10" ${currentColumns === '10' ? 'selected' : ''}>10 Columns</option>
         <option value="11" ${currentColumns === '11' ? 'selected' : ''}>11 Columns</option>
         <option value="12" ${currentColumns === '12' ? 'selected' : ''}>12 Columns</option>
         <option value="13" ${currentColumns === '13' ? 'selected' : ''}>13 Columns</option>
-        <option value="14" ${currentColumns === '14' ? 'selected' : ''}>14 Columns</option>
-        <option value="15" ${currentColumns === '15' ? 'selected' : ''}>15 Columns</option>
     </select>
 
     <button class="settings-button" onclick="tabCloak()">Tab Cloak</button>
