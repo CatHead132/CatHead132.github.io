@@ -1129,8 +1129,6 @@ function sortZones() {
 
 function displayFeaturedZones(featuredZones) {
     featuredContainer.innerHTML = "";
-
-    // Random game card
     const randomItem = document.createElement("div");
     randomItem.className = "zone-item";
     randomItem.onclick = () => openZone(zones[Math.floor(Math.random() * zones.length)]);
@@ -1819,6 +1817,13 @@ popupBody.innerHTML = `
         <option value="11" ${currentColumns === '11' ? 'selected' : ''}>11 Columns</option>
         <option value="12" ${currentColumns === '12' ? 'selected' : ''}>12 Columns</option>
         <option value="13" ${currentColumns === '13' ? 'selected' : ''}>13 Columns</option>
+        <option value="14" ${currentColumns === '14' ? 'selected' : ''}>14 Columns</option>
+        <option value="15" ${currentColumns === '15' ? 'selected' : ''}>15 Columns</option>
+        <option value="16" ${currentColumns === '16' ? 'selected' : ''}>16 Columns</option>
+        <option value="17" ${currentColumns === '17' ? 'selected' : ''}>17 Columns</option>
+        <option value="18" ${currentColumns === '18' ? 'selected' : ''}>18 Columns</option>
+        <option value="19" ${currentColumns === '19' ? 'selected' : ''}>19 Columns</option>
+        <option value="20" ${currentColumns === '20' ? 'selected' : ''}>20 Columns</option>
     </select>
 
     <button class="settings-button" onclick="tabCloak()">Tab Cloak</button>
