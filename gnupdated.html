@@ -510,6 +510,13 @@ main {
     transform: translateY(-1px);
 }
 
+#settingsInGame {
+    padding: 0 !important;
+    width: 37px !important;
+    min-width: unset !important;
+    flex-shrink: 0;
+}
+
 footer {
     background: var(--bg-secondary);
     border-top: 1px solid var(--border);
@@ -796,6 +803,9 @@ footer {
                 <a id="zoneAuthor" href="#" target="_blank">by Author</a>
             </div>
             <div class="zone-controls">
+                <button id="settingsInGame" onclick="document.getElementById('settings').click()">
+                    <img src="https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/setting.png" alt="settings" style="width: 20px; height: 20px;">
+                </button>
                 <button onclick="fullscreenZone()">Fullscreen</button>
                 <button onclick="aboutBlank()">Open in New Tab</button>
                 <button onclick="downloadZone()">Download</button>
@@ -905,6 +915,64 @@ function toTitleCase(str) {
   );
 }
 
+const schedules = {
+    regular: [
+        { name: '1st Period', start: 7*3600+50*60, end: 8*3600+42*60 },
+        { name: '2nd Period', start: 8*3600+47*60, end: 9*3600+36*60 },
+        { name: '3rd Period', start: 9*3600+41*60, end: 10*3600+30*60 },
+        { name: '4th Period', start: 10*3600+35*60, end: 11*3600+24*60 },
+        { name: 'Lunch A/Class A', start: 11*3600+29*60, end: 11*3600+56*60 },
+        { name: 'Lunch B/Class B', start: 12*3600+1*60, end: 12*3600+28*60 },
+        { name: '5th Period', start: 12*3600+33*60, end: 13*3600+22*60 },
+        { name: '6th Period', start: 13*3600+27*60, end: 14*3600+16*60 },
+        { name: '7th Period', start: 14*3600+21*60, end: 15*3600+12*60 }
+    ],
+    morning: [
+        { name: '1st Period', start: 7*3600+50*60, end: 8*3600+34*60 },
+        { name: '2nd Period', start: 8*3600+39*60, end: 9*3600+22*60 },
+        { name: 'Event Period', start: 9*3600+27*60, end: 10*3600+7*60 },
+        { name: '3rd Period', start: 10*3600+12*60, end: 10*3600+55*60 },
+        { name: '4th Period', start: 11*3600+0*60, end: 11*3600+43*60 },
+        { name: 'Lunch A/Class A', start: 11*3600+48*60, end: 12*3600+15*60 },
+        { name: 'Lunch B/Class B', start: 12*3600+19*60, end: 12*3600+46*60 },
+        { name: '5th Period', start: 12*3600+51*60, end: 13*3600+34*60 },
+        { name: '6th Period', start: 13*3600+39*60, end: 14*3600+22*60 },
+        { name: '7th Period', start: 14*3600+27*60, end: 15*3600+12*60 }
+    ],
+    afternoon: [
+        { name: '1st Period', start: 7*3600+50*60, end: 8*3600+34*60 },
+        { name: '2nd Period', start: 8*3600+39*60, end: 9*3600+22*60 },
+        { name: '3rd Period', start: 9*3600+27*60, end: 10*3600+10*60 },
+        { name: '4th Period', start: 10*3600+15*60, end: 10*3600+58*60 },
+        { name: 'Lunch A/Class A', start: 11*3600+3*60, end: 11*3600+30*60 },
+        { name: 'Lunch B/Class B', start: 11*3600+34*60, end: 12*3600+1*60 },
+        { name: '5th Period', start: 12*3600+6*60, end: 12*3600+49*60 },
+        { name: '6th Period', start: 12*3600+54*60, end: 13*3600+37*60 },
+        { name: '7th Period', start: 13*3600+42*60, end: 14*3600+25*60 },
+        { name: 'Event Period', start: 14*3600+30*60, end: 15*3600+12*60 }
+    ]
+};
+
+function getActiveSchedule() {
+    const saved = localStorage.getItem('turkishPlaygroundSchedule');
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Date.now() < parsed.expiry) {
+            return parsed.type;
+        } else {
+            localStorage.removeItem('turkishPlaygroundSchedule');
+        }
+    }
+    return 'regular';
+}
+
+function setSchedule(type) {
+    localStorage.setItem('turkishPlaygroundSchedule', JSON.stringify({
+        type: type,
+        expiry: Date.now() + 12 * 60 * 60 * 1000
+    }));
+}
+
 function updateClassTimer() {
     const now = new Date();
     const day = now.getDay();
@@ -917,34 +985,22 @@ function updateClassTimer() {
         return { period: 'Weekend', remaining: 'No school today' };
     }
 
-    const schedule = [
-        { name: '1st Period', start: 7*3600+50*60, end: 8*3600+42*60 },
-        { name: '2nd Period', start: 8*3600+47*60, end: 9*3600+36*60 },
-        { name: '3rd Period', start: 9*3600+41*60, end: 10*3600+30*60 },
-        { name: '4th Period', start: 10*3600+35*60, end: 11*3600+24*60 },
-        { name: 'Lunch A/Class A', start: 11*3600+29*60, end: 11*3600+56*60 },
-        { name: 'Lunch B/Class B', start: 12*3600+1*60, end: 12*3600+28*60 },
-        { name: '5th Period', start: 12*3600+33*60, end: 13*3600+22*60 },
-        { name: '6th Period', start: 13*3600+27*60, end: 14*3600+16*60 },
-        { name: '7th Period', start: 14*3600+21*60, end: 15*3600+12*60 }
-    ];
+    const schedule = schedules[getActiveSchedule()];
 
-for (let i = 0; i < schedule.length; i++) {
-    const p = schedule[i];
-    if (currentTime >= p.start && currentTime < p.end) {
-        const remaining = p.end - currentTime;
-        const mins = Math.floor(remaining / 60);
-        const secs = remaining % 60;
-
-        if (remaining === 60) {
-            alert('1 minute left in ' + p.name + '!');
+    for (let i = 0; i < schedule.length; i++) {
+        const p = schedule[i];
+        if (currentTime >= p.start && currentTime < p.end) {
+            const remaining = p.end - currentTime;
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            if (remaining === 60) {
+                alert('1 minute left in ' + p.name + '!');
+            }
+            return {
+                period: p.name,
+                remaining: `${mins}:${secs.toString().padStart(2, '0')}`
+            };
         }
-        return {
-            period: p.name,
-            remaining: `${mins}:${secs.toString().padStart(2, '0')}`
-        };
-    }
-
         if (i < schedule.length - 1) {
             const nextPeriod = schedule[i + 1];
             if (currentTime >= p.end && currentTime < nextPeriod.start) {
@@ -958,6 +1014,7 @@ for (let i = 0; i < schedule.length; i++) {
             }
         }
     }
+
     if (currentTime < 7*3600+50*60) {
         return { period: 'Before School', remaining: 'School starts at 7:50 AM' };
     }
@@ -1129,6 +1186,7 @@ function sortZones() {
 
 function displayFeaturedZones(featuredZones) {
     featuredContainer.innerHTML = "";
+
     const randomItem = document.createElement("div");
     randomItem.className = "zone-item";
     randomItem.onclick = () => openZone(zones[Math.floor(Math.random() * zones.length)]);
@@ -1405,32 +1463,7 @@ function openRandomZone() {
 }
 
 function openZone(file) {
-    if (file.id === 27 || file.url.includes("gitlab.com")) {
-        const url = file.url;
-        fetch(url+"?t="+Date.now()).then(response => response.text()).then(html => {
-            if (zoneFrame.contentDocument === null) {
-                zoneFrame = document.createElement("iframe");
-                zoneFrame.id = "zoneFrame";
-                zoneViewer.appendChild(zoneFrame);
-            }
-            zoneFrame.contentDocument.open();
-            zoneFrame.contentDocument.write(html);
-            zoneFrame.contentDocument.close();
-            zoneFrame.contentDocument.querySelectorAll('[id^="sidebarad"]').forEach(el => el.remove());
-            document.getElementById('zoneName').textContent = file.name;
-            document.getElementById('zoneId').textContent = file.id;
-            document.getElementById('zoneAuthor').textContent = "by " + file.author;
-            if (file.authorLink) {
-                document.getElementById('zoneAuthor').href = file.authorLink;
-            }
-            zoneViewer.style.display = "block";
-            startPlaytimeTracking();
-            const url = new URL(window.location);
-            url.searchParams.set('id', file.id);
-            history.pushState(null, '', url.toString());
-            zoneViewer.hidden = false;
-        }).catch(error => alert("Failed to load zone: " + error));
-    } else if (file.url.startsWith("http")) {
+    if (file.url.startsWith("http") && !file.url.includes("gitlab.com")) {
         window.open(file.url, "_blank");
     } else {
         const url = file.url.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
@@ -1443,7 +1476,21 @@ function openZone(file) {
             zoneFrame.contentDocument.open();
             zoneFrame.contentDocument.write(html);
             zoneFrame.contentDocument.close();
-            zoneFrame.contentDocument.querySelectorAll('[id^="sidebarad"]').forEach(el => el.remove());
+
+            function removeAds(doc) {
+                doc.querySelectorAll('[id^="sidebarad"]').forEach(el => el.remove());
+                doc.querySelectorAll('.sidebar-frame').forEach(el => el.remove());
+            }
+
+            zoneFrame.onload = () => {
+                const iframeDoc = zoneFrame.contentDocument;
+                if (!iframeDoc || !iframeDoc.body) return;
+                removeAds(iframeDoc);
+                if (window._adObserver) window._adObserver.disconnect();
+                window._adObserver = new MutationObserver(() => removeAds(iframeDoc));
+                window._adObserver.observe(iframeDoc.body, { childList: true, subtree: true });
+            };
+
             document.getElementById('zoneName').textContent = file.name;
             document.getElementById('zoneId').textContent = file.id;
             document.getElementById('zoneAuthor').textContent = "by " + file.author;
@@ -1474,6 +1521,10 @@ function aboutBlank() {
 
 function closeZone() {
     stopPlaytimeTracking();
+    if (window._adObserver) {
+        window._adObserver.disconnect();
+        window._adObserver = null;
+    }
     zoneViewer.hidden = false;
     zoneViewer.style.display = "none";
     zoneViewer.removeChild(zoneFrame);
@@ -1808,7 +1859,12 @@ popupBody.innerHTML = `
         <div id="current-period" style="font-size: 18px; font-weight: bold; color: var(--accent); margin-bottom: 0.5rem;">Calculating...</div>
         <div id="time-remaining" style="font-size: 24px; font-weight: bold; color: var(--accent); font-family: 'Courier New', monospace;">--:--</div>
     </div>
-
+    <label for="schedule-select" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Schedule Type:</label>
+    <select id="schedule-select" onchange="setSchedule(this.value)" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--text); font-size: 15px; margin-bottom: 1.5rem;">
+        <option value="regular" ${getActiveSchedule() === 'regular' ? 'selected' : ''}>Regular Day</option>
+        <option value="morning" ${getActiveSchedule() === 'morning' ? 'selected' : ''}>Morning Event & Pep Rally</option>
+        <option value="afternoon" ${getActiveSchedule() === 'afternoon' ? 'selected' : ''}>Afternoon Event</option>
+    </select>
     <label for="grid-columns" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">Grid Columns:</label>
     <select id="grid-columns" onchange="setGridColumns(this.value)" style="width: 100%; padding: 0.875rem 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-secondary); color: var(--text); font-size: 15px; margin-bottom: 1.5rem;">
         <option value="8" ${currentColumns === '8' ? 'selected' : ''}>8 Columns (Default)</option>
@@ -1875,6 +1931,18 @@ HTMLCanvasElement.prototype.toDataURL = function (...args) {
 };
 
 window.addEventListener('beforeunload', stopPlaytimeTracking);
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'F11' && zoneViewer.style.display === 'block') {
+        e.preventDefault();
+        fullscreenZone();
+    }
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement && zoneViewer.style.display === 'block') {
+        fullscreenZone();
+    }
+});
 </script>
 </body>
 </html>
