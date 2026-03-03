@@ -1205,22 +1205,22 @@ function displayFeaturedZones(featuredZones) {
     };
     randomItem.appendChild(randomBtn);
     featuredContainer.appendChild(randomItem);
-
+    
     const customItem = document.createElement("div");
     customItem.className = "zone-item";
-
+    
     const customImg = document.createElement("img");
     customImg.src = "https://education-vapor.b-cdn.net/asset/logo-icon.png";
     customImg.style.objectFit = "contain";
     customImg.style.padding = "1rem";
     customItem.appendChild(customImg);
-
+    
     const customBtn = document.createElement("button");
     customBtn.textContent = "PR0XY, AI and MUSIC";
     customItem.appendChild(customBtn);
-
+    
     customItem.onclick = () => {
-        if (zoneFrame.contentDocument === null) {
+        if (!zoneFrame) {
             zoneFrame = document.createElement("iframe");
             zoneFrame.id = "zoneFrame";
             zoneFrame.style.flexGrow = "1";
@@ -1229,30 +1229,32 @@ function displayFeaturedZones(featuredZones) {
             zoneFrame.style.height = "90%";
             zoneViewer.appendChild(zoneFrame);
         }
-        zoneFrame.contentDocument.open();
-        zoneFrame.contentDocument.write(`<iframe src="https://education-vapor.b-cdn.net/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>`);
-        zoneFrame.contentDocument.close();
+        zoneFrame.src = "https://education-vapor.b-cdn.net/";
         document.getElementById('zoneName').textContent = "PR0XY, AI and MUSIC";
         document.getElementById('zoneAuthor').textContent = "by EPSTEIN";
         document.getElementById('zoneId').textContent = "custom-1";
         zoneViewer.style.display = "block";
         startPlaytimeTracking();
     };
+    
+    featuredContainer.appendChild(customItem);
+    
+    // Second custom item
     const customItem2 = document.createElement("div");
-    customItem.className = "zone-item";
-
+    customItem2.className = "zone-item";
+    
     const customImg2 = document.createElement("img");
-    customImg.src = "https://realcomputer.revitcity.com/asset/logo-icon.png";
-    customImg.style.objectFit = "contain";
-    customImg.style.padding = "1rem";
-    customItem.appendChild(customImg);
-
+    customImg2.src = "https://realcomputer.revitcity.com/asset/logo-icon.png";
+    customImg2.style.objectFit = "contain";
+    customImg2.style.padding = "1rem";
+    customItem2.appendChild(customImg2);
+    
     const customBtn2 = document.createElement("button");
-    customBtn.textContent = "PR0XY";
-    customItem.appendChild(customBtn);
-
-    customItem.onclick = () => {
-        if (zoneFrame.contentDocument === null) {
+    customBtn2.textContent = "PR0XY";
+    customItem2.appendChild(customBtn2);
+    
+    customItem2.onclick = () => {
+        if (!zoneFrame) {
             zoneFrame = document.createElement("iframe");
             zoneFrame.id = "zoneFrame";
             zoneFrame.style.flexGrow = "1";
@@ -1261,16 +1263,15 @@ function displayFeaturedZones(featuredZones) {
             zoneFrame.style.height = "90%";
             zoneViewer.appendChild(zoneFrame);
         }
-        zoneFrame.contentDocument.open();
-        zoneFrame.contentDocument.write(`<iframe src="https://realcomputer.revitcity.com/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>`);
-        zoneFrame.contentDocument.close();
+        zoneFrame.src = "https://realcomputer.revitcity.com/";
         document.getElementById('zoneName').textContent = "PR0XY";
         document.getElementById('zoneAuthor').textContent = "by EPSTEIN";
-        document.getElementById('zoneId').textContent = "custom-1";
+        document.getElementById('zoneId').textContent = "custom-2";
         zoneViewer.style.display = "block";
         startPlaytimeTracking();
     };
 
+    featuredContainer.appendChild(customItem2);
     featuredContainer.appendChild(customItem);
 
     featuredZones.forEach((file, index) => {
