@@ -1828,15 +1828,26 @@ async function saveData() {
   }
 
 function cloakIcon(url) {
-    const link = document.querySelector("link[rel~='icon']");
-    link.rel = "icon";
-    if ((url+"").trim().length === 0) {
+    let link = document.querySelector("link[rel~='icon']");
+    if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+    }
+
+    if ((url + "").trim().length === 0) {
         link.href = "https://ssl.gstatic.com/classroom/favicon.png";
-    } else {
+        return;
+    }
+
+    try {
+        const domain = new URL(url).hostname;
+        link.href = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
+    } catch {
         link.href = url;
     }
-    document.head.appendChild(link);
 }
+        
 function cloakName(string) {
     if ((string+"").trim().length === 0) {
         document.title = "Home - Classroom";
