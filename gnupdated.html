@@ -1198,13 +1198,48 @@ function displayFeaturedZones(featuredZones) {
     randomItem.appendChild(randomImg);
 
     const randomBtn = document.createElement("button");
-    randomBtn.textContent = "🎲 Random Game";
+    randomBtn.textContent = "Random Game";
     randomBtn.onclick = (event) => {
         event.stopPropagation();
         openZone(zones[Math.floor(Math.random() * zones.length)]);
     };
     randomItem.appendChild(randomBtn);
     featuredContainer.appendChild(randomItem);
+
+    const customItem = document.createElement("div");
+    customItem.className = "zone-item";
+
+    const customImg = document.createElement("img");
+    customImg.src = "https://education-vapor.b-cdn.net/asset/logo-icon.png";
+    customImg.style.objectFit = "contain";
+    customImg.style.padding = "1rem";
+    customItem.appendChild(customImg);
+
+    const customBtn = document.createElement("button");
+    customBtn.textContent = "PR0XY, AI and MUSIC";
+    customItem.appendChild(customBtn);
+
+    customItem.onclick = () => {
+        if (zoneFrame.contentDocument === null) {
+            zoneFrame = document.createElement("iframe");
+            zoneFrame.id = "zoneFrame";
+            zoneFrame.style.flexGrow = "1";
+            zoneFrame.style.border = "none";
+            zoneFrame.style.width = "100%";
+            zoneFrame.style.height = "90%";
+            zoneViewer.appendChild(zoneFrame);
+        }
+        zoneFrame.contentDocument.open();
+        zoneFrame.contentDocument.write(`<iframe src="https://education-vapor.b-cdn.net/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>`);
+        zoneFrame.contentDocument.close();
+        document.getElementById('zoneName').textContent = "PR0XY, AI and MUSIC";
+        document.getElementById('zoneAuthor').textContent = "by EPSTEIN";
+        document.getElementById('zoneId').textContent = "custom-1";
+        zoneViewer.style.display = "block";
+        startPlaytimeTracking();
+    };
+
+    featuredContainer.appendChild(customItem);
 
     featuredZones.forEach((file, index) => {
         const zoneItem = document.createElement("div");
@@ -1527,7 +1562,9 @@ function closeZone() {
     }
     zoneViewer.hidden = false;
     zoneViewer.style.display = "none";
-    zoneViewer.removeChild(zoneFrame);
+    if (zoneViewer.contains(zoneFrame)) {
+        zoneViewer.removeChild(zoneFrame);
+    }
     const url = new URL(window.location);
     url.searchParams.delete('id');
     history.pushState(null, '', url.toString());
