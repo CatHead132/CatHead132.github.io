@@ -1238,6 +1238,38 @@ function displayFeaturedZones(featuredZones) {
         zoneViewer.style.display = "block";
         startPlaytimeTracking();
     };
+    const customItem2 = document.createElement("div");
+    customItem.className = "zone-item";
+
+    const customImg2 = document.createElement("img");
+    customImg.src = "https://realcomputer.revitcity.com/asset/logo-icon.png";
+    customImg.style.objectFit = "contain";
+    customImg.style.padding = "1rem";
+    customItem.appendChild(customImg);
+
+    const customBtn2 = document.createElement("button");
+    customBtn.textContent = "PR0XY";
+    customItem.appendChild(customBtn);
+
+    customItem.onclick = () => {
+        if (zoneFrame.contentDocument === null) {
+            zoneFrame = document.createElement("iframe");
+            zoneFrame.id = "zoneFrame";
+            zoneFrame.style.flexGrow = "1";
+            zoneFrame.style.border = "none";
+            zoneFrame.style.width = "100%";
+            zoneFrame.style.height = "90%";
+            zoneViewer.appendChild(zoneFrame);
+        }
+        zoneFrame.contentDocument.open();
+        zoneFrame.contentDocument.write(`<iframe src="https://realcomputer.revitcity.com/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>`);
+        zoneFrame.contentDocument.close();
+        document.getElementById('zoneName').textContent = "PR0XY";
+        document.getElementById('zoneAuthor').textContent = "by EPSTEIN";
+        document.getElementById('zoneId').textContent = "custom-1";
+        zoneViewer.style.display = "block";
+        startPlaytimeTracking();
+    };
 
     featuredContainer.appendChild(customItem);
 
