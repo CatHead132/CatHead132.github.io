@@ -1229,7 +1229,9 @@ function displayFeaturedZones(featuredZones) {
             zoneFrame.style.height = "90%";
             zoneViewer.appendChild(zoneFrame);
         }
-        zoneFrame.src = "https://education-vapor.b-cdn.net/";
+        zoneFrame.contentDocument.open();
+        zoneFrame.contentDocument.write(`<iframe src="https://education-vapor.b-cdn.net/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>`);
+        zoneFrame.contentDocument.close();
         document.getElementById('zoneName').textContent = "PR0XY, AI and MUSIC";
         document.getElementById('zoneAuthor').textContent = "by EPSTEIN";
         document.getElementById('zoneId').textContent = "custom-1";
@@ -1238,8 +1240,7 @@ function displayFeaturedZones(featuredZones) {
     };
     
     featuredContainer.appendChild(customItem);
-    
-    // Second custom item
+
     const customItem2 = document.createElement("div");
     customItem2.className = "zone-item";
     
@@ -1263,7 +1264,9 @@ function displayFeaturedZones(featuredZones) {
             zoneFrame.style.height = "90%";
             zoneViewer.appendChild(zoneFrame);
         }
-        zoneFrame.src = "https://realcomputer.revitcity.com/";
+        zoneFrame.contentDocument.open();
+        zoneFrame.contentDocument.write(`<iframe src="https://realcomputer.revitcity.com/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>`);
+        zoneFrame.contentDocument.close();
         document.getElementById('zoneName').textContent = "PR0XY";
         document.getElementById('zoneAuthor').textContent = "by EPSTEIN";
         document.getElementById('zoneId').textContent = "custom-2";
