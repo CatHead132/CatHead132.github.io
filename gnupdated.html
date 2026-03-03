@@ -1241,9 +1241,7 @@ function displayFeaturedZones(featuredZones) {
     customItem2.appendChild(customBtn2);
 
     customItem2.onclick = () => {
-        const w = window.open("about:blank", "_blank");
-        w.document.write('<iframe src="https://computers.netburst.org/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>');
-        w.document.close();
+        window.open("https://computers.netburst.org/", "_blank");
     };
 
     featuredContainer.appendChild(customItem2);
@@ -1847,7 +1845,7 @@ function cloakIcon(url) {
         link.href = url;
     }
 }
-        
+
 function cloakName(string) {
     if ((string+"").trim().length === 0) {
         document.title = "Home - Classroom";
