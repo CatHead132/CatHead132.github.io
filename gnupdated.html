@@ -1209,6 +1209,12 @@ function displayFeaturedZones(featuredZones) {
             'fern',
             () => window.open('https://computers.netburst.org/', '_blank')
         ),
+        makeStaticItem(
+            'https://unblockedmathgames.com/logo.png',
+            'SDXP',
+            () => { const w = window.open('about:blank', '_blank'); w.document.write('<iframe src="https://unblockedmathgames.com/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>'); w.document.close(); },
+            { padding: '0.5rem' }
+        ),
     ];
 
     const zoneItems = featuredZones.map(file => makeZoneItem(file, openZone));
