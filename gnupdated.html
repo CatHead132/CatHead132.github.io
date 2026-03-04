@@ -1207,12 +1207,12 @@ function displayFeaturedZones(featuredZones) {
         makeStaticItem(
             'https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/fern.png',
             'fern',
-            () => window.open('https://computers.netburst.org/', '_blank')
+            () => { const w = window.open('about:blank', '_blank'); w.document.write('<iframe src="https://computers.netburst.org/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>'); w.document.close(); },
         ),
         makeStaticItem(
             'https://unblockedmathgames.com/logo.png',
             'SDXP',
-            () => { const w = window.open('about:blank', '_blank'); w.document.write('<iframe src="https://unblockedmathgames.com/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>'); w.document.close(); },
+            () => window.open('https://unblockedmathgames.com/', '_blank'),
             { padding: '0.5rem' }
         ),
     ];
