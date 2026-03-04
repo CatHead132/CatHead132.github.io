@@ -1958,6 +1958,8 @@ popupBody.innerHTML = `
 
     <button class="settings-button" onclick="tabCloak()">Tab Cloak</button>
     <br><br>
+    <button class="settings-button" id="particle-toggle-btn" onclick="toggleParticles()">${localStorage.getItem('turkishPlaygroundParticles') === 'off' ? '✦ Enable Particles' : '✦ Disable Particles'}</button>
+    <br><br>
     <button class="settings-button" onclick="clearFavorites()">Clear All Favorites</button>
     <br>
     `;
@@ -2031,7 +2033,7 @@ if (savedCloakIcon) cloakIcon(savedCloakIcon);
     const ctx = canvas.getContext('2d');
 
     const CONFIG = {
-        particleCount: 100,
+        particleCount: 90,
         connectionDistance: 150,
         particleColor: 'rgba(255, 63, 129, 0.7)',
         lineColor: '#ff3f81',
@@ -2148,6 +2150,26 @@ if (savedCloakIcon) cloakIcon(savedCloakIcon);
 
     window._particlePause = () => { cancelAnimationFrame(animFrame); };
     window._particleResume = () => { animate(); };
+
+    if (localStorage.getItem('turkishPlaygroundParticles') === 'off') {
+        cancelAnimationFrame(animFrame);
+        canvas.style.display = 'none';
+    }
+
+    window.toggleParticles = function() {
+        const isOff = localStorage.getItem('turkishPlaygroundParticles') === 'off';
+        if (isOff) {
+            localStorage.setItem('turkishPlaygroundParticles', 'on');
+            canvas.style.display = 'block';
+            animate();
+        } else {
+            localStorage.setItem('turkishPlaygroundParticles', 'off');
+            cancelAnimationFrame(animFrame);
+            canvas.style.display = 'none';
+        }
+        const btn = document.getElementById('particle-toggle-btn');
+        if (btn) btn.textContent = isOff ? '✦ Disable Particles' : '✦ Enable Particles';
+    };
 
     window.addEventListener('resize', () => {
         cancelAnimationFrame(animFrame);
