@@ -4,13 +4,7 @@
     <base href="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/">
     <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png">
     <link rel="apple-touch-icon" href="https://ssl.gstatic.com/classroom/favicon.png">
-    <script>
-      window.addEventListener('beforeunload', function (event) {
-        event.preventDefault()
-        event.returnValue = ''
-        return 'Are you sure you want to leave? Any unsaved changes will be lost.'
-      })
-    </script>
+
     <link rel="manifest" href="https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/manifest.json" />
     <script>
         navigator.serviceWorker.register("https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/sw.js");
@@ -83,7 +77,6 @@ header {
     top: 0;
     z-index: 100;
     box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(20px);
 }
 
 .header-content {
@@ -136,7 +129,7 @@ header {
     color: var(--text);
     font-size: 15px;
     outline: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-sm);
 }
 
@@ -162,7 +155,7 @@ header {
     font-size: 15px;
     cursor: pointer;
     outline: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 130px;
     box-shadow: var(--shadow-sm);
 }
@@ -209,7 +202,11 @@ main {
 #favoritesContainer {
     display: grid;
     grid-template-columns: repeat(var(--grid-columns), 1fr);
-    gap: 1.5rem;
+    gap: 0.5rem;
+}
+
+#container {
+    content-visibility: auto;
 }
 
 .zone-item {
@@ -218,11 +215,12 @@ main {
     border-radius: var(--radius-lg);
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     box-shadow: var(--shadow-sm);
+    will-change: transform;
+    contain: layout style;
+    aspect-ratio: 1;
 }
 
 .zone-item:hover {
@@ -247,8 +245,10 @@ main {
 }
 
 .zone-item img {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    aspect-ratio: 1;
+    height: 100%;
     object-fit: cover;
     display: block;
     background: var(--border-light);
@@ -260,38 +260,54 @@ main {
 }
 
 .zone-item button {
-    background: transparent;
+    background: rgba(0,0,0,0.55);
     color: var(--text);
     border: 0;
-    padding: 0.75rem 0.5rem;
+    padding: 0.5rem;
     cursor: pointer;
-    font-weight: 525;
-    font-size: 14px;
+    font-weight: 600;
+    font-size: clamp(9px, 1.1vw, 13px);
     text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    line-clamp: 2;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    position: relative;
-    z-index: 2;
-    flex-grow: 1;
-    min-height: 60px;
-    max-height: 80px;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    line-height: 1.4;
+    word-break: break-word;
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    opacity: 0;
+    backdrop-filter: blur(2px);
+    display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.zone-item img {
-    flex-shrink: 0;
+.zone-item:hover button {
+    opacity: 1;
+    color: white;
 }
 
-.zone-item:hover button {
-    color: var(--primary);
-    background: rgba(252, 38, 81, 0.05);
+@keyframes spinOnce {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#refreshZone img.spinning {
+    animation: spinOnce 0.6s linear infinite;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.zone-item {
+    animation: cardEntrance 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 #zoneViewer {
@@ -301,6 +317,7 @@ main {
     z-index: 1000;
     display: none;
     flex-direction: column;
+    overflow: hidden;
     animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -353,7 +370,7 @@ main {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
     font-weight: 500;
 }
 
@@ -376,7 +393,7 @@ main {
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(20px);
 }
 
@@ -388,11 +405,10 @@ main {
 }
 
 #zoneFrame {
-    flex-grow: 1;
+    flex: 1 1 0;
     border: none;
-    width: 90%;
-    height: 90%;
-    margin: auto;
+    width: 100%;
+    min-height: 0;
     display: block;
 }
 
@@ -467,7 +483,7 @@ main {
     cursor: pointer;
     padding: 0.5rem;
     border-radius: var(--radius);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     line-height: 1;
     width: 36px;
     height: 36px;
@@ -499,7 +515,7 @@ main {
     background: var(--bg-secondary);
     color: var(--text);
     font-size: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
 }
 
@@ -510,7 +526,7 @@ main {
     transform: translateY(-1px);
 }
 
-#settingsInGame {
+#settingsInGame, #refreshZone {
     padding: 0 !important;
     width: 37px !important;
     min-width: unset !important;
@@ -542,7 +558,7 @@ footer {
     text-decoration: none;
     font-weight: 600;
     font-size: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius);
 }
@@ -556,7 +572,7 @@ footer {
 @media (max-width: 768px) {
     .header-content {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.4rem;
         padding: 1rem;
     }
 
@@ -573,12 +589,11 @@ footer {
     #featuredZones,
     #favoritesContainer {
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 1.25rem;
+        gap: 0.5rem;
     }
 
     .zone-item button {
-        padding: 1rem 0.75rem;
-        min-height: 65px;
+        padding: 0.5rem 0.4rem;
         font-size: 13px;
     }
 
@@ -592,7 +607,7 @@ footer {
     #featuredZones,
     #favoritesContainer {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 1rem;
+        gap: 0.4rem;
     }
 
     .popup {
@@ -651,7 +666,7 @@ footer {
     font-weight: 600;
     border-radius: var(--radius);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-sm);
     min-width: 200px;
     width: 100%;
@@ -685,20 +700,26 @@ footer {
 
 .favorite-star {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 24px;
-    height: 24px;
+    top: 5px;
+    left: 5px;
+    width: clamp(14px, calc(32px - var(--grid-columns) * 0.8px), 26px);
+    height: clamp(14px, calc(32px - var(--grid-columns) * 0.8px), 26px);
     background: rgba(0, 0, 0, 0.7);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
+    z-index: 6;
+    transition: transform 0.3s ease, background 0.3s ease, opacity 0.3s ease;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    opacity: 0;
+}
+
+.zone-item:hover .favorite-star,
+.favorite-star.favorited {
+    opacity: 1;
 }
 
 .favorite-star:hover {
@@ -713,14 +734,14 @@ footer {
 .favorite-star.favorited::after {
     content: '★';
     color: #ffd700;
-    font-size: 14px;
+    font-size: clamp(8px, calc(20px - var(--grid-columns) * 0.6px), 15px);
     font-weight: bold;
 }
 
 .favorite-star:not(.favorited)::after {
     content: '☆';
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: clamp(8px, calc(20px - var(--grid-columns) * 0.6px), 15px);
 }
 
 .favorites-has-content {
@@ -750,27 +771,17 @@ footer {
     </style>
 </head>
 <body>
-    <script>
-      if ('serviceWorker' in navigator) {
-        const swCode = `self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`;
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        navigator.serviceWorker.register(URL.createObjectURL(blob));
-      }
-    </script>
+
     <header>
         <div class="header-content">
-            <div class="logo" id="logo"></div>  
+            <div class="logo" id="logo"></div>
             <script>
             const names = [
               "Turkish Playground",
               "Turkish Malware",
               "Turkish Games",
-              "Turkish Tyler Sucks",
               "Turkish Stop Refreshing",
-              "Turkish 676767",
-              "Turkish 360 no-scope",
-              "Turkish Diddy",
-              "Turkish Aimbot"
+              "Turkish 676767"
             ];
             const randomName = names[Math.floor(Math.random() * names.length)];
             document.getElementById("logo").textContent = randomName;
@@ -825,6 +836,9 @@ footer {
                 <a id="zoneAuthor" href="#" target="_blank">by Author</a>
             </div>
             <div class="zone-controls">
+                <button id="refreshZone" onclick="refreshZoneFrame()">
+                    <img src="https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/refresh-icon.png" alt="refresh" style="width: 20px; height: 20px;">
+                </button>
                 <button id="settingsInGame" onclick="document.getElementById('settings').click()">
                     <img src="https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/setting.png" alt="settings" style="width: 20px; height: 20px;">
                 </button>
@@ -1155,12 +1169,8 @@ async function listZones() {
         }
 
         alltags = [...new Set(alltags)];
-        let filteroption = document.getElementById("filterOptions");
-        if (filteroption && filteroption.children.length > 1) {
-            while (filteroption.children.length > 1) {
-                filteroption.removeChild(filteroption.lastElementChild);
-            }
-        }
+        const filteroption = document.getElementById("filterOptions");
+        filteroption.innerHTML = '<option value="none">All</option>';
         for (const tag of alltags) {
             const opt = document.createElement("option");
             opt.value = tag;
@@ -1243,7 +1253,7 @@ function displayFeaturedZones(featuredZones) {
     ];
 
     const zoneItems = featuredZones.map(file => makeZoneItem(file, openZone));
-
+    _cardIndex = 0;
     featuredContainer.replaceChildren(...staticItems, ...zoneItems);
 
     if (featuredContainer.children.length <= 1) {
@@ -1270,11 +1280,15 @@ function attachLazyLoader(scope) {
     lazyImages.forEach(img => observer.observe(img));
 }
 
+let _cardIndex = 0;
+
 function makeZoneItem(file, openFn) {
     const zoneItem = document.createElement('div');
     zoneItem.className = 'zone-item';
     zoneItem.dataset.zoneId = file.id;
     zoneItem.onclick = () => openFn(file);
+    zoneItem.style.animationDelay = `${Math.min(_cardIndex, 40) * 10}ms`;
+    _cardIndex++;
 
     const star = document.createElement('div');
     star.className = 'favorite-star';
@@ -1309,6 +1323,7 @@ function displayZones(zones) {
         container.innerHTML = 'No zones found.';
         return;
     }
+    _cardIndex = 0;
     document.getElementById('allSummary').textContent = `All Zones (${zones.length})`;
     container.replaceChildren(...zones.map(file => makeZoneItem(file, openZone)));
     attachLazyLoader(container);
@@ -1348,58 +1363,39 @@ function displayFavorites() {
         document.getElementById('favoritesSummary').innerHTML = `Favorites <span class="favorites-count">${favoriteZones.length}</span>`;
         favoritesWrapper.classList.add('favorites-has-content');
         if (!hasActiveSearch) favoritesWrapper.setAttribute('open', 'open');
+        _cardIndex = 0;
         favoritesContainer.replaceChildren(...favoriteZones.map(zone => makeZoneItem(zone, openZone)));
         attachLazyLoader(favoritesContainer);
     }
 }
 
+function setSearchMode(active) {
+    const featuredEl = document.getElementById("featuredZonesWrapper");
+    const favEl = document.getElementById("favoritesWrapper");
+    if (active) {
+        featuredEl.removeAttribute("open");
+        favEl.removeAttribute("open");
+    } else {
+        featuredEl.setAttribute("open", "open");
+        if (favorites.length > 0) favEl.setAttribute("open", "open");
+    }
+}
+
 function filterZones2() {
     const query = filterOptions.value;
-    if (query === "none") {
-        displayZones(zones);
-    } else {
-        const filteredZones = zones.filter(zone => zone.special?.includes(query));
-        if (query.length !== 0) {
-            document.getElementById("featuredZonesWrapper").removeAttribute("open");
-            document.getElementById("favoritesWrapper").removeAttribute("open");
-        }
-        displayZones(filteredZones);
-    }
+    const filtered = query === "none" ? zones : zones.filter(z => z.special?.includes(query));
+    if (query !== "none") setSearchMode(true);
+    else setSearchMode(false);
+    displayZones(filtered);
 }
 
 function filterZones() {
     const query = searchBar.value.toLowerCase();
-    const filteredZones = zones.filter(zone => zone.name.toLowerCase().includes(query));
-    if (query.length !== 0) {
-        document.getElementById("featuredZonesWrapper").removeAttribute("open");
-        document.getElementById("favoritesWrapper").removeAttribute("open");
-    } else {
-        document.getElementById("featuredZonesWrapper").setAttribute("open", "open");
-        if (favorites.length > 0) {
-            document.getElementById("favoritesWrapper").setAttribute("open", "open");
-        }
-    }
-    displayZones(filteredZones);
+    setSearchMode(query.length > 0);
+    displayZones(zones.filter(z => z.name.toLowerCase().includes(query)));
 }
 
-function openRandomZone() {
-    const randomZone = zones[Math.floor(Math.random() * zones.length)];
-    openZone(randomZone);
-}
-
-function openZone(file) {
-    if (zoneViewer.style.display === "block") return;
-    if (file.url.startsWith("http") && !file.url.includes("gitlab.com")) {
-        window.open(file.url, "_blank");
-    } else {
-        const url = file.url.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
-        fetch(url+"?t="+Date.now()).then(response => response.text()).then(html => {
-            if (zoneFrame.contentDocument === null) {
-                zoneFrame = document.createElement("iframe");
-                zoneFrame.id = "zoneFrame";
-                zoneViewer.appendChild(zoneFrame);
-            }
-            const adKiller = `<script>(function(){
+const adKiller = `<script>(function(){
     function isAd(el) {
         return el.id && /^sidebarad/.test(el.id);
     }
@@ -1430,9 +1426,25 @@ function openZone(file) {
     document.addEventListener('DOMContentLoaded',function(){nuke(document);});
 }());<\/script>`;
 
-            zoneFrame.contentDocument.open();
-            zoneFrame.contentDocument.write(adKiller + html);
-            zoneFrame.contentDocument.close();
+function writeToFrame(frame, html) {
+    frame.contentDocument.open();
+    frame.contentDocument.write(adKiller + html);
+    frame.contentDocument.close();
+}
+
+function openZone(file) {
+    if (zoneViewer.style.display === "flex") return;
+    if (file.url.startsWith("http") && !file.url.includes("gitlab.com")) {
+        window.open(file.url, "_blank");
+    } else {
+        const url = zoneUrl(file);
+        fetch(url+"?t="+Date.now()).then(response => response.text()).then(html => {
+            if (zoneFrame.contentDocument === null) {
+                zoneFrame = document.createElement("iframe");
+                zoneFrame.id = "zoneFrame";
+                zoneViewer.appendChild(zoneFrame);
+            }
+            writeToFrame(zoneFrame, html);
 
             document.getElementById('zoneName').textContent = file.name;
             document.getElementById('zoneId').textContent = file.id;
@@ -1440,7 +1452,7 @@ function openZone(file) {
             if (file.authorLink) {
                 document.getElementById('zoneAuthor').href = file.authorLink;
             }
-            zoneViewer.style.display = "block";
+            zoneViewer.style.display = "flex";
             startPlaytimeTracking();
             const url = new URL(window.location);
             url.searchParams.set('id', file.id);
@@ -1450,31 +1462,51 @@ function openZone(file) {
     }
 }
 
+function getCurrentZone() {
+    return zones.find(z => z.id + '' === document.getElementById('zoneId').textContent);
+}
+
+function zoneUrl(zone) {
+    return zone.url.replace('{COVER_URL}', coverURL).replace('{HTML_URL}', htmlURL);
+}
+
+function refreshZoneFrame() {
+    const img = document.querySelector('#refreshZone img');
+    img.classList.add('spinning');
+    const zone = getCurrentZone();
+    if (!zone) { img.classList.remove('spinning'); return; }
+    stopPlaytimeTracking();
+    if (zoneViewer.contains(zoneFrame)) zoneViewer.removeChild(zoneFrame);
+    zoneFrame = document.createElement('iframe');
+    zoneFrame.id = 'zoneFrame';
+    zoneViewer.appendChild(zoneFrame);
+    fetch(zoneUrl(zone) + '?t=' + Date.now()).then(r => r.text()).then(html => {
+        writeToFrame(zoneFrame, html);
+        startPlaytimeTracking();
+        img.classList.remove('spinning');
+    }).catch(() => img.classList.remove('spinning'));
+}
+
 function aboutBlank() {
+    const zone = getCurrentZone();
+    if (!zone) return;
     const newWindow = window.open("about:blank", "_blank");
-    let zone = zones.find(zone => zone.id + '' === document.getElementById('zoneId').textContent).url.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
-    fetch(zone+"?t="+Date.now()).then(response => response.text()).then(html => {
+    fetch(zoneUrl(zone) + "?t=" + Date.now()).then(r => r.text()).then(html => {
         if (newWindow) {
             newWindow.document.open();
             newWindow.document.write(html);
             newWindow.document.close();
         }
-    })
+    });
 }
 
 function closeZone() {
     stopPlaytimeTracking();
-    if (window._adObserver) {
-        window._adObserver.disconnect();
-        window._adObserver = null;
-    }
     zoneViewer.style.animation = "slideOutDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards";
     setTimeout(() => {
         zoneViewer.style.animation = "";
         zoneViewer.style.display = "none";
-        if (zoneViewer.contains(zoneFrame)) {
-            zoneViewer.removeChild(zoneFrame);
-        }
+        if (zoneViewer.contains(zoneFrame)) zoneViewer.removeChild(zoneFrame);
         const url = new URL(window.location);
         url.searchParams.delete('id');
         history.pushState(null, '', url.toString());
@@ -1482,19 +1514,15 @@ function closeZone() {
 }
 
 function downloadZone() {
-    let zone = zones.find(zone => zone.id + '' === document.getElementById('zoneId').textContent);
-    fetch(zone.url.replace("{HTML_URL}", htmlURL)+"?t="+Date.now()).then(res => res.text()).then(text => {
-        const blob = new Blob([text], {
-            type: "text/plain;charset=utf-8"
-        });
-        const url = URL.createObjectURL(blob);
+    const zone = getCurrentZone();
+    if (!zone) return;
+    fetch(zoneUrl(zone) + "?t=" + Date.now()).then(r => r.text()).then(text => {
         const a = document.createElement('a');
-        a.href = url;
+        a.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
         a.download = zone.name + ".html";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
     });
 }
 
@@ -1757,12 +1785,14 @@ function tabCloak() {
     closePopup();
     document.getElementById('popupTitle').textContent = "Tab Cloak";
     const popupBody = document.getElementById('popupBody');
+    const savedName = localStorage.getItem('turkishPlaygroundCloakName') || '';
+    const savedIcon = localStorage.getItem('turkishPlaygroundCloakIcon') || '';
     popupBody.innerHTML = `
         <label for="tab-cloak-textbox" style="font-weight: bold;">Set Tab Title:</label><br>
-        <input type="text" id="tab-cloak-textbox" placeholder="Enter new tab name..." oninput="cloakName(this.value)">
+        <input type="text" id="tab-cloak-textbox" placeholder="Home - Classroom" oninput="cloakName(this.value)" value="${savedName.replace(/"/g, '&quot;')}">
         <br><br><br><br>
         <label for="tab-cloak-icon" style="font-weight: bold;">Set Tab Icon:</label><br>
-        <input type="text" id="tab-cloak-icon" placeholder="Enter new tab icon..." oninput='cloakIcon(this.value)'>
+        <input type="text" id="tab-cloak-icon" placeholder="Classroom.Google.com" oninput='cloakIcon(this.value)' value="${savedIcon.replace(/"/g, '&quot;')}">
         <br><br><br>
     `;
     popupBody.contentEditable = false;
@@ -1883,16 +1913,21 @@ HTMLCanvasElement.prototype.toDataURL = function (...args) {
     return "";
 };
 
-window.addEventListener('beforeunload', stopPlaytimeTracking);
+window.addEventListener('beforeunload', function(event) {
+    stopPlaytimeTracking();
+    event.preventDefault();
+    event.returnValue = '';
+    return 'Are you sure you want to leave? Any unsaved changes will be lost.';
+});
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'F11' && zoneViewer.style.display === 'block') {
+    if (e.key === 'F11' && zoneViewer.style.display === 'flex') {
         e.preventDefault();
         fullscreenZone();
     }
 });
 
 document.addEventListener('fullscreenchange', () => {
-    if (document.fullscreenElement && zoneViewer.style.display === 'block') {
+    if (document.fullscreenElement && zoneViewer.style.display === 'flex') {
         fullscreenZone();
     }
 });
