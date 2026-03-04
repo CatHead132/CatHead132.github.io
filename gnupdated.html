@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <base href="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/">
+    <base href="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/">
     <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png">
     <link rel="apple-touch-icon" href="https://ssl.gstatic.com/classroom/favicon.png">
+    <script>
+      window.addEventListener('beforeunload', function (event) {
+        event.preventDefault()
+        event.returnValue = ''
+        return 'Are you sure you want to leave? Any unsaved changes will be lost.'
+      })
+    </script>
+    <link rel="manifest" href="https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/manifest.json" />
+    <script>
+        navigator.serviceWorker.register("https://cdn.jsdelivr.net/gh/gn-math/gn-math-DONTDMCA@main/sw.js");
+    </script>
+    <meta name="theme-color" content="#fb2651" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - Classroom</title>
     <meta name="title" content="Turkish Playground">
     <meta name="description" content="Play unbl*cked games on Turkish Playground. Fast, free, no downloads—perfect for school or home.">
     <meta property="og:type" content="website">
-    <link rel="manifest" href="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/manifest.json">
-    <meta name="theme-color" content="#000000">
     <style>
         :root {
     --grid-columns: 8;
