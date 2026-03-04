@@ -749,7 +749,19 @@ footer {
     </script>
     <header>
         <div class="header-content">
-            <div class="logo">Turkish Malware</div>
+            <div class="logo" id="logo"></div>  
+            <script>
+            const names = [
+              "Turkish Playground",
+              "Turkish Malware",
+              "Turkish Games",
+              "Turkish Tyler Sucks",
+              "Turkish Stop Refreshing",
+              "Turkish 676767"
+            ];
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            document.getElementById("logo").textContent = randomName;
+            </script>
             <div class="search-container">
                 <input type="text" id="searchBar" placeholder="Search games..." oninput="filterZones()">
                 <select id="sortOptions" onchange="sortZones()">
