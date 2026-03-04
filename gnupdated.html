@@ -2,17 +2,6 @@
 <html lang="en">
     <head>
         <base href="https://cdn.jsdelivr.net/gh/gn-math/gn-math.github.io@main/">
-    <style>
-        #particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-    </style>
     <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png">
     <link rel="apple-touch-icon" href="https://ssl.gstatic.com/classroom/favicon.png">
     <meta charset="UTF-8">
@@ -83,11 +72,6 @@ header {
     z-index: 100;
     box-shadow: var(--shadow-lg);
     backdrop-filter: blur(20px);
-}
-
-main {
-    position: relative;
-    z-index: 1;
 }
 
 .header-content {
@@ -333,7 +317,7 @@ main {
 
 @keyframes slideInUp {
     from {
-        transform: translateY(-100%);
+        transform: translateY(100%);
     }
     to {
         transform: translateY(0);
@@ -766,7 +750,6 @@ footer {
     </style>
 </head>
 <body>
-    <canvas id="particle-canvas"></canvas>
     <header>
         <div class="header-content">
             <div class="logo">Turkish Playground</div>
@@ -1555,7 +1538,6 @@ function openZone(file) {
                 document.getElementById('zoneAuthor').href = file.authorLink;
             }
             zoneViewer.style.display = "block";
-            if (window._particlePause) _particlePause();
             startPlaytimeTracking();
             const url = new URL(window.location);
             url.searchParams.set('id', file.id);
@@ -1585,7 +1567,6 @@ function closeZone() {
     }
     zoneViewer.hidden = false;
     zoneViewer.style.display = "none";
-    if (window._particleResume) _particleResume();
     if (zoneViewer.contains(zoneFrame)) {
         zoneViewer.removeChild(zoneFrame);
     }
@@ -1614,6 +1595,9 @@ function downloadZone() {
 function fullscreenZone() {
     if (zoneFrame.requestFullscreen) {
         zoneFrame.requestFullscreen();
+        // Source - https://stackoverflow.com/a/65413565
+        // Posted by Michiel Dral, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-01-16, License - CC BY-SA 4.0
         navigator.keyboard.lock(["Escape"]);
     } else if (zoneFrame.mozRequestFullScreen) {
         zoneFrame.mozRequestFullScreen();
@@ -1958,8 +1942,6 @@ popupBody.innerHTML = `
 
     <button class="settings-button" onclick="tabCloak()">Tab Cloak</button>
     <br><br>
-    <button class="settings-button" id="particle-toggle-btn" onclick="toggleParticles()">${localStorage.getItem('turkishPlaygroundParticles') === 'off' ? '✦ Enable Particles' : '✦ Disable Particles'}</button>
-    <br><br>
     <button class="settings-button" onclick="clearFavorites()">Clear All Favorites</button>
     <br>
     `;
@@ -2025,165 +2007,6 @@ const savedCloakIcon = localStorage.getItem('turkishPlaygroundCloakIcon');
 if (savedCloakName) cloakName(savedCloakName);
 if (savedCloakIcon) cloakIcon(savedCloakIcon);
 
-</script>
-
-<script>
-(function() {
-    const canvas = document.getElementById('particle-canvas');
-    const ctx = canvas.getContext('2d');
-
-    const CONFIG = {
-        particleCount: 90,
-        connectionDistance: 150,
-        particleColor: 'rgba(255, 63, 129, 0.7)',
-        lineColor: '#ff3f81',
-        dotMinRadius: 1.5,
-        dotMaxRadius: 3.5,
-        speedMin: 0.2,
-        speedMax: 0.6,
-    };
-
-    let particles = [];
-    let animFrame;
-
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-
-    class Particle {
-        constructor() {
-            this.reset(true);
-        }
-
-        reset(init) {
-            this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height;
-            this.r = CONFIG.dotMinRadius + Math.random() * (CONFIG.dotMaxRadius - CONFIG.dotMinRadius);
-            const angle = Math.random() * Math.PI * 2;
-            const speed = CONFIG.speedMin + Math.random() * (CONFIG.speedMax - CONFIG.speedMin);
-            this.vx = Math.cos(angle) * speed;
-            this.vy = Math.sin(angle) * speed;
-            this.opacity = 0.4 + Math.random() * 0.6;
-            this.pulseSpeed = 0.005 + Math.random() * 0.01;
-            this.pulseOffset = Math.random() * Math.PI * 2;
-            this.age = init ? Math.random() * 1000 : 0;
-        }
-
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.age++;
-
-            if (this.x < -10) this.x = canvas.width + 10;
-            if (this.x > canvas.width + 10) this.x = -10;
-            if (this.y < -10) this.y = canvas.height + 10;
-            if (this.y > canvas.height + 10) this.y = -10;
-        }
-
-        draw() {
-            const pulse = Math.sin(this.age * this.pulseSpeed + this.pulseOffset) * 0.3 + 0.7;
-            const opacity = this.opacity * pulse;
-
-            const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.r * 3);
-            gradient.addColorStop(0, `rgba(255, 63, 129, ${opacity})`);
-            gradient.addColorStop(0.5, `rgba(255, 63, 129, ${opacity * 0.3})`);
-            gradient.addColorStop(1, `rgba(255, 63, 129, 0)`);
-
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.r * 3, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 63, 129, ${opacity})`;
-            ctx.fill();
-        }
-    }
-
-    function init() {
-        resize();
-        particles = [];
-        for (let i = 0; i < CONFIG.particleCount; i++) {
-            particles.push(new Particle());
-        }
-    }
-
-    function drawConnections() {
-        const maxDist = CONFIG.connectionDistance;
-        const maxDistSq = maxDist * maxDist;
-
-        for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-                const dx = particles[i].x - particles[j].x;
-                const dy = particles[i].y - particles[j].y;
-                const distSq = dx * dx + dy * dy;
-
-                if (distSq < maxDistSq) {
-                    const dist = Math.sqrt(distSq);
-                    const opacity = (1 - dist / maxDist) * 0.6;
-
-                    ctx.beginPath();
-                    ctx.moveTo(particles[i].x, particles[i].y);
-                    ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = `rgba(255, 63, 129, ${opacity})`;
-                    ctx.lineWidth = (1 - dist / maxDist) * 1.5;
-                    ctx.stroke();
-                }
-            }
-        }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        drawConnections();
-
-        for (const p of particles) {
-            p.update();
-            p.draw();
-        }
-
-        animFrame = requestAnimationFrame(animate);
-    }
-
-    window._particlePause = () => { cancelAnimationFrame(animFrame); };
-    window._particleResume = () => { animate(); };
-
-    if (localStorage.getItem('turkishPlaygroundParticles') === 'off') {
-        cancelAnimationFrame(animFrame);
-        canvas.style.display = 'none';
-    }
-
-    window.toggleParticles = function() {
-        const isOff = localStorage.getItem('turkishPlaygroundParticles') === 'off';
-        if (isOff) {
-            localStorage.setItem('turkishPlaygroundParticles', 'on');
-            canvas.style.display = 'block';
-            animate();
-        } else {
-            localStorage.setItem('turkishPlaygroundParticles', 'off');
-            cancelAnimationFrame(animFrame);
-            canvas.style.display = 'none';
-        }
-        const btn = document.getElementById('particle-toggle-btn');
-        if (btn) btn.textContent = isOff ? '✦ Disable Particles' : '✦ Enable Particles';
-    };
-
-    window.addEventListener('resize', () => {
-        cancelAnimationFrame(animFrame);
-        resize();
-        for (const p of particles) {
-            if (p.x > canvas.width) p.x = Math.random() * canvas.width;
-            if (p.y > canvas.height) p.y = Math.random() * canvas.height;
-        }
-        animate();
-    });
-
-    init();
-    animate();
-})();
 </script>
 </body>
 </html>
