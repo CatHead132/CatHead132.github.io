@@ -57,7 +57,7 @@ body {
     padding: 0;
     background: var(--bg);
     color: var(--text);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -139,28 +139,7 @@ header {
     color: var(--text-muted);
 }
 
-#sortOptions {
-    padding: 0.875rem 1rem;
-    border: 0;
-    border-radius: var(--radius);
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    color: var(--text-muted);
-    font-size: 15px;
-    cursor: pointer;
-    outline: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-width: 130px;
-    box-shadow: var(--shadow-sm);
-}
-
-#sortOptions:hover {
-    background: var(--text);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow);
-    color: var(--glass);
-}
-
+#sortOptions,
 #filterOptions {
     padding: 0.875rem 1rem;
     border: 0;
@@ -176,6 +155,7 @@ header {
     box-shadow: var(--shadow-sm);
 }
 
+#sortOptions:hover,
 #filterOptions:hover {
     background: var(--text);
     transform: translateY(-1px);
@@ -275,25 +255,22 @@ main {
     cursor: pointer;
     font-weight: 525;
     font-size: 14px;
-    line-height: 1.4;
     text-align: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     line-clamp: 2;
     line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    z-index: 2;
     flex-grow: 1;
     min-height: 60px;
     max-height: 80px;
+    align-items: center;
+    justify-content: center;
 }
 
 .zone-item img {
@@ -317,10 +294,19 @@ main {
 
 @keyframes slideInUp {
     from {
-        transform: translateY(100%);
+        transform: translateX(100%);
     }
     to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutDown {
+    from {
         transform: translateY(0);
+    }
+    to {
+        transform: translateY(100%);
     }
 }
 
@@ -394,6 +380,8 @@ main {
     border: none;
     width: 90%;
     height: 90%;
+    margin: auto;
+    display: block;
 }
 
 #popupOverlay {
@@ -1184,121 +1172,94 @@ function sortZones() {
     displayFavorites();
 }
 
+function makeStaticItem(imgSrc, label, onClickFn, imgStyle = {}) {
+    const item = document.createElement('div');
+    item.className = 'zone-item';
+    item.onclick = onClickFn;
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    Object.assign(img.style, { objectFit: 'contain', ...imgStyle });
+    item.appendChild(img);
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.onclick = (e) => { e.stopPropagation(); onClickFn(); };
+    item.appendChild(btn);
+    return item;
+}
+
 function displayFeaturedZones(featuredZones) {
-    featuredContainer.innerHTML = "";
+    const randomZone = () => openZone(zones[Math.floor(Math.random() * zones.length)]);
 
-    const randomItem = document.createElement("div");
-    randomItem.className = "zone-item";
-    randomItem.onclick = () => openZone(zones[Math.floor(Math.random() * zones.length)]);
+    const staticItems = [
+        makeStaticItem(
+            'https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/hmmm.png',
+            'Random Game', randomZone, { padding: '1rem' }
+        ),
+        makeStaticItem(
+            'https://education-vapor.b-cdn.net/asset/logo-icon.png',
+            'VAPOR v4',
+            () => { const w = window.open('about:blank', '_blank'); w.document.write('<iframe src="https://education-vapor.b-cdn.net/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>'); w.document.close(); },
+            { padding: '0.5rem' }
+        ),
+        makeStaticItem(
+            'https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/fern.png',
+            'fern',
+            () => window.open('https://computers.netburst.org/', '_blank')
+        ),
+    ];
 
-    const randomImg = document.createElement("img");
-    randomImg.src = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/hmmm.png";
-    randomImg.style.objectFit = "contain";
-    randomImg.style.padding = "1rem";
-    randomItem.appendChild(randomImg);
+    const zoneItems = featuredZones.map(file => makeZoneItem(file, openZone));
 
-    const randomBtn = document.createElement("button");
-    randomBtn.textContent = "Random Game";
-    randomBtn.onclick = (event) => {
-        event.stopPropagation();
-        openZone(zones[Math.floor(Math.random() * zones.length)]);
-    };
-    randomItem.appendChild(randomBtn);
-    featuredContainer.appendChild(randomItem);
-
-    const customItem = document.createElement("div");
-    customItem.className = "zone-item";
-
-    const customImg = document.createElement("img");
-    customImg.src = "https://education-vapor.b-cdn.net/asset/logo-icon.png";
-    customImg.style.objectFit = "contain";
-    customImg.style.padding = "0.5rem";
-    customItem.appendChild(customImg);
-
-    const customBtn = document.createElement("button");
-    customBtn.textContent = "VAPOR v4";
-    customItem.appendChild(customBtn);
-
-    customItem.onclick = () => {
-        const w = window.open("about:blank", "_blank");
-        w.document.write('<iframe src="https://education-vapor.b-cdn.net/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>');
-        w.document.close();
-    };
-
-    featuredContainer.appendChild(customItem);
-
-    const customItem2 = document.createElement("div");
-    customItem2.className = "zone-item";
-
-    const customImg2 = document.createElement("img");
-    customImg2.src = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/fern.png";
-    customImg2.style.objectFit = "contain";
-    customItem2.appendChild(customImg2);
-
-    const customBtn2 = document.createElement("button");
-    customBtn2.textContent = "fern";
-    customItem2.appendChild(customBtn2);
-
-    customItem2.onclick = () => {
-        window.open("https://computers.netburst.org/", "_blank");
-    };
-
-    featuredContainer.appendChild(customItem2);
-    featuredContainer.appendChild(customItem);
-
-    featuredZones.forEach((file, index) => {
-        const zoneItem = document.createElement("div");
-        zoneItem.className = "zone-item";
-        zoneItem.dataset.zoneId = file.id;
-        zoneItem.onclick = () => openZone(file);
-
-        const star = document.createElement("div");
-        star.className = "favorite-star";
-        if (favorites.includes(file.id)) star.classList.add('favorited');
-        star.onclick = (event) => toggleFavorite(file.id, event);
-        zoneItem.appendChild(star);
-
-        const img = document.createElement("img");
-        img.dataset.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
-        img.alt = file.name;
-        img.loading = "auto";
-        img.className = "lazy-zone-img";
-        zoneItem.appendChild(img);
-
-        const button = document.createElement("button");
-        button.textContent = file.name;
-        button.onclick = (event) => {
-            event.stopPropagation();
-            openZone(file);
-        };
-        zoneItem.appendChild(button);
-        featuredContainer.appendChild(zoneItem);
-    });
+    featuredContainer.replaceChildren(...staticItems, ...zoneItems);
 
     if (featuredContainer.children.length <= 1) {
-        featuredContainer.innerHTML = "No featured zones found.";
+        featuredContainer.innerHTML = 'No featured zones found.';
     } else {
-        document.getElementById("allZonesSummary").textContent = `Featured Zones (${featuredZones.length})`;
+        document.getElementById('allZonesSummary').textContent = `Featured Zones (${featuredZones.length})`;
     }
 
-    const lazyImages = document.querySelectorAll('#featuredZones img.lazy-zone-img');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
+    attachLazyLoader(featuredContainer);
+}
+
+function attachLazyLoader(scope) {
+    const lazyImages = scope.querySelectorAll('img.lazy-zone-img');
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
                 img.src = img.dataset.src;
-                img.classList.remove("lazy-zone-img");
-                observer.unobserve(img);
+                img.classList.remove('lazy-zone-img');
+                obs.unobserve(img);
             }
         });
-    }, {
-        rootMargin: "100px",
-        threshold: 0.1
-    });
+    }, { rootMargin: '100px', threshold: 0.1 });
+    lazyImages.forEach(img => observer.observe(img));
+}
 
-    lazyImages.forEach(img => {
-        imageObserver.observe(img);
-    });
+function makeZoneItem(file, openFn) {
+    const zoneItem = document.createElement('div');
+    zoneItem.className = 'zone-item';
+    zoneItem.dataset.zoneId = file.id;
+    zoneItem.onclick = () => openFn(file);
+
+    const star = document.createElement('div');
+    star.className = 'favorite-star';
+    if (favorites.includes(file.id)) star.classList.add('favorited');
+    star.onclick = (e) => toggleFavorite(file.id, e);
+    zoneItem.appendChild(star);
+
+    const img = document.createElement('img');
+    img.dataset.src = file.cover.replace('{COVER_URL}', coverURL).replace('{HTML_URL}', htmlURL);
+    img.alt = file.name;
+    img.loading = 'auto';
+    img.className = 'lazy-zone-img';
+    zoneItem.appendChild(img);
+
+    const button = document.createElement('button');
+    button.textContent = file.name;
+    button.onclick = (e) => { e.stopPropagation(); openFn(file); };
+    zoneItem.appendChild(button);
+    return zoneItem;
 }
 
 function setGridColumns(columns) {
@@ -1307,76 +1268,23 @@ function setGridColumns(columns) {
 }
 
 const savedGridColumns = localStorage.getItem('turkishPlaygroundGridColumns');
-if (savedGridColumns) {
-    setGridColumns(savedGridColumns);
-}
+if (savedGridColumns) setGridColumns(savedGridColumns);
 
 function displayZones(zones) {
-    container.innerHTML = "";
-    zones.forEach((file, index) => {
-        const zoneItem = document.createElement("div");
-        zoneItem.className = "zone-item";
-        zoneItem.dataset.zoneId = file.id;
-        zoneItem.onclick = () => openZone(file);
-
-        const star = document.createElement("div");
-        star.className = "favorite-star";
-        if (favorites.includes(file.id)) star.classList.add('favorited');
-        star.onclick = (event) => toggleFavorite(file.id, event);
-        zoneItem.appendChild(star);
-
-        const img = document.createElement("img");
-        img.dataset.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
-        img.alt = file.name;
-        img.loading = "auto";
-        img.className = "lazy-zone-img";
-        zoneItem.appendChild(img);
-
-        const button = document.createElement("button");
-        button.textContent = file.name;
-        button.onclick = (event) => {
-            event.stopPropagation();
-            openZone(file);
-        };
-        zoneItem.appendChild(button);
-        container.appendChild(zoneItem);
-    });
-    if (container.innerHTML === "") {
-        container.innerHTML = "No zones found.";
-    } else {
-        document.getElementById("allSummary").textContent = `All Zones (${zones.length})`;
+    if (zones.length === 0) {
+        container.innerHTML = 'No zones found.';
+        return;
     }
-
-    const lazyImages = document.querySelectorAll('img.lazy-zone-img');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.classList.remove("lazy-zone-img");
-                observer.unobserve(img);
-            }
-        });
-    }, {
-        rootMargin: "100px",
-        threshold: 0.1
-    });
-
-    lazyImages.forEach(img => {
-        imageObserver.observe(img);
-    });
+    document.getElementById('allSummary').textContent = `All Zones (${zones.length})`;
+    container.replaceChildren(...zones.map(file => makeZoneItem(file, openZone)));
+    attachLazyLoader(container);
 }
 
 function toggleFavorite(zoneId, event) {
     if (event) event.stopPropagation();
-
     const index = favorites.indexOf(zoneId);
-    if (index > -1) {
-        favorites.splice(index, 1);
-    } else {
-        favorites.push(zoneId);
-    }
-
+    if (index > -1) favorites.splice(index, 1);
+    else favorites.push(zoneId);
     localStorage.setItem('turkishPlaygroundFavorites', JSON.stringify(favorites));
     updateFavoriteStars();
     displayFavorites();
@@ -1386,13 +1294,7 @@ function updateFavoriteStars() {
     document.querySelectorAll('.zone-item').forEach(item => {
         const zoneId = parseInt(item.dataset.zoneId);
         const star = item.querySelector('.favorite-star');
-        if (zoneId) {
-            if (favorites.includes(zoneId)) {
-                star.classList.add('favorited');
-            } else {
-                star.classList.remove('favorited');
-            }
-        }
+        if (zoneId && star) star.classList.toggle('favorited', favorites.includes(zoneId));
     });
 }
 
@@ -1401,70 +1303,19 @@ function displayFavorites() {
     if (!favoritesContainer) return;
 
     const favoriteZones = zones.filter(zone => favorites.includes(zone.id));
-    const hasActiveSearch = searchBar.value.toLowerCase().length > 0;
+    const hasActiveSearch = searchBar.value.length > 0;
 
     if (favoriteZones.length === 0) {
         favoritesContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No favorites yet. Click the star icon on any zone to add it here!</p>';
         document.getElementById('favoritesSummary').innerHTML = 'Favorites <span class="favorites-count">0</span>';
-
         favoritesWrapper.classList.remove('favorites-has-content');
         favoritesWrapper.removeAttribute('open');
     } else {
-        favoritesContainer.innerHTML = '';
-        favoriteZones.forEach(zone => {
-            const zoneItem = document.createElement("div");
-            zoneItem.className = "zone-item";
-            zoneItem.dataset.zoneId = zone.id;
-            zoneItem.onclick = () => openZone(zone);
-
-            const star = document.createElement("div");
-            star.className = "favorite-star favorited";
-            star.onclick = (event) => toggleFavorite(zone.id, event);
-            zoneItem.appendChild(star);
-
-            const img = document.createElement("img");
-            img.dataset.src = zone.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
-            img.alt = zone.name;
-            img.loading = "auto";
-            img.className = "lazy-zone-img";
-            zoneItem.appendChild(img);
-
-            const button = document.createElement("button");
-            button.textContent = zone.name;
-            button.onclick = (event) => {
-                event.stopPropagation();
-                openZone(zone);
-            };
-            zoneItem.appendChild(button);
-
-            favoritesContainer.appendChild(zoneItem);
-        });
-
         document.getElementById('favoritesSummary').innerHTML = `Favorites <span class="favorites-count">${favoriteZones.length}</span>`;
-
         favoritesWrapper.classList.add('favorites-has-content');
-        if (!hasActiveSearch) {
-            favoritesWrapper.setAttribute('open', 'open');
-        }
-
-        const lazyImages = favoritesContainer.querySelectorAll('img.lazy-zone-img');
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.remove("lazy-zone-img");
-                    observer.unobserve(img);
-                }
-            });
-        }, {
-            rootMargin: "100px",
-            threshold: 0.1
-        });
-
-        lazyImages.forEach(img => {
-            imageObserver.observe(img);
-        });
+        if (!hasActiveSearch) favoritesWrapper.setAttribute('open', 'open');
+        favoritesContainer.replaceChildren(...favoriteZones.map(zone => makeZoneItem(zone, openZone)));
+        attachLazyLoader(favoritesContainer);
     }
 }
 
@@ -1513,23 +1364,40 @@ function openZone(file) {
                 zoneFrame.id = "zoneFrame";
                 zoneViewer.appendChild(zoneFrame);
             }
-            zoneFrame.contentDocument.open();
-            zoneFrame.contentDocument.write(html);
-            zoneFrame.contentDocument.close();
-
-            function removeAds(doc) {
-                doc.querySelectorAll('[id^="sidebarad"]').forEach(el => el.remove());
-                doc.querySelectorAll('.sidebar-frame').forEach(el => el.remove());
+            const adKiller = `<script>(function(){
+    function isAd(el) {
+        return el.id && /^sidebarad/.test(el.id);
+    }
+    function nukeEl(el) {
+        let t = el;
+        while (t && t !== document.documentElement) {
+            if (isAd(t)) { t.remove(); return; }
+            t = t.parentElement;
+        }
+        el.remove();
+    }
+    function nuke(root) {
+        root.querySelectorAll('[id^="sidebarad"],[class~="sidebar-frame"],[class~="sidebar-close"]')
+            .forEach(nukeEl);
+    }
+    new MutationObserver(function(ms){
+        for(var i=0;i<ms.length;i++){
+            var nodes=ms[i].addedNodes;
+            for(var j=0;j<nodes.length;j++){
+                var n=nodes[j];
+                if(n.nodeType!==1) continue;
+                if(isAd(n)||n.classList.contains('sidebar-frame')||n.classList.contains('sidebar-close'))
+                    { n.remove(); continue; }
+                nuke(n);
             }
+        }
+    }).observe(document.documentElement,{childList:true,subtree:true});
+    document.addEventListener('DOMContentLoaded',function(){nuke(document);});
+}());<\/script>`;
 
-            zoneFrame.onload = () => {
-                const iframeDoc = zoneFrame.contentDocument;
-                if (!iframeDoc || !iframeDoc.body) return;
-                removeAds(iframeDoc);
-                if (window._adObserver) window._adObserver.disconnect();
-                window._adObserver = new MutationObserver(() => removeAds(iframeDoc));
-                window._adObserver.observe(iframeDoc.body, { childList: true, subtree: true });
-            };
+            zoneFrame.contentDocument.open();
+            zoneFrame.contentDocument.write(adKiller + html);
+            zoneFrame.contentDocument.close();
 
             document.getElementById('zoneName').textContent = file.name;
             document.getElementById('zoneId').textContent = file.id;
@@ -1565,14 +1433,17 @@ function closeZone() {
         window._adObserver.disconnect();
         window._adObserver = null;
     }
-    zoneViewer.hidden = false;
-    zoneViewer.style.display = "none";
-    if (zoneViewer.contains(zoneFrame)) {
-        zoneViewer.removeChild(zoneFrame);
-    }
-    const url = new URL(window.location);
-    url.searchParams.delete('id');
-    history.pushState(null, '', url.toString());
+    zoneViewer.style.animation = "slideOutDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards";
+    setTimeout(() => {
+        zoneViewer.style.animation = "";
+        zoneViewer.style.display = "none";
+        if (zoneViewer.contains(zoneFrame)) {
+            zoneViewer.removeChild(zoneFrame);
+        }
+        const url = new URL(window.location);
+        url.searchParams.delete('id');
+        history.pushState(null, '', url.toString());
+    }, 300);
 }
 
 function downloadZone() {
@@ -1593,21 +1464,10 @@ function downloadZone() {
 }
 
 function fullscreenZone() {
-    if (zoneFrame.requestFullscreen) {
-        zoneFrame.requestFullscreen();
-        // Source - https://stackoverflow.com/a/65413565
-        // Posted by Michiel Dral, modified by community. See post 'Timeline' for change history
-        // Retrieved 2026-01-16, License - CC BY-SA 4.0
-        navigator.keyboard.lock(["Escape"]);
-    } else if (zoneFrame.mozRequestFullScreen) {
-        zoneFrame.mozRequestFullScreen();
-        navigator.keyboard.lock(["Escape"]);
-    } else if (zoneFrame.webkitRequestFullscreen) {
-        zoneFrame.webkitRequestFullscreen();
-        navigator.keyboard.lock(["Escape"]);
-    } else if (zoneFrame.msRequestFullscreen) {
-        zoneFrame.msRequestFullscreen();
-        navigator.keyboard.lock(["Escape"]);
+    const req = zoneFrame.requestFullscreen || zoneFrame.webkitRequestFullscreen || zoneFrame.mozRequestFullScreen || zoneFrame.msRequestFullscreen;
+    if (req) {
+        req.call(zoneFrame);
+        navigator.keyboard?.lock(["Escape"]);
     }
 }
 
