@@ -294,10 +294,10 @@ main {
 
 @keyframes slideInUp {
     from {
-        transform: translateX(100%);
+        transform: translateY(-100%);
     }
     to {
-        transform: translateX(0);
+        transform: translateY(0);
     }
 }
 
@@ -306,7 +306,7 @@ main {
         transform: translateY(0);
     }
     to {
-        transform: translateY(100%);
+        transform: translateY(-100%);
     }
 }
 
@@ -1354,6 +1354,7 @@ function openRandomZone() {
 }
 
 function openZone(file) {
+    if (zoneViewer.style.display === "block") return;
     if (file.url.startsWith("http") && !file.url.includes("gitlab.com")) {
         window.open(file.url, "_blank");
     } else {
