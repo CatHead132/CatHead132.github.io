@@ -1212,11 +1212,11 @@ function displayFeaturedZones(featuredZones) {
     const customImg = document.createElement("img");
     customImg.src = "https://education-vapor.b-cdn.net/asset/logo-icon.png";
     customImg.style.objectFit = "contain";
-    customImg.style.padding = "1rem";
+    customImg.style.padding = "0.5rem";
     customItem.appendChild(customImg);
 
     const customBtn = document.createElement("button");
-    customBtn.textContent = "PR0XY, AI and MUSIC";
+    customBtn.textContent = "VAPOR v4";
     customItem.appendChild(customBtn);
 
     customItem.onclick = () => {
@@ -1233,11 +1233,10 @@ function displayFeaturedZones(featuredZones) {
     const customImg2 = document.createElement("img");
     customImg2.src = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/fern.png";
     customImg2.style.objectFit = "contain";
-    customImg2.style.padding = "1rem";
     customItem2.appendChild(customImg2);
 
     const customBtn2 = document.createElement("button");
-    customBtn2.textContent = "PR0XY";
+    customBtn2.textContent = "fern";
     customItem2.appendChild(customBtn2);
 
     customItem2.onclick = () => {
@@ -1835,23 +1834,28 @@ function cloakIcon(url) {
 
     if ((url + "").trim().length === 0) {
         link.href = "https://ssl.gstatic.com/classroom/favicon.png";
+        localStorage.removeItem('turkishPlaygroundCloakIcon');
         return;
     }
 
     try {
-        const domain = new URL(url).hostname;
+        const fullUrl = /^https?:\/\//i.test(url) ? url : "https://" + url;
+        const domain = new URL(fullUrl).hostname;
         link.href = `https://www.google.com/s2/favicons?domain=${domain}&sz=256`;
     } catch {
         link.href = url;
     }
+    localStorage.setItem('turkishPlaygroundCloakIcon', url);
 }
 
 function cloakName(string) {
     if ((string+"").trim().length === 0) {
         document.title = "Home - Classroom";
+        localStorage.removeItem('turkishPlaygroundCloakName');
         return;
     }
     document.title = string;
+    localStorage.setItem('turkishPlaygroundCloakName', string);
 }
 
 function tabCloak() {
@@ -1862,8 +1866,8 @@ function tabCloak() {
         <label for="tab-cloak-textbox" style="font-weight: bold;">Set Tab Title:</label><br>
         <input type="text" id="tab-cloak-textbox" placeholder="Enter new tab name..." oninput="cloakName(this.value)">
         <br><br><br><br>
-        <label for="tab-cloak-textbox" style="font-weight: bold;">Set Tab Icon:</label><br>
-        <input type="text" id="tab-cloak-textbox" placeholder="Enter new tab icon..." oninput='cloakIcon(this.value)'>
+        <label for="tab-cloak-icon" style="font-weight: bold;">Set Tab Icon:</label><br>
+        <input type="text" id="tab-cloak-icon" placeholder="Enter new tab icon..." oninput='cloakIcon(this.value)'>
         <br><br><br>
     `;
     popupBody.contentEditable = false;
@@ -1997,6 +2001,12 @@ document.addEventListener('fullscreenchange', () => {
         fullscreenZone();
     }
 });
+
+const savedCloakName = localStorage.getItem('turkishPlaygroundCloakName');
+const savedCloakIcon = localStorage.getItem('turkishPlaygroundCloakIcon');
+if (savedCloakName) cloakName(savedCloakName);
+if (savedCloakIcon) cloakIcon(savedCloakIcon);
+
 </script>
 </body>
 </html>
