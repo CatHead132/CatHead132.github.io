@@ -10,6 +10,8 @@
     <meta name="title" content="Turkish Playground">
     <meta name="description" content="Play unbl*cked games on Turkish Playground. Fast, free, no downloads—perfect for school or home.">
     <meta property="og:type" content="website">
+    <link rel="manifest" href="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/manifest.json">
+    <meta name="theme-color" content="#000000">
     <style>
         :root {
     --grid-columns: 8;
@@ -738,6 +740,13 @@ footer {
     </style>
 </head>
 <body>
+    <script>
+      if ('serviceWorker' in navigator) {
+        const swCode = `self.addEventListener('fetch', e => e.respondWith(fetch(e.request)));`;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(blob));
+      }
+    </script>
     <header>
         <div class="header-content">
             <div class="logo">Turkish Playground</div>
