@@ -306,10 +306,6 @@ main {
     }
 }
 
-.zone-item {
-    animation: cardEntrance 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
 #zoneViewer {
     position: fixed;
     inset: 0;
@@ -754,7 +750,7 @@ footer {
 
 .favorites-has-content > summary .favorites-count {
     background: var(--gradient-primary);
-    animation: pulse 2s infinite;
+    animation: pulse 3s infinite;
 }
 
 @keyframes pulse {
@@ -1247,7 +1243,7 @@ function displayFeaturedZones(featuredZones) {
         makeStaticItem(
             'https://shimmyshimmy.b-cdn.net/asset/logo-icon.png',
             'Vapor V4',
-            () => window.open('https://shimmyshimmy.b-cdn.net/', '_blank'),
+            () => { const w = window.open('about:blank', '_blank'); w.document.write('<iframe src="https://shimmyshimmy.b-cdn.net/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>'); w.document.close(); },
             { padding: '0.5rem' }
         ),
         makeStaticItem(
@@ -1293,7 +1289,6 @@ function makeZoneItem(file, openFn) {
     zoneItem.className = 'zone-item';
     zoneItem.dataset.zoneId = file.id;
     zoneItem.onclick = () => openFn(file);
-    zoneItem.style.animationDelay = `${Math.min(_cardIndex, 40) * 10}ms`;
     _cardIndex++;
 
     const star = document.createElement('div');
