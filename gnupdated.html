@@ -67,6 +67,7 @@ body {
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
 }
 
 header {
@@ -125,11 +126,10 @@ header {
     border: 0;
     border-radius: var(--radius);
     background: var(--glass);
-    backdrop-filter: blur(20px);
     color: var(--text);
     font-size: 15px;
     outline: none;
-    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
     box-shadow: var(--shadow-sm);
 }
 
@@ -155,7 +155,7 @@ header {
     font-size: 15px;
     cursor: pointer;
     outline: none;
-    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
     min-width: 130px;
     box-shadow: var(--shadow-sm);
 }
@@ -215,11 +215,10 @@ main {
     border-radius: var(--radius-lg);
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     position: relative;
     box-shadow: var(--shadow-sm);
-    will-change: transform;
-    contain: layout style;
+    contain: layout style paint;
     aspect-ratio: 1;
 }
 
@@ -227,6 +226,7 @@ main {
     transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-xl);
     border-color: var(--primary);
+    will-change: transform;
 }
 
 .zone-item:hover::before {
@@ -252,7 +252,7 @@ main {
     object-fit: cover;
     display: block;
     background: var(--border-light);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.2s ease;
 }
 
 .zone-item:hover img {
@@ -268,14 +268,13 @@ main {
     font-weight: 600;
     font-size: clamp(9px, 1.1vw, 13px);
     text-align: center;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.2s ease;
     line-height: 1.4;
     word-break: break-word;
     position: absolute;
     inset: 0;
     z-index: 5;
     opacity: 0;
-    backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -389,8 +388,8 @@ main {
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(20px);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    backdrop-filter: none;
 }
 
 .zone-controls button:hover {
@@ -479,14 +478,13 @@ main {
     cursor: pointer;
     padding: 0.5rem;
     border-radius: var(--radius);
-    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
     line-height: 1;
     width: 36px;
     height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(20px);
 }
 
 #popupClose:hover {
@@ -647,7 +645,6 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(20px);
 }
 .control-buttons button:hover {
     background: var(--surface-hover);
@@ -707,8 +704,7 @@ footer {
     justify-content: center;
     cursor: pointer;
     z-index: 6;
-    transition: transform 0.3s ease, background 0.3s ease, opacity 0.3s ease;
-    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
     opacity: 0;
 }
