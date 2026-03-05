@@ -1234,25 +1234,15 @@ function displayFeaturedZones(featuredZones) {
         makeStaticItem(
             'https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/fern.png',
             'fern',
-            () => { const w = window.open('about:blank', '_blank'); w.document.write('<iframe src="https://67uhftyuj.b-cdn.net" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>'); w.document.close(); },
+            () => openExternalAsZone('fern', 'https://67uhftyuj.b-cdn.net', ''),
         ),
         makeStaticItem(
             'https://shimmyshimmy.b-cdn.net/asset/logo-icon.png',
             'Vapor V4',
-            () => { const w = window.open('about:blank', '_blank'); w.document.write('<iframe src="https://shimmyshimmy.b-cdn.net/" style="width:100%;height:100%;border:none;position:fixed;top:0;left:0;" allowfullscreen></iframe>'); w.document.close(); },
+            () => openExternalAsZone('Vapor V4', 'https://shimmyshimmy.b-cdn.net/', ''),
             { padding: '0.5rem' }
         ),
-        makeStaticItem(
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3qyH-B5qBsFlLQ8BHRLZy4HRJ6S9OBj40tQ&s',
-            'Blooket Cheats',
-            () => window.open('https://blooketbot.b-cdn.net', '_blank'),
-        ),
-        makeStaticItem(
-            'https://unblockedmathgames.com/logo.png',
-            'SDXP',
-            () => window.open('https://unblockedmathgames.com/', '_blank'),
-            { padding: '0.5rem' }
-        ),
+
     ];
 
     const zoneItems = featuredZones.map(file => makeZoneItem(file, openZone));
@@ -1432,6 +1422,24 @@ function writeToFrame(frame, html) {
     frame.contentDocument.open();
     frame.contentDocument.write(adKiller + html);
     frame.contentDocument.close();
+}
+
+function openExternalAsZone(name, src, author) {
+    if (zoneViewer.style.display === "flex") return;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box;}html,body{width:100%;height:100%;overflow:hidden;}iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:none;}</style></head><body><iframe src="${src}" allowfullscreen></iframe></body></html>`;
+    if (zoneFrame.contentDocument === null) {
+        zoneFrame = document.createElement("iframe");
+        zoneFrame.id = "zoneFrame";
+        zoneViewer.appendChild(zoneFrame);
+    }
+    writeToFrame(zoneFrame, html);
+    document.getElementById('zoneName').textContent = name;
+    document.getElementById('zoneId').textContent = '';
+    document.getElementById('zoneAuthor').textContent = author ? "by " + author : '';
+    document.getElementById('zoneAuthor').href = '#';
+    zoneViewer.style.display = "flex";
+    startPlaytimeTracking();
+    zoneViewer.hidden = false;
 }
 
 function openZone(file) {
@@ -1919,7 +1927,7 @@ window.addEventListener('beforeunload', function(event) {
     stopPlaytimeTracking();
     event.preventDefault();
     event.returnValue = '';
-    return 'Are you sure you want to leave? Any unsaved changes will be lost.';
+    return 'If this appeared without u clicking anything, your teacher tryna close ur tab lol';
 });
 document.addEventListener('keydown', (e) => {
     if (e.key === 'F11' && zoneViewer.style.display === 'flex') {
