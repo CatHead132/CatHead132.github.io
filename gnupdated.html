@@ -844,20 +844,18 @@ footer {
             "Fahh",
             "Sponsored by Pala Baba",
             "New Turkish Empire coming soon",
-            '"Meet me at the mat boi -Landon Siler"',
+            '"Meet me at the mat boi -Landon"',
             '"not user1 joined the game"',
             '"Anyone named user1 will be kicked"',
             "W Speed ❤️‍🩹",
             "STOP SIGN! WHAT STOP SIGN? 🛑",
-            "yes.",
             "Emory is thinking",
-            "I don't know",
-            '"I am a femboy" -Not Landon Siler',
+            '"I am a femboy" -Not Landon',
             '"Did he just say his last name is Burger?"',
             "https://youtu.be/72TDVG5a5M0",
             "https://youtu.be/dQw4w9WgXcQ",
             "I am pibble, wash ma bellayy",
-            '"A homeless man chased me through the woods" -Landon Siler',
+            '"A homeless man chased me through the woods" -Landon',
             "Charlie Charlie Kirky",
             ];
 
@@ -874,7 +872,9 @@ footer {
                 if (!oldSlide) return;
                 oldSlide.classList.add("flip-out");
                 setTimeout(() => {
-                    current = (current + 1) % subtitles.length;
+                    let next;
+                    do { next = Math.floor(Math.random() * subtitles.length); } while (next === current && subtitles.length > 1);
+                    current = next;
                     const newSlide = document.createElement("span");
                     newSlide.className = "reel-slide flip-in";
                     newSlide.textContent = subtitles[current];
