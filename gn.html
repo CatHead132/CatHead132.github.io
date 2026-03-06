@@ -1,6 +1,60 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head><body>
 <div id="r"></div>
+<div id="lockscreen">
+  <h1>No more Turkish Playground for you! You shall contact the site owner to get the new one.</h1>
+  <p>or i might just reject (Lookin at u Jag)</p>
+  <h2>This is due to people not doing their work before playing which is badd!!!</h2>
+</div>
+<script>
+const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a","Enter"];
+let pos = 0;
+
+function loadSite() {
+  document.getElementById("lockscreen").style.display = "none";
+  fetch("https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/gnupdated.html?t=" + Date.now())
+    .then(r => r.text())
+    .then(h => {
+      let d = document.getElementById("r"), x = document.createElement("html");
+      d.innerHTML = h; x.innerHTML = h;
+      let t = x.querySelector("title"), i = x.querySelector('link[rel*="icon"]');
+      if (t) document.title = t.textContent;
+      if (i) {
+        let f = document.createElement("link");
+        f.rel = "icon"; f.href = i.getAttribute("href");
+        document.head.appendChild(f);
+      }
+      d.querySelectorAll("script").forEach(s => {
+        let n = document.createElement("script");
+        if (s.src) n.src = s.src;
+        else n.textContent = s.textContent;
+        if (s.type) n.type = s.type;
+        document.body.appendChild(n);
+      });
+    }).catch(e => console.error(e));
+}
+
+if (localStorage.getItem("unlocked") === "1") {
+  loadSite();
+} else {
+  document.addEventListener("keydown", function(e) {
+    if (e.key === KONAMI[pos]) {
+      pos++;
+      if (pos === KONAMI.length) {
+        localStorage.setItem("unlocked", "1");
+        loadSite();
+        pos = 0;
+      }
+    } else {
+      pos = e.key === KONAMI[0] ? 1 : 0;
+    }
+  });
+}
+</script>
+</body></html>
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head><body>
+<div id="r"></div>
 <h1>No more turkish playground for you! You shall contact the site owner to get the new one</h1></h1>
 <!--<script>
 fetch("https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/gnupdated.html?t="+Date.now())
