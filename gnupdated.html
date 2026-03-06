@@ -766,17 +766,100 @@ footer {
 
     <header>
         <div class="header-content">
-            <div class="logo" id="logo"></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0rem;margin-top:-10px;">
+            <div class="logo">Turkish Playground</div>
+            <div id="subtitle-reel" style="
+                font-size:12px;
+                font-weight:600;
+                color:var(--text-muted);
+                letter-spacing:0.05em;
+                padding-left:2px;
+                height:1.4em;
+                overflow:hidden;
+                position:relative;
+                display:inline-block;
+                min-width:10px;
+            ">
+                <div id="subtitle-inner" style="
+                    position:relative;
+                    will-change:transform;
+                "></div>
+            </div>
+            </div>
+            <style>
+            @keyframes reelFlipIn {
+                0%   { transform: translateY(-100%); opacity: 0.3; }
+                60%  { transform: translateY(8%);    opacity: 1; }
+                80%  { transform: translateY(-3%);   opacity: 1; }
+                100% { transform: translateY(0%);    opacity: 1; }
+            }
+            @keyframes reelFlipOut {
+                0%   { transform: translateY(0%);    opacity: 1; }
+                100% { transform: translateY(100%);  opacity: 0.3; }
+            }
+            .reel-slide {
+                display: block;
+                line-height: 1.4em;
+                white-space: nowrap;
+            }
+            .reel-slide.flip-out {
+                animation: reelFlipOut 0.18s cubic-bezier(0.4,0,1,1) forwards;
+            }
+            .reel-slide.flip-in {
+                animation: reelFlipIn 0.28s cubic-bezier(0,0,0.2,1) forwards;
+            }
+            </style>
             <script>
-            const names = [
-              "Turkish Playground",
-              "Turkish Malware",
-              "Turkish Games",
-              "Turkish Stop Refreshing",
-              "Turkish 676767"
+            const subtitles = [
+            "Turkish Malware",
+            "676767",
+            "Not a virus (probably)",
+            "Alt+🔍+fullscreen for secret",
+            "100% homework free",
+            "Sponsored by detention",
+            "Brought to you by the best Turkish guy",
+            "Chicken Butt",
+            "Tyler sucks",
+            "Stop staring to this text",
+            "Bro is really playing games in class",
+            "Definitely doing research",
+            "Finals? never heard of her",
+            "Stop playing games and do ur work",
+            "Currently failing 3 classes",
+            "Teachers behind u gng",
+            "Oh we have a sub? YAY",
+            "Wifi pass is Teacher5!@!@",
+            "The Promethean board saw everything",
+            '"Do you have a charger?"',
+            "We live, we love, we lie",
+            "Greece sucks",
+            "JAG BRO STOP WITH THE SOUNDBOARD",
+            "Written on Arch Linux",
+            '"Bro i didnt know the notecards weer doe today"',
+            "Green day is ball",
             ];
-            const randomName = names[Math.floor(Math.random() * names.length)];
-            document.getElementById("logo").textContent = randomName;
+
+            const inner = document.getElementById("subtitle-inner");
+            let current = Math.floor(Math.random() * subtitles.length);
+
+            const initSlide = document.createElement("span");
+            initSlide.className = "reel-slide";
+            initSlide.textContent = subtitles[current];
+            inner.appendChild(initSlide);
+
+            setInterval(() => {
+                const oldSlide = inner.querySelector(".reel-slide");
+                if (!oldSlide) return;
+                oldSlide.classList.add("flip-out");
+                setTimeout(() => {
+                    current = (current + 1) % subtitles.length;
+                    const newSlide = document.createElement("span");
+                    newSlide.className = "reel-slide flip-in";
+                    newSlide.textContent = subtitles[current];
+                    if (oldSlide.parentNode) oldSlide.parentNode.removeChild(oldSlide);
+                    inner.appendChild(newSlide);
+                }, 180);
+            }, 4000);
             </script>
             <div class="search-container">
                 <input type="text" id="searchBar" placeholder="Search games..." oninput="filterZones()">
