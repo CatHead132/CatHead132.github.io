@@ -2,12 +2,15 @@
 <html><head><meta charset="UTF-8"></head><body>
 <div id="r"></div>
 <script>
-fetch("https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/gnupdated.html?t=" + Date.now())
+fetch("https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/gnupdated.html?t="+Date.now())
 .then(r=>r.text())
 .then(h=>{
-  let d=document.getElementById("r");
-  d.innerHTML=h;
-  let x=document.createElement("html");x.innerHTML=h;
-  let t=x.querySelector("title");if(t)document.title=t.textContent;
-  let i=x.querySelector('link[rel*="icon"]');if(i){let f=document.createElement("link");f.rel="icon";f.href=i.href;document.head.appendChild(f);}
-  d.querySelectorAll("script").forEach(s=>{let n=document.createElement("script");s.src?n.src=s.src:n.textContent=s.textContent;document.body.appendChild(n);});
+  let d=document.getElementById("r"),x=document.createElement("html");
+  d.innerHTML=h;x.innerHTML=h;
+  let t=x.querySelector("title"),i=x.querySelector('link[rel*="icon"]');
+  if(t)document.title=t.textContent;
+  if(i){let f=document.createElement("link");f.rel="icon";f.href=i.getAttribute("href");document.head.appendChild(f);}
+  d.querySelectorAll("script").forEach(s=>{let n=document.createElement("script");if(s.src)n.src=s.src;else n.textContent=s.textContent;if(s.type)n.type=s.type;document.body.appendChild(n);});
+}).catch(e=>console.error(e));
+</script>
+</body></html>
