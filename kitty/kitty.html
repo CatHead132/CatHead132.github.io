@@ -80,8 +80,51 @@ function doYawn(){
   aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,rand(1000,1500));},2200);
 }
 
+
+
+function handleMouse(type, x){
+  if(type==="mousedown"){
+    if(sleeping)return;
+    lastInteractTime=Date.now();
+    clearTimeout(leaveT);
+    if(!clicking){
+      clicking=true;
+      clearTimers();
+      set(I.cursor);
+      lastClickX=x;
+      rubCount=0;
+    }
+  } else if(type==="mousemove"){
+    if(!clicking||sleeping||rubbing)return;
+    lastInteractTime=Date.now();
+    if(lastClickX!==null){
+      const dx=Math.abs(x-lastClickX);
+      if(dx>10){
+        rubCount++;
+        if(rubCount>=RUB_N){
+          rubbing=true;clicking=false;rubCount=0;
+          clearTimers();set(I.happy);
+          aT=setTimeout(()=>{
+            rubbing=false;set(I.cursor);
+            aT=setTimeout(()=>{clicking=false;set(I.stand);idleLoop();},LEAVE_DELAY);
+          },3500);
+        }
+      } else {rubCount=Math.max(0,rubCount-0.5);}
+      lastClickX=x;
+    }
+  } else if(type==="mouseup"){
+    if(!clicking||rubbing)return;
+    leaveT=setTimeout(()=>{
+      clicking=false;lastClickX=null;rubCount=0;
+      if(!rubbing&&!sleeping){set(I.stand);idleLoop();}
+    },LEAVE_DELAY);
+  }
+}
+
 window.addEventListener("message",e=>{
-  if(!e.data||e.data.cmd!=="greet")return;
+  if(!e.data)return;
+  if(e.data.cmd==="mouse"){handleMouse(e.data.type,e.data.x);return;}
+  if(e.data.cmd!=="greet")return;
   reset();
   set(I.sleep1);
   setTimeout(()=>set(I.sleep2),500);
@@ -92,62 +135,6 @@ window.addEventListener("message",e=>{
       setTimeout(()=>{set(I.stand);idleLoop();},1200);
     },1000);
   },2000);
-});
-
-document.addEventListener("mousedown",e=>{
-  if(sleeping)return;
-  lastInteractTime=Date.now();
-  clearTimeout(leaveT);
-  if(!clicking){
-    clicking=true;
-    clearTimers();
-    set(I.cursor);
-    lastClickX=e.clientX;
-    rubCount=0;
-  }
-});
-
-document.addEventListener("mousemove",e=>{
-  if(!clicking||sleeping||rubbing)return;
-  lastInteractTime=Date.now();
-  if(lastClickX!==null){
-    const dx=Math.abs(e.clientX-lastClickX);
-    if(dx>10){
-      rubCount++;
-      if(rubCount>=RUB_N){
-        rubbing=true;
-        clicking=false;
-        rubCount=0;
-        clearTimers();
-        set(I.happy);
-        aT=setTimeout(()=>{
-          rubbing=false;
-          set(I.cursor);
-          aT=setTimeout(()=>{
-            clicking=false;
-            set(I.stand);
-            idleLoop();
-          },LEAVE_DELAY);
-        },3500);
-      }
-    } else {
-      rubCount=Math.max(0,rubCount-0.5);
-    }
-    lastClickX=e.clientX;
-  }
-});
-
-document.addEventListener("mouseup",()=>{
-  if(!clicking||rubbing)return;
-  leaveT=setTimeout(()=>{
-    clicking=false;
-    lastClickX=null;
-    rubCount=0;
-    if(!rubbing&&!sleeping){
-      set(I.stand);
-      idleLoop();
-    }
-  },LEAVE_DELAY);
 });
 </script>
 </body>
