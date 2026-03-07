@@ -766,7 +766,139 @@ footer {
 
     <header>
         <div class="header-content">
-            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0rem;margin-top:-10px;">
+            <img id="kittyImg" src="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png"
+  style="width:72px;height:72px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:default;flex-shrink:0;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;margin-left:-0.5rem;"
+  draggable="false">
+<script>
+(function(){
+const el=document.getElementById('kittyImg');
+
+const B="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
+const I={
+  aware:B+"aware.png",stand:B+"stand.png",
+  sleep1:B+"sleep1.png",sleep2:B+"sleep2.png",
+  scratch1:B+"scratch1.png",scratch2:B+"scratch2.png",
+  cursor:B+"cursor.png",happy:B+":3.png",yawn:B+"yawn.png"
+};
+const set=img=>el.src=img;
+const rand=(a,b)=>a+Math.random()*b;
+
+let sleeping=false,rubbing=false,hovered=false;
+let rubCount=0,lastInteractTime=0,lastMouseX=null;
+let aT=null,fT=null,enterT=null,leaveT=null;
+
+const SLEEP_DELAY=12000,RUB_N=5,ENTER_DELAY=400,LEAVE_DELAY=600;
+
+function clearTimers(){clearTimeout(aT);clearInterval(fT);aT=fT=null}
+function freshEnough(){return Date.now()-lastInteractTime<SLEEP_DELAY}
+
+function reset(){
+  clearTimers();clearTimeout(leaveT);
+  sleeping=rubbing=hovered=false;rubCount=0;lastMouseX=null;
+}
+
+set(I.aware);
+aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,1200)},1500);
+
+function idleLoop(){
+  if(hovered||rubbing)return;
+  clearTimers();
+  const r=Math.random();
+  if(r<0.35&&!freshEnough())doSleep();
+  else if(r<0.6)doScratch();
+  else if(r<0.75)doYawn();
+  else{set(I.stand);aT=setTimeout(idleLoop,rand(2000,2000));}
+}
+
+function doSleep(){
+  if(hovered||freshEnough())return idleLoop();
+  set(I.yawn);
+  aT=setTimeout(()=>{
+    if(hovered||freshEnough())return idleLoop();
+    sleeping=true;
+    let f=0;set(I.sleep1);
+    fT=setInterval(()=>set((++f%2)?I.sleep2:I.sleep1),800);
+    aT=setTimeout(()=>{
+      clearInterval(fT);sleeping=false;set(I.yawn);
+      aT=setTimeout(()=>{
+        set(I.stand);aT=setTimeout(idleLoop,1000);
+      },900);
+    },rand(10000,6000));
+  },700);
+}
+
+function doScratch(){
+  if(hovered)return idleLoop();
+  let f=0;set(I.scratch1);
+  fT=setInterval(()=>set((++f%2)?I.scratch2:I.scratch1),200);
+  aT=setTimeout(()=>{clearInterval(fT);set(I.stand);aT=setTimeout(idleLoop,rand(800,1000));},rand(1800,1200));
+}
+
+function doYawn(){
+  if(hovered)return idleLoop();
+  set(I.yawn);
+  aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,rand(1000,1500));},2200);
+}
+
+
+
+el.addEventListener("mouseenter",()=>{
+  clearTimeout(leaveT);
+  if(!rubbing&&!sleeping){
+    enterT=setTimeout(()=>{
+      hovered=true;lastInteractTime=Date.now();
+      clearTimers();set(I.cursor);lastMouseX=null;rubCount=0;
+    },ENTER_DELAY);
+  }
+});
+
+el.addEventListener("mousemove",e=>{
+  if(!hovered||sleeping||rubbing)return;
+  lastInteractTime=Date.now();
+  if(lastMouseX!==null){
+    const dx=Math.abs(e.clientX-lastMouseX);
+    if(dx>10){
+      rubCount++;
+      if(rubCount>=RUB_N){
+        rubbing=true;hovered=false;rubCount=0;
+        clearTimers();set(I.happy);
+        aT=setTimeout(()=>{
+          rubbing=false;
+          if(hovered){set(I.cursor);}else{set(I.stand);idleLoop();}
+        },3500);
+      }
+    } else {rubCount=Math.max(0,rubCount-0.5);}
+    lastMouseX=e.clientX;
+  } else {lastMouseX=e.clientX;}
+});
+
+el.addEventListener("mouseleave",()=>{
+  clearTimeout(enterT);
+  if(rubbing)return;
+  leaveT=setTimeout(()=>{
+    hovered=false;lastMouseX=null;rubCount=0;
+    if(!rubbing&&!sleeping){set(I.stand);aT=setTimeout(idleLoop,1000);}
+  },LEAVE_DELAY);
+});
+
+window.addEventListener("message",e=>{
+  if(!e.data||e.data.cmd!=="greet")return;
+  reset();
+  set(I.sleep1);
+  setTimeout(()=>set(I.sleep2),500);
+  setTimeout(()=>set(I.sleep1),1000);
+  setTimeout(()=>set(I.sleep2),1500);
+  setTimeout(()=>{set(I.yawn);
+    setTimeout(()=>{set(I.aware);
+      setTimeout(()=>{set(I.stand);idleLoop();},1200);
+    },1000);
+  },2000);
+});
+
+// Override set to update img src
+})();
+</script>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0rem;margin-top:-10px;">
             <div class="logo">Turkish Playground</div>
             <div id="subtitle-reel" style="
                 font-size:12px;
@@ -856,6 +988,12 @@ footer {
             "I am pibble, wash ma bellayy",
             '"A homeless man chased me through the woods" -Landon',
             "Charlie Charlie Kirky",
+            "<-- This is Luna <3",
+            "We love Luna",
+            "Luna is Turkish Playground's mascot",
+            "Luna loves getting perfect",
+            "I spent way too much time on Luna",
+            "Luna wants attention :3"
             ];
 
             const inner = document.getElementById("subtitle-inner");
@@ -1616,6 +1754,7 @@ function aboutBlank() {
 
 function closeZone() {
     stopPlaytimeTracking();
+    window.dispatchEvent(new MessageEvent("message", {data:{cmd:"greet"}}));
     zoneViewer.style.animation = "slideOutDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards";
     setTimeout(() => {
         zoneViewer.style.animation = "";
