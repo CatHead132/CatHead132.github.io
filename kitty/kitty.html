@@ -2,48 +2,46 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>kitty</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%}
-body{background:transparent;display:flex;align-items:center;justify-content:center;width:100%;height:100%;overflow:hidden;cursor:default;margin:0;padding:0}
-#kitty{image-rendering:pixelated;image-rendering:crisp-edges;width:96px;height:96px;object-fit:contain;user-select:none;pointer-events:none}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:transparent}
+body{display:flex;align-items:center;justify-content:center;cursor:pointer}
+#kitty{image-rendering:pixelated;image-rendering:crisp-edges;width:48px;height:48px;object-fit:contain;user-select:none;pointer-events:none}
 </style>
 </head>
 <body>
 <img id="kitty" src="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png" alt="kitty" draggable="false">
 <script>
-const B = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
-const I = {
-  aware:B+"aware.png", stand:B+"stand.png",
-  sleep1:B+"sleep1.png", sleep2:B+"sleep2.png",
-  scratch1:B+"scratch1.png", scratch2:B+"scratch2.png",
-  cursor:B+"cursor.png", happy:B+":3.png", yawn:B+"yawn.png"
+const B="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
+const I={
+  aware:B+"aware.png",stand:B+"stand.png",
+  sleep1:B+"sleep1.png",sleep2:B+"sleep2.png",
+  scratch1:B+"scratch1.png",scratch2:B+"scratch2.png",
+  cursor:B+"cursor.png",happy:B+":3.png",yawn:B+"yawn.png"
 };
-const el = document.getElementById("kitty");
-const set = img => el.src = img;
-const rand = (a,b) => a + Math.random() * b;
+const el=document.getElementById("kitty");
+const set=img=>el.src=img;
+const rand=(a,b)=>a+Math.random()*b;
 
-let hovered=false, sleeping=false, rubbing=false;
-let rubCount=0, lastInteractTime=0, lastMouseX=null;
-let aT=null, fT=null, ceT=null, clT=null;
+let sleeping=false,rubbing=false,clicking=false;
+let rubCount=0,lastInteractTime=0,lastClickX=null;
+let aT=null,fT=null,leaveT=null;
 
-const SLEEP_DELAY=12000, RUB_N=5, CE=400, CL=600;
+const SLEEP_DELAY=12000,RUB_N=5,LEAVE_DELAY=800;
 
 function clearTimers(){clearTimeout(aT);clearInterval(fT);aT=fT=null}
 function freshEnough(){return Date.now()-lastInteractTime<SLEEP_DELAY}
-function afterIdle(){aT=setTimeout(idleLoop,300)}
 
 function reset(){
-  clearTimers();clearTimeout(ceT);clearTimeout(clT);
-  sleeping=rubbing=false;rubCount=0;hovered=false;
+  clearTimers();clearTimeout(leaveT);
+  sleeping=rubbing=clicking=false;rubCount=0;lastClickX=null;
 }
 
 set(I.aware);
 aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,1200)},1500);
 
 function idleLoop(){
-  if(hovered||rubbing)return;
+  if(clicking||rubbing)return;
   clearTimers();
   const r=Math.random();
   if(r<0.35&&!freshEnough())doSleep();
@@ -53,32 +51,31 @@ function idleLoop(){
 }
 
 function doSleep(){
-  if(hovered||freshEnough())return idleLoop();
+  if(clicking||freshEnough())return idleLoop();
   set(I.yawn);
   aT=setTimeout(()=>{
-    if(hovered||freshEnough())return idleLoop();
+    if(clicking||freshEnough())return idleLoop();
     sleeping=true;
     let f=0;set(I.sleep1);
     fT=setInterval(()=>set((++f%2)?I.sleep2:I.sleep1),800);
     aT=setTimeout(()=>{
       clearInterval(fT);sleeping=false;set(I.yawn);
       aT=setTimeout(()=>{
-        if(hovered){set(I.cursor);}
-        else{set(I.stand);aT=setTimeout(idleLoop,1000);}
+        set(I.stand);aT=setTimeout(idleLoop,1000);
       },900);
     },rand(10000,6000));
   },700);
 }
 
 function doScratch(){
-  if(hovered)return idleLoop();
+  if(clicking)return idleLoop();
   let f=0;set(I.scratch1);
   fT=setInterval(()=>set((++f%2)?I.scratch2:I.scratch1),200);
   aT=setTimeout(()=>{clearInterval(fT);set(I.stand);aT=setTimeout(idleLoop,rand(800,1000));},rand(1800,1200));
 }
 
 function doYawn(){
-  if(hovered)return idleLoop();
+  if(clicking)return idleLoop();
   set(I.yawn);
   aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,rand(1000,1500));},2200);
 }
@@ -97,41 +94,60 @@ window.addEventListener("message",e=>{
   },2000);
 });
 
-document.addEventListener("mousemove",e=>{
-  const r=el.getBoundingClientRect();
-  const dist=Math.hypot(e.clientX-(r.left+r.width/2),e.clientY-(r.top+r.height/2));
-  const wasHovered=hovered;
-  hovered=dist<140;
-
-  if(hovered){
-    lastInteractTime=Date.now();
-    if(clT){clearTimeout(clT);clT=null;}
-
-    if(lastMouseX!==null){
-      const dx=Math.abs(e.clientX-lastMouseX);
-      if(dx>10){
-        if(!sleeping&&!rubbing)rubCount++;
-        if(rubCount>=RUB_N&&!rubbing&&!sleeping){
-          rubbing=true;rubCount=0;
-          clearTimeout(ceT);clearTimers();
-          set(I.happy);
-          aT=setTimeout(()=>{rubbing=false;hovered?set(I.cursor):(set(I.stand),idleLoop());},3500);
-        }
-      }else{rubCount=Math.max(0,rubCount-0.5);}
-    }
-    lastMouseX=e.clientX;
-
-    if(!wasHovered&&!rubbing&&!sleeping){
-      clearTimeout(ceT);
-      ceT=setTimeout(()=>{if(hovered&&!rubbing&&!sleeping){clearTimers();set(I.cursor);}},CE);
-    }
-  }else{
-    lastMouseX=null;rubCount=0;
-    if(ceT){clearTimeout(ceT);ceT=null;}
-    if(wasHovered&&!rubbing&&!sleeping){
-      clT=setTimeout(()=>{clT=null;if(!rubbing&&!sleeping){set(I.stand);clearTimers();afterIdle();}},CL);
-    }
+document.addEventListener("mousedown",e=>{
+  if(sleeping)return;
+  lastInteractTime=Date.now();
+  clearTimeout(leaveT);
+  if(!clicking){
+    clicking=true;
+    clearTimers();
+    set(I.cursor);
+    lastClickX=e.clientX;
+    rubCount=0;
   }
+});
+
+document.addEventListener("mousemove",e=>{
+  if(!clicking||sleeping||rubbing)return;
+  lastInteractTime=Date.now();
+  if(lastClickX!==null){
+    const dx=Math.abs(e.clientX-lastClickX);
+    if(dx>10){
+      rubCount++;
+      if(rubCount>=RUB_N){
+        rubbing=true;
+        clicking=false;
+        rubCount=0;
+        clearTimers();
+        set(I.happy);
+        aT=setTimeout(()=>{
+          rubbing=false;
+          set(I.cursor);
+          aT=setTimeout(()=>{
+            clicking=false;
+            set(I.stand);
+            idleLoop();
+          },LEAVE_DELAY);
+        },3500);
+      }
+    } else {
+      rubCount=Math.max(0,rubCount-0.5);
+    }
+    lastClickX=e.clientX;
+  }
+});
+
+document.addEventListener("mouseup",()=>{
+  if(!clicking||rubbing)return;
+  leaveT=setTimeout(()=>{
+    clicking=false;
+    lastClickX=null;
+    rubCount=0;
+    if(!rubbing&&!sleeping){
+      set(I.stand);
+      idleLoop();
+    }
+  },LEAVE_DELAY);
 });
 </script>
 </body>
