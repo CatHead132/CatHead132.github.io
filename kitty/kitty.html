@@ -5,237 +5,134 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>kitty</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    cursor: default;
-  }
-  #kitty {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    width: 96px;
-    height: 96px;
-    object-fit: contain;
-    user-select: none;
-    pointer-events: none;
-    transition: none;
-  }
+*{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;height:100%}
+body{background:transparent;display:flex;align-items:center;justify-content:center;width:100%;height:100%;overflow:hidden;cursor:default;margin:0;padding:0}
+#kitty{image-rendering:pixelated;image-rendering:crisp-edges;width:96px;height:96px;object-fit:contain;user-select:none;pointer-events:none}
 </style>
 </head>
 <body>
 <img id="kitty" src="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png" alt="kitty" draggable="false">
-
 <script>
-  const base = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
-  const imgs = {
-    aware:    base + "aware.png",
-    stand:    base + "stand.png",
-    sleep1:   base + "sleep1.png",
-    sleep2:   base + "sleep2.png",
-    scratch1: base + "scratch1.png",
-    scratch2: base + "scratch2.png",
-    cursor:   base + "cursor.png",
-    happy:    base + ":3.png",
-    yawn:     base + "yawn.png",
-  };
+const B = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
+const I = {
+  aware:B+"aware.png", stand:B+"stand.png",
+  sleep1:B+"sleep1.png", sleep2:B+"sleep2.png",
+  scratch1:B+"scratch1.png", scratch2:B+"scratch2.png",
+  cursor:B+"cursor.png", happy:B+":3.png", yawn:B+"yawn.png"
+};
+const el = document.getElementById("kitty");
+const set = img => el.src = img;
+const rand = (a,b) => a + Math.random() * b;
 
-  const kitty = document.getElementById("kitty");
+let hovered=false, sleeping=false, rubbing=false;
+let rubCount=0, lastInteractTime=0, lastMouseX=null;
+let aT=null, fT=null, ceT=null, clT=null;
 
-  let state = "booting";
-  let hovered = false;
-  let sleeping = false;
-  let rubbing = false;
-  let rubCount = 0;
-  let lastInteractTime = 0;
-  let lastMouseX = null;
-  let animTimer = null;
-  let frameTimer = null;
-  let cursorEnterTimer = null;
-  let cursorLeaveTimer = null
-  let showingCursor = false;
+const SLEEP_DELAY=12000, RUB_N=5, CE=400, CL=600;
 
-  const INTERACT_SLEEP_DELAY = 12000;
-  const RUB_THRESHOLD = 8;
-  const CURSOR_ENTER_DELAY = 400;
-  const CURSOR_LEAVE_DELAY = 600;
+function clearTimers(){clearTimeout(aT);clearInterval(fT);aT=fT=null}
+function freshEnough(){return Date.now()-lastInteractTime<SLEEP_DELAY}
+function afterIdle(){aT=setTimeout(idleLoop,300)}
 
-  function set(img) { kitty.src = img; }
+function reset(){
+  clearTimers();clearTimeout(ceT);clearTimeout(clT);
+  sleeping=rubbing=false;rubCount=0;hovered=false;
+}
 
-  function clearTimers() {
-    clearTimeout(animTimer);
-    clearInterval(frameTimer);
-    frameTimer = null;
-    animTimer = null;
-  }
+set(I.aware);
+aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,1200)},1500);
 
-  function recentlyInteracted() {
-    return (Date.now() - lastInteractTime) < INTERACT_SLEEP_DELAY;
-  }
+function idleLoop(){
+  if(hovered||rubbing)return;
+  clearTimers();
+  const r=Math.random();
+  if(r<0.35&&!freshEnough())doSleep();
+  else if(r<0.6)doScratch();
+  else if(r<0.75)doYawn();
+  else{set(I.stand);aT=setTimeout(idleLoop,rand(2000,2000));}
+}
 
-  set(imgs.aware);
-  animTimer = setTimeout(() => {
-    set(imgs.stand);
-    animTimer = setTimeout(() => {
-      state = "idle";
-      idleLoop();
-    }, 1200);
-  }, 1500);
+function doSleep(){
+  if(hovered||freshEnough())return idleLoop();
+  set(I.yawn);
+  aT=setTimeout(()=>{
+    if(hovered||freshEnough())return idleLoop();
+    sleeping=true;
+    let f=0;set(I.sleep1);
+    fT=setInterval(()=>set((++f%2)?I.sleep2:I.sleep1),800);
+    aT=setTimeout(()=>{
+      clearInterval(fT);sleeping=false;set(I.yawn);
+      aT=setTimeout(()=>{
+        if(hovered){set(I.cursor);}
+        else{set(I.stand);aT=setTimeout(idleLoop,1000);}
+      },900);
+    },rand(10000,6000));
+  },700);
+}
 
-  function idleLoop() {
-    if (hovered || rubbing) return;
-    clearTimers();
-    const roll = Math.random();
-    if (roll < 0.35 && !recentlyInteracted()) {
-      doSleep();
-    } else if (roll < 0.6) {
-      doScratch();
-    } else if (roll < 0.75) {
-      doYawn();
-    } else {
-      set(imgs.stand);
-      animTimer = setTimeout(idleLoop, 2000 + Math.random() * 2000);
-    }
-  }
+function doScratch(){
+  if(hovered)return idleLoop();
+  let f=0;set(I.scratch1);
+  fT=setInterval(()=>set((++f%2)?I.scratch2:I.scratch1),200);
+  aT=setTimeout(()=>{clearInterval(fT);set(I.stand);aT=setTimeout(idleLoop,rand(800,1000));},rand(1800,1200));
+}
 
-  function doSleep() {
-    if (hovered || recentlyInteracted()) return idleLoop();
-    set(imgs.yawn);
-    animTimer = setTimeout(() => {
-      if (hovered || recentlyInteracted()) return idleLoop();
-      sleeping = true;
-      let frame = 0;
-      set(imgs.sleep1);
-      frameTimer = setInterval(() => {
-        frame++;
-        set(frame % 2 === 0 ? imgs.sleep1 : imgs.sleep2);
-      }, 800);
-      animTimer = setTimeout(() => {
-        clearInterval(frameTimer);
-        sleeping = false;
-        set(imgs.yawn);
-        animTimer = setTimeout(() => {
-          if (hovered) {
-            showingCursor = true;
-            set(imgs.cursor);
-          } else {
-            set(imgs.stand);
-            animTimer = setTimeout(idleLoop, 1000);
-          }
-        }, 900);
-      }, 10000 + Math.random() * 6000);
-    }, 700);
-  }
+function doYawn(){
+  if(hovered)return idleLoop();
+  set(I.yawn);
+  aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,rand(1000,1500));},2200);
+}
 
-  function doScratch() {
-    if (hovered) return idleLoop();
-    let frame = 0;
-    set(imgs.scratch1);
-    frameTimer = setInterval(() => {
-      frame++;
-      set(frame % 2 === 0 ? imgs.scratch1 : imgs.scratch2);
-    }, 200);
-    animTimer = setTimeout(() => {
-      clearInterval(frameTimer);
-      set(imgs.stand);
-      animTimer = setTimeout(idleLoop, 800 + Math.random() * 1000);
-    }, 1800 + Math.random() * 1200);
-  }
+window.addEventListener("message",e=>{
+  if(!e.data||e.data.cmd!=="greet")return;
+  reset();
+  set(I.sleep1);
+  setTimeout(()=>set(I.sleep2),500);
+  setTimeout(()=>set(I.sleep1),1000);
+  setTimeout(()=>set(I.sleep2),1500);
+  setTimeout(()=>{set(I.yawn);
+    setTimeout(()=>{set(I.aware);
+      setTimeout(()=>{set(I.stand);idleLoop();},1200);
+    },1000);
+  },2000);
+});
 
-  function doYawn() {
-    if (hovered) return idleLoop();
-    set(imgs.yawn);
-    animTimer = setTimeout(() => {
-      set(imgs.stand);
-      animTimer = setTimeout(idleLoop, 1000 + Math.random() * 1500);
-    }, 2200);
-  }
+document.addEventListener("mousemove",e=>{
+  const r=el.getBoundingClientRect();
+  const dist=Math.hypot(e.clientX-(r.left+r.width/2),e.clientY-(r.top+r.height/2));
+  const wasHovered=hovered;
+  hovered=dist<140;
 
-  document.addEventListener("mousemove", (e) => {
-    const rect = kitty.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
-    const nearThreshold = 80;
+  if(hovered){
+    lastInteractTime=Date.now();
+    if(clT){clearTimeout(clT);clT=null;}
 
-    const wasHovered = hovered;
-    hovered = dist < nearThreshold;
-
-    if (hovered) {
-      lastInteractTime = Date.now();
-      if (cursorLeaveTimer) {
-        clearTimeout(cursorLeaveTimer);
-        cursorLeaveTimer = null;
-      }
-
-      if (lastMouseX !== null) {
-        const dx = Math.abs(e.clientX - lastMouseX);
-        if (dx > 15) {
-          if (!sleeping && !rubbing) rubCount++;
-          if (rubCount >= RUB_THRESHOLD && !rubbing && !sleeping) {
-            rubbing = true;
-            rubCount = 0;
-            showingCursor = false;
-            clearTimeout(cursorEnterTimer);
-            clearTimers();
-            set(imgs.happy);
-            animTimer = setTimeout(() => {
-              rubbing = false;
-              if (hovered) {
-                showingCursor = true;
-                set(imgs.cursor);
-              } else {
-                set(imgs.stand);
-                idleLoop();
-              }
-            }, 3500);
-          }
-        } else {
-          rubCount = Math.max(0, rubCount - 0.5);
+    if(lastMouseX!==null){
+      const dx=Math.abs(e.clientX-lastMouseX);
+      if(dx>10){
+        if(!sleeping&&!rubbing)rubCount++;
+        if(rubCount>=RUB_N&&!rubbing&&!sleeping){
+          rubbing=true;rubCount=0;
+          clearTimeout(ceT);clearTimers();
+          set(I.happy);
+          aT=setTimeout(()=>{rubbing=false;hovered?set(I.cursor):(set(I.stand),idleLoop());},3500);
         }
-      }
-      lastMouseX = e.clientX;
-
-      if (!wasHovered && !rubbing && !sleeping) {
-        clearTimeout(cursorEnterTimer);
-        cursorEnterTimer = setTimeout(() => {
-          if (hovered && !rubbing && !sleeping) {
-            showingCursor = true;
-            clearTimers();
-            set(imgs.cursor);
-          }
-        }, CURSOR_ENTER_DELAY);
-      }
-
-    } else {
-      lastMouseX = null;
-      rubCount = 0;
-
-      if (cursorEnterTimer) {
-        clearTimeout(cursorEnterTimer);
-        cursorEnterTimer = null;
-      }
-
-      if (wasHovered && !rubbing && !sleeping) {
-        cursorLeaveTimer = setTimeout(() => {
-          cursorLeaveTimer = null;
-          showingCursor = false;
-          if (!rubbing && !sleeping) {
-            set(imgs.stand);
-            if (state === "idle") {
-              clearTimers();
-              animTimer = setTimeout(idleLoop, 300);
-            }
-          }
-        }, CURSOR_LEAVE_DELAY);
-      }
+      }else{rubCount=Math.max(0,rubCount-0.5);}
     }
-  });
+    lastMouseX=e.clientX;
+
+    if(!wasHovered&&!rubbing&&!sleeping){
+      clearTimeout(ceT);
+      ceT=setTimeout(()=>{if(hovered&&!rubbing&&!sleeping){clearTimers();set(I.cursor);}},CE);
+    }
+  }else{
+    lastMouseX=null;rubCount=0;
+    if(ceT){clearTimeout(ceT);ceT=null;}
+    if(wasHovered&&!rubbing&&!sleeping){
+      clT=setTimeout(()=>{clT=null;if(!rubbing&&!sleeping){set(I.stand);clearTimers();afterIdle();}},CL);
+    }
+  }
+});
 </script>
 </body>
 </html>
