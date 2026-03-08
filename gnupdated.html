@@ -766,63 +766,128 @@ footer {
 
     <header>
         <div class="header-content">
-            <img id="kittyImg" src="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png"
-  style="width:72px;height:72px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:default;flex-shrink:0;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;margin-left:-0.5rem;"
-  draggable="false">
+<div id="kittyWrap" style="position:relative;width:72px;height:72px;flex-shrink:0;margin-left:-0.5rem;">
+  <img id="kittyImg" src="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png"
+    style="width:72px;height:72px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:default;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;display:block;"
+    draggable="false">
+  <div id="petLeft" style="position:absolute;top:0;left:calc(50% - 20px);width:20px;height:100%;z-index:10;cursor:default;"></div>
+  <div id="petRight" style="position:absolute;top:0;left:50%;width:20px;height:100%;z-index:10;cursor:default;"></div>
+</div>
 <script>
 (function(){
 const el=document.getElementById('kittyImg');
-
+const wrap=document.getElementById('kittyWrap');
 const B="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
-const I={
-  aware:B+"aware.png",stand:B+"stand.png",
-  sleep1:B+"sleep1.png",sleep2:B+"sleep2.png",
-  scratch1:B+"scratch1.png",scratch2:B+"scratch2.png",
-  cursor:B+"cursor.png",happy:B+":3.png",yawn:B+"yawn.png"
-};
-const set=img=>el.src=img;
+const I={aware:B+"aware.png",stand:B+"stand.png",sleep1:B+"sleep1.png",sleep2:B+"sleep2.png",scratch1:B+"scratch1.png",scratch2:B+"scratch2.png",cursor:B+"cursor.png",happy:B+":3.png",yawn:B+"yawn.png"};
+const SH=B+"smallheart.gif",BH=B+"bigheart.gif";
+const set=s=>el.src=s;
 const rand=(a,b)=>a+Math.random()*b;
+const SLEEP_DELAY=12000,ENTER_DELAY=80,LEAVE_DELAY=60,PET_COOLDOWN=1000,THRESHOLD=6;
+let sleeping=false,petting=false,hovered=false,onCooldown=false,happy=false;
+let lastInteractTime=0,lastAction=null,lastSide=null,awaitingOtherSide=false,strokeCount=0;
+let aT=null,fT=null,enterT=null,leaveT=null,strokeResetT=null,cooldownT=null,happyT=null,cursorDelayT=null;
 
-let sleeping=false,rubbing=false,hovered=false;
-let rubCount=0,lastInteractTime=0,lastMouseX=null;
-let aT=null,fT=null,enterT=null,leaveT=null;
-
-const SLEEP_DELAY=12000,RUB_N=5,ENTER_DELAY=400,LEAVE_DELAY=600;
-
-function clearTimers(){clearTimeout(aT);clearInterval(fT);aT=fT=null}
-function freshEnough(){return Date.now()-lastInteractTime<SLEEP_DELAY}
+const ct=()=>{clearTimeout(aT);clearInterval(fT);aT=fT=null;};
+const fresh=()=>Date.now()-lastInteractTime<SLEEP_DELAY;
+const blocked=()=>sleeping||onCooldown||happy;
 
 function reset(){
-  clearTimers();clearTimeout(leaveT);
-  sleeping=rubbing=hovered=false;rubCount=0;lastMouseX=null;
+  ct();clearTimeout(leaveT);clearTimeout(cooldownT);clearTimeout(strokeResetT);clearTimeout(happyT);clearTimeout(cursorDelayT);
+  sleeping=petting=hovered=onCooldown=happy=false;
+  strokeCount=0;lastSide=null;awaitingOtherSide=false;lastAction=null;
 }
 
-set(I.aware);
-aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,1200)},1500);
+function showHappy(cb){
+  happy=true;
+  ct();clearTimeout(cursorDelayT);clearTimeout(strokeResetT);
+  set(I.happy);
+  happyT=setTimeout(()=>{
+    happy=false;
+    if(cb)cb();
+  },1200);
+}
+
+function heart(big){
+  const h=document.createElement('img');
+  const ts='?t='+Date.now();
+  if(big){
+    h.src=BH+ts;
+    h.style.cssText='position:absolute;width:32px;height:32px;image-rendering:pixelated;pointer-events:none;z-index:99;bottom:calc(100% - 15px);left:50%;transform:translateX(-50%);';
+  } else {
+    const ox=(Math.random()*30-15),oy=(Math.random()*6-3);
+    h.src=SH+ts;h.className='small-heart';
+    h.style.cssText='position:absolute;width:24px;height:24px;image-rendering:pixelated;pointer-events:none;z-index:98;bottom:calc(100% - 8px + '+oy+'px);left:50%;transform:translateX(calc(-50% + '+ox+'px));';
+  }
+  wrap.appendChild(h);
+  setTimeout(()=>h.parentNode&&h.parentNode.removeChild(h),big?800:300);
+}
+
+function finishSession(){
+  clearTimeout(strokeResetT);clearTimeout(cursorDelayT);
+  strokeCount=0;lastSide=null;awaitingOtherSide=false;
+  petting=false;hovered=false;
+  if(happy)return;
+  ct();set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);
+}
+
+function onSideEnter(side){
+  if(blocked())return;
+  lastInteractTime=Date.now();
+  clearTimeout(strokeResetT);
+  if(side==='right'){
+    clearTimeout(cursorDelayT);
+    cursorDelayT=setTimeout(()=>{if(!happy)set(I.cursor);},180);
+  }
+  if(!petting){
+    petting=true;hovered=false;ct();
+    lastSide=side;awaitingOtherSide=false;
+    return;
+  }
+  if(!awaitingOtherSide||side===lastSide)return;
+  lastSide=side;awaitingOtherSide=false;strokeCount++;
+  if(strokeCount>=THRESHOLD){
+    heart(true);
+    onCooldown=true;
+    clearTimeout(cooldownT);
+    showHappy(()=>{
+      onCooldown=false;
+      petting=false;hovered=false;
+      ct();set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);
+    });
+    return;
+  }
+  heart(false);
+}
+
+function onSideExit(side){
+  if(blocked()||!petting)return;
+  lastSide=side;awaitingOtherSide=true;
+  clearTimeout(strokeResetT);
+  strokeResetT=setTimeout(()=>{if(awaitingOtherSide&&!blocked())finishSession();},400);
+}
 
 function idleLoop(){
-  if(hovered||rubbing)return;
-  clearTimers();
-  const r=Math.random();
-  if(r<0.35&&!freshEnough())doSleep();
-  else if(r<0.6)doScratch();
-  else if(r<0.75)doYawn();
+  if(hovered||petting||happy)return;
+  ct();
+  let c=['sleep','scratch','yawn','stand'][Math.random()<0.35&&!fresh()?0:Math.random()<0.6?1:Math.random()<0.75?2:3];
+  if(c===lastAction&&c!=='stand')c='stand';
+  lastAction=c;
+  if(c==='sleep')doSleep();
+  else if(c==='scratch')doScratch();
+  else if(c==='yawn')doYawn();
   else{set(I.stand);aT=setTimeout(idleLoop,rand(2000,2000));}
 }
 
 function doSleep(){
-  if(hovered||freshEnough())return idleLoop();
+  if(hovered||fresh())return idleLoop();
   set(I.yawn);
   aT=setTimeout(()=>{
-    if(hovered||freshEnough())return idleLoop();
-    sleeping=true;
-    let f=0;set(I.sleep1);
+    if(hovered||fresh())return idleLoop();
+    sleeping=true;let f=0;set(I.sleep1);
     fT=setInterval(()=>set((++f%2)?I.sleep2:I.sleep1),800);
     aT=setTimeout(()=>{
       clearInterval(fT);sleeping=false;set(I.yawn);
-      aT=setTimeout(()=>{
-        set(I.stand);aT=setTimeout(idleLoop,1000);
-      },900);
+      aT=setTimeout(()=>{set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);},900);
     },rand(10000,6000));
   },700);
 }
@@ -831,71 +896,49 @@ function doScratch(){
   if(hovered)return idleLoop();
   let f=0;set(I.scratch1);
   fT=setInterval(()=>set((++f%2)?I.scratch2:I.scratch1),200);
-  aT=setTimeout(()=>{clearInterval(fT);set(I.stand);aT=setTimeout(idleLoop,rand(800,1000));},rand(1800,1200));
+  aT=setTimeout(()=>{ct();set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,rand(800,1000));},rand(1800,1200));
 }
 
 function doYawn(){
   if(hovered)return idleLoop();
   set(I.yawn);
-  aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,rand(1000,1500));},2200);
+  aT=setTimeout(()=>{set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,rand(1000,1500));},2200);
 }
 
+const pL=document.getElementById('petLeft'),pR=document.getElementById('petRight');
+pL.addEventListener('mouseenter',()=>onSideEnter('left'));
+pL.addEventListener('mouseleave',()=>onSideExit('left'));
+pR.addEventListener('mouseenter',()=>onSideEnter('right'));
+pR.addEventListener('mouseleave',()=>onSideExit('right'));
 
-
-el.addEventListener("mouseenter",()=>{
+el.addEventListener('mouseenter',()=>{
   clearTimeout(leaveT);
-  if(!rubbing&&!sleeping){
+  if(!petting&&!sleeping&&!happy){
     enterT=setTimeout(()=>{
-      hovered=true;lastInteractTime=Date.now();
-      clearTimers();set(I.cursor);lastMouseX=null;rubCount=0;
+      if(happy)return;
+      hovered=true;lastInteractTime=Date.now();ct();
+      awaitingOtherSide=false;lastSide=null;
+
+      set(I.aware);
     },ENTER_DELAY);
   }
 });
-
-el.addEventListener("mousemove",e=>{
-  if(!hovered||sleeping||rubbing)return;
-  lastInteractTime=Date.now();
-  if(lastMouseX!==null){
-    const dx=Math.abs(e.clientX-lastMouseX);
-    if(dx>10){
-      rubCount++;
-      if(rubCount>=RUB_N){
-        rubbing=true;hovered=false;rubCount=0;
-        clearTimers();set(I.happy);
-        aT=setTimeout(()=>{
-          rubbing=false;
-          if(hovered){set(I.cursor);}else{set(I.stand);idleLoop();}
-        },3500);
-      }
-    } else {rubCount=Math.max(0,rubCount-0.5);}
-    lastMouseX=e.clientX;
-  } else {lastMouseX=e.clientX;}
-});
-
-el.addEventListener("mouseleave",()=>{
+el.addEventListener('mouseleave',()=>{
   clearTimeout(enterT);
-  if(rubbing)return;
-  leaveT=setTimeout(()=>{
-    hovered=false;lastMouseX=null;rubCount=0;
-    if(!rubbing&&!sleeping){set(I.stand);aT=setTimeout(idleLoop,1000);}
-  },LEAVE_DELAY);
+  leaveT=setTimeout(()=>{hovered=false;if(!petting&&!sleeping&&!happy){set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);}},LEAVE_DELAY);
+});
+wrap.addEventListener('mouseleave',e=>{
+  if(wrap.contains(e.relatedTarget))return;
+  if(!sleeping&&!happy)finishSession();
+});
+window.addEventListener('message',e=>{
+  if(!e.data||e.data.cmd!=='greet')return;
+  reset();set(I.sleep1);
+  setTimeout(()=>set(I.sleep2),500);setTimeout(()=>set(I.sleep1),1000);setTimeout(()=>set(I.sleep2),1500);
+  setTimeout(()=>{set(I.yawn);setTimeout(()=>{set(I.aware);setTimeout(()=>{set(I.stand);lastAction='stand';idleLoop();},1200);},1000);},2000);
 });
 
-window.addEventListener("message",e=>{
-  if(!e.data||e.data.cmd!=="greet")return;
-  reset();
-  set(I.sleep1);
-  setTimeout(()=>set(I.sleep2),500);
-  setTimeout(()=>set(I.sleep1),1000);
-  setTimeout(()=>set(I.sleep2),1500);
-  setTimeout(()=>{set(I.yawn);
-    setTimeout(()=>{set(I.aware);
-      setTimeout(()=>{set(I.stand);idleLoop();},1200);
-    },1000);
-  },2000);
-});
-
-// Override set to update img src
+set(I.aware);aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,1200);},1500);
 })();
 </script>
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0rem;margin-top:-10px;">
@@ -1112,16 +1155,16 @@ window.addEventListener("message",e=>{
     if(!/[?&]e=true/.test(location.href)) return;
 
     const scripts = [
-        '//cdn.jsdelivr.net/npm/eruda',
-        '//cdn.jsdelivr.net/npm/eruda-monitor',
-        '//cdn.jsdelivr.net/npm/eruda-features',
-        '//cdn.jsdelivr.net/npm/eruda-timing',
-        '//cdn.jsdelivr.net/npm/eruda-code',
-        '//cdn.jsdelivr.net/npm/eruda-benchmark',
-        '//cdn.jsdelivr.net/npm/eruda-geolocation',
-        '//cdn.jsdelivr.net/npm/eruda-orientation',
-        '//cdn.jsdelivr.net/npm/eruda-touches',
-        '//cdn.jsdelivr.net/npm/eruda-vue'
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
+        '
     ];
 
     let index = 0;
