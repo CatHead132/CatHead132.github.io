@@ -782,7 +782,7 @@ const I={aware:B+"aware.png",stand:B+"stand.png",sleep1:B+"sleep1.png",sleep2:B+
 const SH=B+"smallheart.gif",BH=B+"bigheart.gif";
 const set=s=>el.src=s;
 const rand=(a,b)=>a+Math.random()*b;
-const SLEEP_DELAY=12000,ENTER_DELAY=80,LEAVE_DELAY=60,PET_COOLDOWN=1000,THRESHOLD=6;
+const SLEEP_DELAY=12000,ENTER_DELAY=80,LEAVE_DELAY=60,PET_COOLDOWN=1500,THRESHOLD=6;
 let sleeping=false,petting=false,hovered=false,onCooldown=false,happy=false;
 let lastInteractTime=0,lastAction=null,lastSide=null,awaitingOtherSide=false,strokeCount=0;
 let aT=null,fT=null,enterT=null,leaveT=null,strokeResetT=null,cooldownT=null,happyT=null,cursorDelayT=null;
@@ -852,6 +852,7 @@ function onSideEnter(side){
     showHappy(()=>{
       onCooldown=false;
       petting=false;hovered=false;
+      strokeCount=0;lastSide=null;awaitingOtherSide=false;
       ct();set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);
     });
     return;
