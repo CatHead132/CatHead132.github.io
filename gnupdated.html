@@ -1520,6 +1520,18 @@ function displayFeaturedZones(featuredZones) {
             'https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/hmmm.png',
             'Random Game', randomZone, { padding: '1rem' }
         ),
+        makeStaticItem(
+            'https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@latest/fern.png',
+            'fern',
+            () => openExternalAsZone('fern', 'https://67uhftyuj.b-cdn.net', ''),
+        ),
+        makeStaticItem(
+            'https://shimmyshimmy.b-cdn.net/asset/logo-icon.png',
+            'Vapor V4',
+            () => openExternalAsZone('Vapor V4', 'https://shimmyshimmy.b-cdn.net/', ''),
+            { padding: '0.5rem' }
+        ),
+
     ];
 
     const zoneItems = featuredZones.map(file => makeZoneItem(file, openZone));
@@ -1721,6 +1733,31 @@ function openExternalAsZone(name, src, author) {
 
 function openZone(file) {
     if (zoneViewer.style.display === "flex") return;
+    if (file.id + '' === '441') {
+        const kittyBase = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/KittyToy/";
+        const kittyUrl = kittyBase + "KittyToy.html";
+        fetch(kittyUrl + "?t=" + Date.now()).then(r => r.text()).then(html => {
+            const basedHtml = html.replace(/<head>/i, `<head><base href="${kittyBase}">`);
+            if (zoneFrame.contentDocument === null) {
+                zoneFrame = document.createElement("iframe");
+                zoneFrame.id = "zoneFrame";
+                zoneViewer.appendChild(zoneFrame);
+            }
+            writeToFrame(zoneFrame, basedHtml);
+            document.getElementById('zoneName').textContent = file.name;
+            document.getElementById('zoneId').textContent = file.id;
+            document.getElementById('zoneAuthor').textContent = "by " + (file.author || "CatHead132");
+            if (file.authorLink) document.getElementById('zoneAuthor').href = file.authorLink;
+            zoneViewer.style.display = "flex";
+            startPlaytimeTracking();
+            const u = new URL(window.location);
+            u.searchParams.set('id', file.id);
+            history.pushState(null, '', u.toString());
+            zoneViewer.hidden = false;
+        }).catch(error => alert("Failed to load KittyToy: " + error));
+        return;
+    }
+
     if (file.url.startsWith("http") && !file.url.includes("gitlab.com")) {
         window.open(file.url, "_blank");
     } else {
