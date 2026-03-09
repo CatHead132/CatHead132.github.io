@@ -114,7 +114,12 @@
 	</style>
 <link id='-gd-engine-icon' rel='icon' type='image/png' href='KittyToy.icon.png' />
 <link rel='apple-touch-icon' href='KittyToy.apple-touch-icon.png'/>
-
+<style>
+  canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+</style>
 </head>
 <body>
 	<canvas id='canvas'>
@@ -139,7 +144,7 @@
 	<script type='text/javascript' src='KittyToy.js'></script>
 	<script type='text/javascript'>//<![CDATA[
 
-		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"KittyToy","experimentalVK":false,"fileSizes":{"KittyToy.pck":6676320,"KittyToy.wasm":13790961},"focusCanvas":true,"gdnativeLibs":[]};
+		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"KittyToy","experimentalVK":false,"fileSizes":{"KittyToy.pck":6692112,"KittyToy.wasm":13790961},"focusCanvas":true,"gdnativeLibs":[]};
 		var engine = new Engine(GODOT_CONFIG);
 
 		(function() {
