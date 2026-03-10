@@ -111,6 +111,20 @@
 			padding: 4px 6px;
 			visibility: visible;
 		}
+
+		#status-logo {
+			visibility: visible;
+			margin-bottom: 16px;
+			image-rendering: pixelated;
+			width: 96px;
+			height: 96px;
+		}
+
+		#status-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
 	</style>
 <link id='-gd-engine-icon' rel='icon' type='image/png' href='KittyToy.icon.png' />
 <link rel='apple-touch-icon' href='KittyToy.apple-touch-icon.png'/>
@@ -122,25 +136,50 @@
 </style>
 </head>
 <body>
+	<input type="file" id="fileInput" accept=".save" style="display:none" />
 	<canvas id='canvas'>
 		HTML5 canvas appears to be unsupported in the current browser.<br />
 		Please try updating or use a different browser.
 	</canvas>
 	<div id='status'>
-		<div id='status-progress' style='display: none;' oncontextmenu='event.preventDefault();'><div id ='status-progress-inner'></div></div>
-		<div id='status-indeterminate' style='display: none;' oncontextmenu='event.preventDefault();'>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
-			<div></div>
+		<div id='status-container'>
+			<img id='status-logo' src='KittyToy.icon.png' alt='' />
+			<div id='status-progress' style='display: none;' oncontextmenu='event.preventDefault();'><div id ='status-progress-inner'></div></div>
+			<div id='status-indeterminate' style='display: none;' oncontextmenu='event.preventDefault();'>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</div>
+			<div id='status-notice' class='godot' style='display: none;'></div>
 		</div>
-		<div id='status-notice' class='godot' style='display: none;'></div>
 	</div>
 
+	<script type='text/javascript'>
+		var storedFileCallback = null;
+
+		function getFile(callback) {
+			storedFileCallback = callback;
+		}
+
+		var input = document.getElementById('fileInput');
+		input.addEventListener('change', function(e) {
+			if (!storedFileCallback) return;
+			var file = e.target.files[0];
+			if (!file) return;
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				storedFileCallback(e.target.result);
+			};
+			reader.readAsText(file);
+			// Reset so same file can be loaded again
+			input.value = '';
+		});
+	</script>
 	<script type='text/javascript' src='KittyToy.js'></script>
 	<script type='text/javascript'>//<![CDATA[
 
@@ -153,6 +192,7 @@
 			var statusProgressInner = document.getElementById('status-progress-inner');
 			var statusIndeterminate = document.getElementById('status-indeterminate');
 			var statusNotice = document.getElementById('status-notice');
+			var statusLogo = document.getElementById('status-logo');
 
 			var initializing = true;
 			var statusMode = 'hidden';
@@ -186,6 +226,7 @@
 						statusNotice.style.display = 'block';
 						break;
 					case 'hidden':
+						statusLogo.style.display = 'none';
 						break;
 					default:
 						throw new Error('Invalid status mode');
