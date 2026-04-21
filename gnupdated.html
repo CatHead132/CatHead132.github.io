@@ -219,7 +219,9 @@ main {
     gap: 0.5rem;
 }
 
-#container {
+#container,
+#featuredZones,
+#favoritesContainer {
     content-visibility: auto;
 }
 
@@ -238,10 +240,9 @@ main {
 }
 
 .zone-item:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-6px);
     box-shadow: var(--shadow-xl);
     border-color: var(--primary);
-    will-change: transform;
 }
 
 .zone-item:hover::before {
@@ -267,12 +268,8 @@ main {
     object-fit: cover;
     display: block;
     background: var(--border-light);
-    transition: transform 0.2s ease;
 }
 
-.zone-item:hover img {
-    transform: scale(1.05);
-}
 
 .zone-item button {
     background: rgba(0,0,0,0.55);
@@ -430,8 +427,7 @@ main {
 #popupOverlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.75);
     display: none;
     align-items: center;
     justify-content: center;
@@ -472,6 +468,22 @@ main {
         transform: scale(1) translateY(0);
         opacity: 1;
     }
+}
+
+@keyframes slideOutScale {
+    from {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.9) translateY(20px);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
 
 .popup-header {
@@ -700,7 +712,7 @@ footer {
     }
 
     .zone-item:hover {
-        transform: translateY(-10px) scale(1.01);
+        transform: translateY(-6px);
     }
 
 }
@@ -1763,8 +1775,25 @@ function displayZones(zones) {
     }
     _cardIndex = 0;
     document.getElementById('allSummary').textContent = `All Zones (${zones.length})`;
-    container.replaceChildren(...zones.map(file => makeZoneItem(file, openZone)));
+    const FIRST_BATCH = 40;
+    const CHUNK = 40;
+    const firstItems = zones.slice(0, FIRST_BATCH).map(file => makeZoneItem(file, openZone));
+    container.replaceChildren(...firstItems);
     attachLazyLoader(container);
+    if (zones.length <= FIRST_BATCH) return;
+    let offset = FIRST_BATCH;
+    function renderChunk(deadline) {
+        while (offset < zones.length && (deadline.timeRemaining() > 2 || deadline.didTimeout)) {
+            const end = Math.min(offset + CHUNK, zones.length);
+            const frag = document.createDocumentFragment();
+            for (let i = offset; i < end; i++) frag.appendChild(makeZoneItem(zones[i], openZone));
+            container.appendChild(frag);
+            offset = end;
+        }
+        if (offset < zones.length) requestIdleCallback(renderChunk, { timeout: 500 });
+        else attachLazyLoader(container);
+    }
+    requestIdleCallback(renderChunk, { timeout: 500 });
 }
 
 function toggleFavoriteCurrentZone() {
@@ -2517,7 +2546,15 @@ popupBody.innerHTML = `
 });
 
 function closePopup() {
-    document.getElementById('popupOverlay').style.display = "none";
+    const overlay = document.getElementById('popupOverlay');
+    const popup = overlay.querySelector('.popup');
+    overlay.style.animation = 'fadeOut 0.25s ease forwards';
+    if (popup) popup.style.animation = 'slideOutScale 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards';
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        overlay.style.animation = '';
+        if (popup) popup.style.animation = '';
+    }, 250);
 }
 listZones();
 
