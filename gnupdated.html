@@ -1341,6 +1341,7 @@ const coverURL = "https://tpcdn.b-cdn.net/gh/gn-math/covers@main";
 const htmlURL = "https://tpcdn.b-cdn.net/gh/gn-math/html@main";
 let zones = [];
 let popularityData = {};
+let _currentZoneMeta = null;
 const featuredContainer = document.getElementById('featuredZones');
 const favoritesWrapper = document.getElementById('favoritesWrapper');
 
@@ -2011,9 +2012,13 @@ function writeToFrame(frame, html) {
     frame.contentDocument.close();
 }
 
+function _makeExternalHtml(src) {
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box;}html,body{width:100%;height:100%;overflow:hidden;}iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:none;}</style></head><body><iframe src="${src}" allowfullscreen></iframe></body></html>`;
+}
+
 function openExternalAsZone(name, src, author, urlId) {
     if (zoneViewer.style.display === "flex") return;
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*{margin:0;padding:0;box-sizing:border-box;}html,body{width:100%;height:100%;overflow:hidden;}iframe{position:fixed;top:0;left:0;width:100%;height:100%;border:none;}</style></head><body><iframe src="${src}" allowfullscreen></iframe></body></html>`;
+    const html = _makeExternalHtml(src);
     if (zoneFrame.contentDocument === null) {
         zoneFrame = document.createElement("iframe");
         zoneFrame.id = "zoneFrame";
@@ -2030,6 +2035,8 @@ function openExternalAsZone(name, src, author, urlId) {
     if (urlId) u.searchParams.set('id', urlId); else u.searchParams.delete('id');
     history.pushState(null, '', u.toString());
     zoneViewer.hidden = false;
+    updateFavoriteZoneBtn();
+    _currentZoneMeta = { type: 'external', src, name, author };
 }
 
 function openZone(file) {
@@ -2056,13 +2063,14 @@ function openZone(file) {
             history.pushState(null, '', u.toString());
             zoneViewer.hidden = false;
             updateFavoriteZoneBtn();
+            _currentZoneMeta = { type: 'kitty', base: kittyBase, file };
         }).catch(error => alert("Failed to load KittyToy: " + error));
         return;
     }
     if (file.id + '' === '253') {
         const kittyBase = "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/";
-        const kittyUrl = kittyBase + "ai.html";
-        fetch(kittyUrl).then(r => r.text()).then(html => {
+        const kittyUrl = kittyBase + "ai.html?_=" + Date.now();
+        fetch(kittyUrl, { cache: 'no-store' }).then(r => r.text()).then(html => {
             const basedHtml = html.replace(/<head>/i, `<head><base href="${kittyBase}">`);
             if (zoneFrame.contentDocument === null) {
                 zoneFrame = document.createElement("iframe");
@@ -2081,6 +2089,7 @@ function openZone(file) {
             history.pushState(null, '', u.toString());
             zoneViewer.hidden = false;
             updateFavoriteZoneBtn();
+            _currentZoneMeta = { type: 'ai', base: kittyBase, file };
         }).catch(error => alert("Failed to load ai: " + error));
         return;
     }
@@ -2115,6 +2124,7 @@ function openZone(file) {
             history.pushState(null, '', locationUrl.toString());
             zoneViewer.hidden = false;
             updateFavoriteZoneBtn();
+            _currentZoneMeta = null;
         }).catch(error => alert("Failed to load zone: " + error));
     }
 }
@@ -2129,16 +2139,54 @@ function zoneUrl(zone) {
     return zone.url.replace('{COVER_URL}', coverURL).replace('{HTML_URL}', htmlURL);
 }
 
-function refreshZoneFrame() {
-    const img = document.querySelector('#refreshZone svg');
-    img.classList.add('spinning');
-    const zone = getCurrentZone();
-    if (!zone) { img.classList.remove('spinning'); return; }
+function _refreshReplaceFrame() {
     stopPlaytimeTracking();
     if (zoneViewer.contains(zoneFrame)) zoneViewer.removeChild(zoneFrame);
     zoneFrame = document.createElement('iframe');
     zoneFrame.id = 'zoneFrame';
     zoneViewer.appendChild(zoneFrame);
+    return zoneFrame;
+}
+
+function refreshZoneFrame() {
+    const img = document.querySelector('#refreshZone svg');
+    img.classList.add('spinning');
+
+    if (_currentZoneMeta && _currentZoneMeta.type === 'external') {
+        _refreshReplaceFrame();
+        writeToFrame(zoneFrame, _makeExternalHtml(_currentZoneMeta.src));
+        startPlaytimeTracking();
+        img.classList.remove('spinning');
+        return;
+    }
+
+    if (_currentZoneMeta && _currentZoneMeta.type === 'ai') {
+        _refreshReplaceFrame();
+        const base = _currentZoneMeta.base;
+        fetch(base + "ai.html?_=" + Date.now(), { cache: 'no-store' }).then(r => r.text()).then(html => {
+            const basedHtml = html.replace(/<head>/i, `<head><base href="${base}">`);
+            writeToFrame(zoneFrame, basedHtml);
+            startPlaytimeTracking();
+            img.classList.remove('spinning');
+        }).catch(() => img.classList.remove('spinning'));
+        return;
+    }
+
+    if (_currentZoneMeta && _currentZoneMeta.type === 'kitty') {
+        _refreshReplaceFrame();
+        const base = _currentZoneMeta.base;
+        fetch(base + "KittyToy.html").then(r => r.text()).then(html => {
+            const basedHtml = html.replace(/<head>/i, `<head><base href="${base}">`);
+            writeToFrame(zoneFrame, basedHtml);
+            startPlaytimeTracking();
+            img.classList.remove('spinning');
+        }).catch(() => img.classList.remove('spinning'));
+        return;
+    }
+
+    const zone = getCurrentZone();
+    if (!zone) { img.classList.remove('spinning'); return; }
+    _refreshReplaceFrame();
     fetch(zoneUrl(zone)).then(r => r.text()).then(html => {
         writeToFrame(zoneFrame, html);
         startPlaytimeTracking();
@@ -2147,6 +2195,31 @@ function refreshZoneFrame() {
 }
 
 function aboutBlank() {
+    if (_currentZoneMeta && _currentZoneMeta.type === 'external') {
+        window.open(_currentZoneMeta.src, "_blank");
+        return;
+    }
+
+    if (_currentZoneMeta && _currentZoneMeta.type === 'ai') {
+        const base = _currentZoneMeta.base;
+        const newWindow = window.open("about:blank", "_blank");
+        fetch(base + "ai.html?_=" + Date.now(), { cache: 'no-store' }).then(r => r.text()).then(html => {
+            const basedHtml = html.replace(/<head>/i, `<head><base href="${base}">`);
+            if (newWindow) { newWindow.document.open(); newWindow.document.write(processHtml(basedHtml)); newWindow.document.close(); }
+        });
+        return;
+    }
+
+    if (_currentZoneMeta && _currentZoneMeta.type === 'kitty') {
+        const base = _currentZoneMeta.base;
+        const newWindow = window.open("about:blank", "_blank");
+        fetch(base + "KittyToy.html").then(r => r.text()).then(html => {
+            const basedHtml = html.replace(/<head>/i, `<head><base href="${base}">`);
+            if (newWindow) { newWindow.document.open(); newWindow.document.write(processHtml(basedHtml)); newWindow.document.close(); }
+        });
+        return;
+    }
+
     const zone = getCurrentZone();
     if (!zone) return;
     const newWindow = window.open("about:blank", "_blank");
@@ -2160,6 +2233,7 @@ function aboutBlank() {
 }
 
 function closeZone() {
+    _currentZoneMeta = null;
     stopPlaytimeTracking();
     window.dispatchEvent(new MessageEvent("message", {data:{cmd:"greet"}}));
     zoneViewer.classList.remove('topbar-hidden');
@@ -2176,16 +2250,41 @@ function closeZone() {
     }, 300);
 }
 
+function _triggerDownload(filename, html) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([processHtml(html)], { type: "text/plain;charset=utf-8" }));
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
 function downloadZone() {
+    if (_currentZoneMeta && _currentZoneMeta.type === 'external') {
+        window.open(_currentZoneMeta.src, "_blank");
+        return;
+    }
+
+    if (_currentZoneMeta && _currentZoneMeta.type === 'ai') {
+        const base = _currentZoneMeta.base;
+        fetch(base + "ai.html?_=" + Date.now(), { cache: 'no-store' }).then(r => r.text()).then(html => {
+            _triggerDownload('ai.html', html.replace(/<head>/i, `<head><base href="${base}">`));
+        });
+        return;
+    }
+
+    if (_currentZoneMeta && _currentZoneMeta.type === 'kitty') {
+        const base = _currentZoneMeta.base;
+        fetch(base + "KittyToy.html").then(r => r.text()).then(html => {
+            _triggerDownload('KittyToy.html', html.replace(/<head>/i, `<head><base href="${base}">`));
+        });
+        return;
+    }
+
     const zone = getCurrentZone();
     if (!zone) return;
     fetch(zoneUrl(zone)).then(r => r.text()).then(text => {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([processHtml(text)], { type: "text/plain;charset=utf-8" }));
-        a.download = zone.name + ".html";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        _triggerDownload(zone.name + ".html", text);
     });
 }
 
@@ -2452,7 +2551,11 @@ function cloakName(string) {
 }
 
 function tabCloak() {
-    closePopup();
+    const overlay = document.getElementById('popupOverlay');
+    const popup = overlay.querySelector('.popup');
+    overlay.style.animation = '';
+    if (popup) popup.style.animation = '';
+
     document.getElementById('popupTitle').textContent = "Tab Cloak";
     const popupBody = document.getElementById('popupBody');
     const savedName = localStorage.getItem('turkishPlaygroundCloakName') || '';
@@ -2466,7 +2569,7 @@ function tabCloak() {
         <br><br><br>
     `;
     popupBody.contentEditable = false;
-    document.getElementById('popupOverlay').style.display = "flex";
+    overlay.style.display = "flex";
 }
 
 const settings = document.getElementById('settings');
