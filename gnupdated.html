@@ -2051,6 +2051,31 @@ function openZone(file) {
         }).catch(error => alert("Failed to load KittyToy: " + error));
         return;
     }
+    if (file.id + '' === '253') {
+        const kittyBase = "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/";
+        const kittyUrl = kittyBase + "ai.html";
+        fetch(kittyUrl).then(r => r.text()).then(html => {
+            const basedHtml = html.replace(/<head>/i, `<head><base href="${kittyBase}">`);
+            if (zoneFrame.contentDocument === null) {
+                zoneFrame = document.createElement("iframe");
+                zoneFrame.id = "zoneFrame";
+                zoneViewer.appendChild(zoneFrame);
+            }
+            writeToFrame(zoneFrame, basedHtml);
+            document.getElementById('zoneName').textContent = file.name;
+            document.getElementById('zoneId').textContent = file.id;
+            document.getElementById('zoneAuthor').textContent = "by " + (file.author || "CatHead132");
+            if (file.authorLink) document.getElementById('zoneAuthor').href = file.authorLink;
+            zoneViewer.style.display = "flex";
+            startPlaytimeTracking();
+            const u = new URL(window.location);
+            u.searchParams.set('id', file.id);
+            history.pushState(null, '', u.toString());
+            zoneViewer.hidden = false;
+            updateFavoriteZoneBtn();
+        }).catch(error => alert("Failed to load ai: " + error));
+        return;
+    }
 
     if (file.url.startsWith("http") && !file.url.includes("gitlab.com")) {
         window.open(file.url, "_blank");
