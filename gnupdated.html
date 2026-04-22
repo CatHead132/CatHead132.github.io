@@ -7,17 +7,10 @@
 
     <link rel="manifest" href="https://tpcdn.b-cdn.net/gh/gn-math/gn-math-DONTDMCA@main/manifest.json" />
     <script>
-        (function() {
-            if (window.location.protocol === 'file:') {
-                var tp = localStorage.getItem('tp_original');
-                if (tp !== '1') {
-                    // document.documentElement.innerHTML = '<body style="margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font-family:sans-serif;font-size:2rem;font-weight:bold;">Press Ctrl+Shift+R Orrr you are using unoffical Turkish Playground</body>';
-                } else {
-                    localStorage.setItem('tp_original', '0');
-                }
-            }
-        })();
-        navigator.serviceWorker.register("https://tpcdn.b-cdn.net/gh/gn-math/gn-math-DONTDMCA@main/sw.js");
+
+        if (window.location.protocol !== 'file:') {
+            navigator.serviceWorker.register("https://tpcdn.b-cdn.net/gh/gn-math/gn-math-DONTDMCA@main/sw.js");
+        }
     </script>
     <meta name="theme-color" content="#fb2651" />
     <meta charset="UTF-8">
@@ -1707,7 +1700,7 @@ function displayFeaturedZones(featuredZones) {
     _cardIndex = 0;
     featuredContainer.replaceChildren(...staticItems, ...zoneItems);
 
-    if (featuredContainer.children.length <= 1) {
+    if (featuredZones.length === 0) {
         featuredContainer.innerHTML = 'No featured zones found.';
     } else {
         document.getElementById('allZonesSummary').textContent = `Featured Zones (${featuredZones.length})`;
@@ -1976,7 +1969,7 @@ const adKiller = `<script>(function(){
     document.addEventListener('DOMContentLoaded',function(){nuke(document);});
 }());<\/script>`;
 
-function writeToFrame(frame, html) {
+function processHtml(html) {
     let cleaned = html
         .replace(/https?:\/\/cdn\.jsdelivr\.net/g, 'https://tpcdn.b-cdn.net')
         .replace(/https?:\/\/rawgit\.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^"'\s]+)/g, 'https://tpcdn.b-cdn.net/githack/$1/$2/$3/$4')
@@ -1987,9 +1980,7 @@ function writeToFrame(frame, html) {
     doc.querySelectorAll('script').forEach(s => {
         const src = s.getAttribute('src') || '';
         const content = s.textContent || '';
-
         if (content.includes('WebSocket') || content.includes('chatEl') || content.includes('WS_URL')) return;
-
         if (
             src.match(/googletagmanager|googlesyndication|pagead2|fundingchoices|adsbygoogle/) ||
             content.includes('window.dataLayer') ||
@@ -2001,10 +1992,14 @@ function writeToFrame(frame, html) {
     doc.querySelectorAll('ins').forEach(el => {
         if ((el.className || '').includes('adsbygoogle')) el.remove();
     });
-    cleaned = doc.documentElement.outerHTML;
+    return adKiller + doc.documentElement.outerHTML;
+}
+
+function writeToFrame(frame, html) {
+    const processed = processHtml(html);
     frame.style.background = '#000';
     frame.contentDocument.open();
-    frame.contentDocument.write(adKiller + cleaned);
+    frame.contentDocument.write(processed);
     frame.contentDocument.close();
 }
 
@@ -2060,8 +2055,8 @@ function openZone(file) {
     if (file.url.startsWith("http") && !file.url.includes("gitlab.com")) {
         window.open(file.url, "_blank");
     } else {
-        const url = zoneUrl(file);
-        fetch(url).then(response => response.text()).then(html => {
+        const zoneHtmlUrl = zoneUrl(file);
+        fetch(zoneHtmlUrl).then(response => response.text()).then(html => {
             if (zoneFrame.contentDocument === null) {
                 zoneFrame = document.createElement("iframe");
                 zoneFrame.id = "zoneFrame";
@@ -2077,9 +2072,9 @@ function openZone(file) {
             }
             zoneViewer.style.display = "flex";
             startPlaytimeTracking();
-            const url = new URL(window.location);
-            url.searchParams.set('id', file.id);
-            history.pushState(null, '', url.toString());
+            const locationUrl = new URL(window.location);
+            locationUrl.searchParams.set('id', file.id);
+            history.pushState(null, '', locationUrl.toString());
             zoneViewer.hidden = false;
             updateFavoriteZoneBtn();
         }).catch(error => alert("Failed to load zone: " + error));
@@ -2087,7 +2082,9 @@ function openZone(file) {
 }
 
 function getCurrentZone() {
-    return zones.find(z => z.id + '' === document.getElementById('zoneId').textContent);
+    const zoneIdText = document.getElementById('zoneId').textContent;
+    if (!zoneIdText || isNaN(Number(zoneIdText))) return null;
+    return zones.find(z => z.id + '' === zoneIdText) || null;
 }
 
 function zoneUrl(zone) {
@@ -2118,7 +2115,7 @@ function aboutBlank() {
     fetch(zoneUrl(zone)).then(r => r.text()).then(html => {
         if (newWindow) {
             newWindow.document.open();
-            newWindow.document.write(html);
+            newWindow.document.write(processHtml(html));
             newWindow.document.close();
         }
     });
@@ -2146,7 +2143,7 @@ function downloadZone() {
     if (!zone) return;
     fetch(zoneUrl(zone)).then(r => r.text()).then(text => {
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+        a.href = URL.createObjectURL(new Blob([processHtml(text)], { type: "text/plain;charset=utf-8" }));
         a.download = zone.name + ".html";
         document.body.appendChild(a);
         a.click();
@@ -2297,6 +2294,7 @@ async function saveData() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async function (e) {
+        alert("This might take a while, dont touch anything other than this OK button");
         const data = JSON.parse(e.target.result);
         if (data.cookies) {
             data.cookies.split(';').forEach(cookie => {
@@ -2379,10 +2377,8 @@ async function saveData() {
           }
         alert("Data loaded");
     };
-    alert("This might take a while, dont touch anything other than this OK button");
     reader.readAsText(file);
   }
-
 function cloakIcon(url) {
     let link = document.querySelector("link[rel~='icon']");
     if (!link) {
@@ -2459,8 +2455,9 @@ async function submitLeaderboard() {
         alert('Please enter a username in the Leaderboard Username field first!');
         return;
     }
+    const wasTracking = playStartTime !== null;
     stopPlaytimeTracking();
-    if (playStartTime === null) startPlaytimeTracking();
+    if (wasTracking) startPlaytimeTracking();
     try {
         await fetch('https://tpws.b-cdn.net/leaderboard/submit', {
             method: 'POST',
@@ -2592,7 +2589,7 @@ const adList = [
     "adsymptotic.com", "adtelligent.com", "liveintent.com", "lotame.com",
     "zeotap.com", "nielsen.com", "liveramp.com", "acuityads.com",
     "id5-sync.com", "intentiq.com", "sharedid.org", "pubcid.org",
-    "adroll.com", "perfectaudience.com", "bizible.com", "marin software.com",
+    "adroll.com", "perfectaudience.com", "bizible.com", "marinsoftware.com",
     "kenshoo.com", "dv360.com", "flashtalking.com", "sizmek.com",
     "trustarc.com", "onetrust.com", "cookielaw.org",
 ];
@@ -2778,6 +2775,7 @@ function disableGunMode() {
         wrap._gunClickHandler = null;
     }
     const kittyImg = document.getElementById('kittyImg');
+    kittyImg.src = "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png";
     kittyImg.style.cursor = 'default';
     kittyImg.style.transform = '';
     if (window._origCloseZone) {
