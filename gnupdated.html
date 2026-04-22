@@ -1534,6 +1534,14 @@ async function listZones() {
         const blockedGameIds = [-1, 596, 0];
         zones = zones.filter(zone => !blockedGameIds.includes(zone.id));
 
+        zones.push({
+            id: 9999,
+            name: "First Person Tetris",
+            cover: "https://tpcdn.b-cdn.net/gh/CatHead132/fpstetrisoffline@latest/assets/1T5DmAh.png",
+            url: "https://tpcdn.b-cdn.net/githack/CatHead132/fpstetrisoffline/refs/heads/main/index.html",
+            author: "sdrmme"
+        });
+
         zones[0].featured = true;
         await fetchPopularity();
         sortZones();
@@ -2074,6 +2082,11 @@ function openZone(file) {
             zoneViewer.hidden = false;
             updateFavoriteZoneBtn();
         }).catch(error => alert("Failed to load ai: " + error));
+        return;
+    }
+
+    if (file.id + '' === '9999') {
+        openExternalAsZone(file.name, file.url, file.author, file.id);
         return;
     }
 
