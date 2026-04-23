@@ -1553,7 +1553,7 @@ async function listZones() {
         if (id === 'chat') {
             const tpNameRaw = localStorage.getItem('tp_username') || '';
             const tpName = tpNameRaw.replace(/\s+/g, '');
-            const chatUrl = 'https://tpchat.b-cdn.net' + (tpName ? '?name=' + encodeURIComponent(tpName) : '');
+            const chatUrl = 'https://tpchat.b-cdn.net' + (tpName ? '?name=' + encodeURIComponent(tpName) + '&_=' + Date.now() : '?_=' + Date.now());
             openExternalAsZone('Chat', chatUrl, 'Turkish Guy', 'chat');
         } else if (id) {
             const zone = zones.find(zone => zone.id + '' == id + '');
@@ -1694,7 +1694,7 @@ function displayFeaturedZones(featuredZones) {
             const btn = item.querySelector('button');
             const open = () => {
                 const tpName = localStorage.getItem('tp_username') || '';
-                const chatUrl = 'https://tpchat.b-cdn.net' + (tpName ? '?name=' + encodeURIComponent(tpName) : '');
+                const chatUrl = 'https://tpchat.b-cdn.net' + (tpName ? '?name=' + encodeURIComponent(tpName) + '&_=' + Date.now() : '?_=' + Date.now());
                 openExternalAsZone('Chat', chatUrl, 'Turkish Guy', 'chat');
             };
             item.onclick = open;
