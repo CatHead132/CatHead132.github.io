@@ -1,17 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-    <base href="https://tpcdn.b-cdn.net/gh/gn-math/gn-math.github.io@main/">
+    <base href="https://cdn.jsdelivr.net/gh/freebuisness/freebuisness.github.io@main/">
     <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png">
     <link rel="apple-touch-icon" href="https://ssl.gstatic.com/classroom/favicon.png">
-
-    <link rel="manifest" href="https://tpcdn.b-cdn.net/gh/gn-math/gn-math-DONTDMCA@main/manifest.json" />
-    <script>
-
-        if (window.location.protocol !== 'file:') {
-            navigator.serviceWorker.register("https://tpcdn.b-cdn.net/gh/gn-math/gn-math-DONTDMCA@main/sw.js");
-        }
-    </script>
     <meta name="theme-color" content="#fb2651" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -900,7 +892,7 @@ body.american-mode .logo {
     <header>
         <div class="header-content">
 <div id="kittyWrap" style="position:relative;width:72px;height:72px;flex-shrink:0;margin-left:-0.5rem;">
-  <img id="kittyImg" src="https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png"
+  <img id="kittyImg" src="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png"
     style="width:72px;height:72px;image-rendering:pixelated;image-rendering:crisp-edges;cursor:default;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;display:block;"
     draggable="false">
   <div id="petLeft" style="position:absolute;top:0;left:calc(50% - 20px);width:20px;height:100%;z-index:10;cursor:default;"></div>
@@ -910,7 +902,7 @@ body.american-mode .logo {
 (function(){
 const el=document.getElementById('kittyImg');
 const wrap=document.getElementById('kittyWrap');
-const B="https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
+const B="https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
 const I={aware:B+"aware.png",stand:B+"stand.png",sleep1:B+"sleep1.png",sleep2:B+"sleep2.png",scratch1:B+"scratch1.png",scratch2:B+"scratch2.png",cursor:B+"cursor.png",happy:B+":3.png",yawn:B+"yawn.png"};
 const SH=B+"smallheart.gif",BH=B+"bigheart.gif";
 const set=s=>{if(document.body.classList.contains('american-mode'))return;el.src=s;};
@@ -1332,13 +1324,14 @@ const searchBar = document.getElementById('searchBar');
 const sortOptions = document.getElementById('sortOptions');
 const filterOptions = document.getElementById('filterOptions');
 const zonesurls = [
-    "https://tpcdn.b-cdn.net/gh/gn-math/assets@latest/zones.json",
-    "https://tpcdn.b-cdn.net/gh/gn-math/assets@master/zones.json",
-    "https://tpcdn.b-cdn.net/gh/gn-math/assets/zones.json"
+    "https://cdn.jsdelivr.net/gh/freebuisness/assets@main/zones.json",
+    "https://cdn.jsdelivr.net/gh/freebuisness/assets@latest/zones.json",
+    "https://cdn.jsdelivr.net/gh/freebuisness/assets@master/zones.json",
+    "https://cdn.jsdelivr.net/gh/freebuisness/assets/zones.json"
 ];
 let zonesURL = zonesurls[Math.floor(Math.random() * zonesurls.length)];
-const coverURL = "https://tpcdn.b-cdn.net/gh/gn-math/covers@main";
-const htmlURL = "https://tpcdn.b-cdn.net/gh/gn-math/html@main";
+const coverURL = "https://cdn.jsdelivr.net/gh/freebuisness/covers@main";
+const htmlURL = "https://cdn.jsdelivr.net/gh/freebuisness/html@main";
 let zones = [];
 let popularityData = {};
 let _currentZoneMeta = null;
@@ -1496,7 +1489,7 @@ async function listZones() {
       const cachedShaTime = parseInt(localStorage.getItem('tp_assets_sha_time') || '0');
       if (cachedSha && Date.now() - cachedShaTime < SHA_TTL) {
           sha = cachedSha;
-          zonesURL = `https://tpcdn.b-cdn.net/gh/gn-math/assets@${sha}/zones.json`;
+          zonesURL = `https://cdn.jsdelivr.net/gh/freebuisness/assets@${sha}/zones.json`;
       } else {
         let sharesponse;
         let shajson;
@@ -1508,7 +1501,7 @@ async function listZones() {
             shajson = await sharesponse.json();
             sha = shajson[0]['sha'];
             if (sha) {
-                zonesURL = `https://tpcdn.b-cdn.net/gh/gn-math/assets@${sha}/zones.json`;
+                zonesURL = `https://cdn.jsdelivr.net/gh/freebuisness/assets@${sha}/zones.json`;
                 localStorage.setItem('tp_assets_sha', sha);
                 localStorage.setItem('tp_assets_sha_time', Date.now().toString());
             }
@@ -1518,7 +1511,7 @@ async function listZones() {
                 if (secondarysharesponse && secondarysharesponse.status === 200) {
                     sha = (await secondarysharesponse.text()).trim();
                     if (sha) {
-                        zonesURL = `https://tpcdn.b-cdn.net/gh/gn-math/assets@${sha}/zones.json`;
+                        zonesURL = `https://cdn.jsdelivr.net/gh/freebuisness/assets@${sha}/zones.json`;
                         localStorage.setItem('tp_assets_sha', sha);
                         localStorage.setItem('tp_assets_sha_time', Date.now().toString());
                     }
@@ -1538,7 +1531,7 @@ async function listZones() {
         zones.push({
             id: 9999,
             name: "First Person Tetris",
-            cover: "https://tpcdn.b-cdn.net/gh/CatHead132/fpstetrisoffline@latest/assets/1T5DmAh.png",
+            cover: "https://cdn.jsdelivr.net/gh/CatHead132/fpstetrisoffline@latest/assets/1T5DmAh.png",
             url: "https://tpcdn.b-cdn.net/githack/CatHead132/fpstetrisoffline/refs/heads/main/index.html",
             author: "sdrmme"
         });
@@ -1683,7 +1676,7 @@ function displayFeaturedZones(featuredZones) {
 
     const staticItems = [
         makeStaticItem(
-            'https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/hmmm.png',
+            'https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/hmmm.png',
             'Random Game', randomZone, { padding: '1rem' }
         ),
         (() => {
@@ -1980,7 +1973,7 @@ const adKiller = `<script>(function(){
 
 function processHtml(html) {
     let cleaned = html
-        .replace(/https?:\/\/cdn\.jsdelivr\.net/g, 'https://tpcdn.b-cdn.net')
+
         .replace(/https?:\/\/rawgit\.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^"'\s]+)/g, 'https://tpcdn.b-cdn.net/githack/$1/$2/$3/$4')
         .replace(/https?:\/\/raw\.githack\.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^"'\s]+)/g, 'https://tpcdn.b-cdn.net/githack/$1/$2/$3/$4')
         .replace(/https?:\/\/rawcdn\.githack\.com\/([^/]+)\/([^/]+)\/([^/]+)\/([^"'\s]+)/g, 'https://tpcdn.b-cdn.net/githack/$1/$2/$3/$4')
@@ -2042,7 +2035,7 @@ function openExternalAsZone(name, src, author, urlId) {
 function openZone(file) {
     if (zoneViewer.style.display === "flex") return;
     if (file.id + '' === '441') {
-        const kittyBase = "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/KittyToy/";
+        const kittyBase = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/KittyToy/";
         const kittyUrl = kittyBase + "KittyToy.html";
         fetch(kittyUrl).then(r => r.text()).then(html => {
             const basedHtml = html.replace(/<head>/i, `<head><base href="${kittyBase}">`);
@@ -2068,7 +2061,7 @@ function openZone(file) {
         return;
     }
     if (file.id + '' === '253') {
-        const kittyBase = "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/";
+        const kittyBase = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/";
         const kittyUrl = kittyBase + "ai.html?_=" + Date.now();
         fetch(kittyUrl, { cache: 'no-store' }).then(r => r.text()).then(html => {
             const basedHtml = html.replace(/<head>/i, `<head><base href="${kittyBase}">`);
@@ -2880,7 +2873,7 @@ function applyAmericanMode(on) {
     }
 }
 
-const GUN_BASE = "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
+const GUN_BASE = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
 const GUN_NORMAL    = GUN_BASE + "gun_normal.png";
 const GUN_SLIDEBACK = GUN_BASE + "gun_slideback.png";
 const BULLET_IMG    = GUN_BASE + "bullet.png";
@@ -2916,7 +2909,7 @@ function disableGunMode() {
         wrap._gunClickHandler = null;
     }
     const kittyImg = document.getElementById('kittyImg');
-    kittyImg.src = "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png";
+    kittyImg.src = "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png";
     kittyImg.style.cursor = 'default';
     kittyImg.style.transform = '';
     if (window._origCloseZone) {
