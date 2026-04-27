@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #000; }
+
+#waflashContainer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+}
+
+#waflashStatus {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  color: #fff;
+  padding: 20px;
+  font-size: 1.2rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.waflashCanvas {
+  display: block;
+  margin: 0 auto;
+  border: 0;
+  background: #000;
+  width: 100vw;
+  height: 100vh;
+}
+</style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/gh/u-cvlassrom-y/google@main/ruffle.js"></script>
+
+<div id="waflashContainer">
+  <div id="waflashStatus">Loading...</div>
+  <canvas class="waflashCanvas"></canvas>
+</div>
+
+<script>
+window.RufflePlayer = window.RufflePlayer || {};
+window.addEventListener("load", function() {
+  const ruffle = window.RufflePlayer.newest();
+  const player = ruffle.createPlayer();
+  player.style.width = "100vw";
+  player.style.height = "100vh";
+  player.style.display = "block";
+  const container = document.getElementById("waflashContainer");
+  const canvas = container.querySelector(".waflashCanvas");
+  container.replaceChild(player, canvas);
+  player.load("https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/portalswf/404612_Portal.swf");
+});
+</script>
+
+</body>
+</html>
