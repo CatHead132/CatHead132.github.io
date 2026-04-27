@@ -1535,6 +1535,13 @@ async function listZones() {
             url: "https://tpcdn.b-cdn.net/githack/CatHead132/fpstetrisoffline/refs/heads/main/index.html",
             author: "sdrmme"
         });
+        zones.push({
+            id: 99999,
+            name: "Portal: The Flash Version",
+            cover: "https://cdn.jsdelivr.net/gh/CatHead132/CatHead132.github.io@main/portalswf/cover.png",
+            url: "https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/portalswf/portal.html",
+            author: "Not Valve"
+        });
 
         zones[0].featured = true;
         await fetchPopularity();
@@ -2087,7 +2094,7 @@ function openZone(file) {
         return;
     }
 
-    if (file.id + '' === '9999') {
+    if (file.id + '' === '9999' || file.id + '' === '99999') {
         openExternalAsZone(file.name, file.url, file.author, file.id);
         return;
     }
