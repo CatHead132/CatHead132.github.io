@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turkish Timer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #000;
+    color: #f1f5f9;
+    min-height: 100vh;
+    padding: 1.5rem 1rem 4rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { width: 100%; max-width: 1100px; margin: 0 auto; }
+  .header { margin-bottom: 1.5rem; }
+  .logo {
+    font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
+    background: linear-gradient(270deg, #fc2651, #ffffff, #f51441);
+    background-size: 600% 600%;
+    background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: gradientShift 6s linear infinite; display: inline-block;
+  }
+  @keyframes gradientShift { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+  .subtitle-wrap {
+    font-size: 12px; font-weight: 600; color: #94a3b8; letter-spacing: 0.05em;
+    height: 1.4em; overflow: hidden; position: relative; display: inline-block; min-width: 10px; margin-top: 2px;
+  }
+  .subtitle-inner { position: relative; will-change: transform; }
+  @keyframes reelFlipIn {
+    0%{transform:translateY(-100%);opacity:0.3} 60%{transform:translateY(8%);opacity:1}
+    80%{transform:translateY(-3%);opacity:1} 100%{transform:translateY(0%);opacity:1}
+  }
+  @keyframes reelFlipOut { 0%{transform:translateY(0%);opacity:1} 100%{transform:translateY(100%);opacity:0.3} }
+  .reel-slide { display: block; line-height: 1.4em; white-space: nowrap; }
+  .reel-slide.flip-out { animation: reelFlipOut 0.18s cubic-bezier(0.4,0,1,1) forwards; }
+  .reel-slide.flip-in  { animation: reelFlipIn  0.28s cubic-bezier(0,0,0.2,1) forwards; }
+  .status-bar {
+    display: flex; align-items: center; font-size: 13px; color: #64748b;
+    font-weight: 600; margin-bottom: 0.75rem; gap: 6px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #34d399; flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(52,211,153,0.7); animation: pulse 2s infinite;
+  }
+  .dot.off { background: #64748b; box-shadow: none; animation: none; }
+  @keyframes pulse {
+    0%{box-shadow:0 0 0 0 rgba(52,211,153,0.4)} 70%{box-shadow:0 0 0 8px rgba(52,211,153,0)} 100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}
+  }
+  .columns { display: grid; grid-template-columns: 360px 1fr; gap: 1rem; align-items: start; }
+  @media (max-width: 760px) { .columns { grid-template-columns: 1fr; } }
+  .card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 16px; padding: 1.4rem; }
+  .card-label { font-size: 11px; color: #64748b; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .period-name { font-size: 20px; font-weight: 700; color: #fc2651; margin-bottom: 0.5rem; }
+  .time-display { font-size: 52px; font-weight: 700; font-family: 'Courier New', monospace; color: #f1f5f9; letter-spacing: 4px; line-height: 1; }
+  .end-time { font-size: 13px; color: #64748b; margin-top: 0.6rem; }
+  .progress-bg { height: 4px; background: #1a1a1a; border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+  .progress-fill { height: 100%; background: #fc2651; border-radius: 2px; transition: width 1s linear; width: 0%; }
+  .divider-line { border: none; border-top: 1px solid #1a1a1a; margin: 1.1rem 0; }
+  .schedule-row { display: flex; align-items: center; gap: 0.75rem; }
+  .schedule-row label { font-size: 12px; color: #64748b; font-weight: 600; white-space: nowrap; letter-spacing: 0.05em; text-transform: uppercase; }
+  select {
+    flex: 1; background: #111; border: 1px solid #2a2a2a; border-radius: 8px;
+    color: #f1f5f9; padding: 0.5rem 0.75rem; font-size: 13px; cursor: pointer; outline: none; font-family: inherit;
+  }
+  select:hover, select:focus { border-color: #fc2651; }
+  .todo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .todo-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+  .todo-count { font-size: 11px; font-weight: 700; color: #fc2651; background: rgba(252,38,81,0.12); border-radius: 10px; padding: 2px 10px; }
+  .todo-input-row { display: flex; gap: 0.4rem; margin-bottom: 0.5rem; }
+  .todo-input {
+    flex: 1; background: #111; border: 1px solid #2a2a2a; border-radius: 10px;
+    color: #f1f5f9; padding: 0.55rem 0.9rem; font-size: 13px; outline: none; font-family: inherit; transition: border-color 0.2s;
+  }
+  .todo-input:focus { border-color: #fc2651; }
+  .todo-input::placeholder { color: #64748b; }
+  .due-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .due-row label { font-size: 12px; color: #64748b; font-weight: 600; white-space: nowrap; }
+  .due-input {
+    background: #111; border: 1px solid #2a2a2a; border-radius: 8px; color: #94a3b8;
+    padding: 0.4rem 0.6rem; font-size: 12px; outline: none; font-family: inherit;
+    cursor: pointer; transition: border-color 0.2s; width: 130px;
+  }
+  .due-input:focus { border-color: #fc2651; }
+  ::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+  .add-btn {
+    background: linear-gradient(135deg, #fc2651, #d91e45); border: none; border-radius: 10px;
+    color: white; font-size: 22px; font-weight: 700; width: 40px; height: 40px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: opacity 0.2s, transform 0.15s; line-height: 1;
+  }
+  .add-btn:hover { opacity: 0.85; transform: scale(1.05); }
+  .add-btn:active { transform: scale(0.97); }
+  .todo-filters { display: flex; gap: 0.35rem; margin-bottom: 0.75rem; align-items: center; flex-wrap: wrap; }
+  .filter-btn {
+    background: none; border: 1px solid #1a1a1a; border-radius: 7px; color: #64748b;
+    font-size: 11px; font-weight: 700; padding: 0.25rem 0.65rem; cursor: pointer;
+    font-family: inherit; transition: border-color 0.2s, color 0.2s; letter-spacing: 0.03em;
+  }
+  .filter-btn.active { border-color: #fc2651; color: #fc2651; background: rgba(252,38,81,0.08); }
+  .filter-btn:hover { border-color: #fc2651; color: #fc2651; }
+  .clear-done {
+    background: none; border: none; color: #64748b; font-size: 11px; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: color 0.2s; padding: 0; margin-left: auto;
+  }
+  .clear-done:hover { color: #fc2651; }
+  .todo-list { display: flex; flex-direction: column; gap: 0.35rem; max-height: 480px; overflow-y: auto; padding-right: 2px; }
+  .todo-list::-webkit-scrollbar { width: 3px; }
+  .todo-list::-webkit-scrollbar-track { background: transparent; }
+  .todo-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+  .todo-item {
+    display: flex; align-items: flex-start; gap: 0.6rem;
+    background: #111; border: 1px solid #1a1a1a; border-radius: 10px;
+    padding: 0.6rem 0.8rem; transition: border-color 0.2s, opacity 0.2s;
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+  .todo-item.done { opacity: 0.4; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: #64748b; }
+  .todo-item.overdue { border-color: rgba(252,38,81,0.35); }
+  .todo-checkbox {
+    width: 17px; height: 17px; border-radius: 50%; border: 2px solid #2a2a2a; flex-shrink: 0;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s, background 0.2s; margin-top: 1px;
+  }
+  .todo-checkbox:hover { border-color: #fc2651; }
+  .todo-checkbox.checked { background: #fc2651; border-color: #fc2651; }
+  .todo-checkbox.checked::after {
+    content: ''; width: 4px; height: 8px; border: 2px solid white;
+    border-top: none; border-left: none; transform: rotate(45deg) translate(-1px,-1px); display: block;
+  }
+  .todo-body { flex: 1; min-width: 0; }
+  .todo-text { font-size: 13px; color: #f1f5f9; word-break: break-word; line-height: 1.4; }
+  .todo-due-tag {
+    display: inline-block; font-size: 10px; font-weight: 700; margin-top: 3px;
+    padding: 1px 6px; border-radius: 5px; letter-spacing: 0.04em; font-family: 'Courier New', monospace;
+  }
+  .todo-due-tag.normal  { background: rgba(100,116,139,0.15); color: #64748b; }
+  .todo-due-tag.soon    { background: rgba(251,191,36,0.15);  color: #fbbf24; }
+  .todo-due-tag.urgent  { background: rgba(252,38,81,0.15);   color: #fc2651; }
+  .todo-due-tag.overdue { background: rgba(252,38,81,0.25);   color: #fc2651; }
+  .todo-delete {
+    background: none; border: none; color: #2a2a2a; cursor: pointer;
+    font-size: 15px; line-height: 1; padding: 0 1px; transition: color 0.2s; flex-shrink: 0; margin-top: 1px;
+  }
+  .todo-delete:hover { color: #fc2651; }
+  .todo-empty { text-align: center; color: #2a2a2a; font-size: 13px; padding: 2rem 0; font-weight: 600; }
+  #kittyWrap { position:relative; width:72px; height:72px; flex-shrink:0; }
+  .small-heart { pointer-events:none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header" style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+    <div id="kittyWrap" style="position:relative;width:72px;height:72px;flex-shrink:0;">
+      <img id="kittyImg" src="https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/kitty/aware.png"
+        style="width:72px;height:72px;image-rendering:pixelated;cursor:default;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;display:block;" draggable="false">
+      <div id="petLeft"  style="position:absolute;top:0;left:calc(50% - 20px);width:20px;height:100%;z-index:10;"></div>
+      <div id="petRight" style="position:absolute;top:0;left:50%;width:20px;height:100%;z-index:10;"></div>
+    </div>
+    <div>
+      <div class="logo">Turkish Timer</div><br>
+      <div class="subtitle-wrap"><div class="subtitle-inner" id="subtitle-inner"></div></div>
+    </div>
+  </div>
+  <div class="status-bar"><span class="dot" id="dot"></span><span id="status-text">Calculating...</span></div>
+  <div class="columns">
+    <!-- TIMER -->
+    <div class="card">
+      <div class="card-label">Current Period</div>
+      <div class="period-name" id="period-name">—</div>
+      <div class="time-display" id="time-display">--:--</div>
+      <div class="end-time" id="end-time"></div>
+      <div class="progress-bg"><div class="progress-fill" id="progress-fill"></div></div>
+      <hr class="divider-line">
+      <div class="schedule-row">
+        <label for="schedule-select">Schedule</label>
+        <select id="schedule-select" onchange="setSchedule(this.value)">
+          <option value="regular">Regular Day</option>
+          <option value="morning">Morning Event / Pep Rally</option>
+          <option value="afternoon">Afternoon Event</option>
+        </select>
+      </div>
+    </div>
+    <!-- HOMEWORK -->
+    <div class="card">
+      <div class="todo-header">
+        <span class="todo-title">Homework Tracker</span>
+        <span class="todo-count" id="todo-count">0 tasks</span>
+      </div>
+      <div class="todo-input-row">
+        <input class="todo-input" id="todo-input" type="text" placeholder="Add assignment..." maxlength="120">
+        <button class="add-btn" onclick="addTodo()">+</button>
+      </div>
+      <div class="due-row">
+        <label for="due-input">Due:</label>
+        <input class="due-input" id="due-input" type="date">
+      </div>
+      <div class="todo-filters">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('active',this)">Active</button>
+        <button class="filter-btn" onclick="setFilter('done',this)">Done</button>
+        <button class="clear-done" onclick="clearDone()">Clear done</button>
+      </div>
+      <div class="todo-list" id="todo-list">
+        <div class="todo-empty" id="todo-empty">No tasks yet. Add one above!</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const subtitles=["Welcome, Player","Turkish Malware","676767","Not a virus (probably)","Alt+\uD83D\uDD0D+fullscreen for secret","100% homework free","Sponsored by detention","Brought to you by the best Turkish guy","Chicken Butt","Tyler sucks","Stop staring at this text","Bro is really playing games in class","Definitely doing research","Finals? never heard of her","Stop playing games and do ur work","Currently failing 3 classes","Teachers behind u gng","Oh we have a sub? YAY","Wifi pass is Teacher5!@!@","The Promethean board saw everything",'"Do you have a charger?"',"We live, we love, we lie","Greece sucks","JAG BRO STOP WITH THE SOUNDBOARD","Written on Arch Linux",'"Bro i didnt know the notecards were due today"',"Green day is fire",'"Yo bro do you have the POGIL?"',"Shimmy shimmy ya shimmy ya","Du Du DuDu Max Verstappen","Zac sucks -Riddick","Fahh","Sponsored by Pala Baba","New Turkish Empire coming soon",'"Meet me at the mat boi -Landon"','"not user1 joined the game"','"Anyone named user1 will be kicked"',"W Speed \u2764\uFE0F\u200D\uD83E\uDE79","Emory is thinking",'"I am a femboy" -Not Landon','"Did he just say his last name is Burger?"',"https://youtu.be/72TDVG5a5M0","https://youtu.be/dQw4w9WgXcQ","I am pibble, wash ma bellayy",'"A homeless man chased me through the woods" -Landon',"Charlie Charlie Kirky","Rahhh","Ra ta ta ta warning","Gyaru","This playground = Low cortisol \uD83D\uDE07 - Matthew","American Playground sucks"];
+let subCur=0;
+const inner=document.getElementById('subtitle-inner');
+const is=document.createElement('span');is.className='reel-slide';is.textContent=subtitles[0];inner.appendChild(is);
+setInterval(()=>{const old=inner.querySelector('.reel-slide');if(!old)return;old.classList.add('flip-out');setTimeout(()=>{let n;do{n=Math.floor(Math.random()*subtitles.length);}while(n===subCur&&subtitles.length>1);subCur=n;const s=document.createElement('span');s.className='reel-slide flip-in';s.textContent=subtitles[n];if(old.parentNode)old.parentNode.removeChild(old);inner.appendChild(s);},180);},5000);
+
+const schedules={
+  regular:[{name:'1st Period',start:7*3600+50*60,end:8*3600+42*60},{name:'2nd Period',start:8*3600+47*60,end:9*3600+36*60},{name:'3rd Period',start:9*3600+41*60,end:10*3600+30*60},{name:'4th Period',start:10*3600+35*60,end:11*3600+24*60},{name:'Lunch A / Class A',start:11*3600+29*60,end:11*3600+56*60},{name:'Lunch B / Class B',start:12*3600+1*60,end:12*3600+28*60},{name:'5th Period',start:12*3600+33*60,end:13*3600+22*60},{name:'6th Period',start:13*3600+27*60,end:14*3600+16*60},{name:'7th Period',start:14*3600+21*60,end:15*3600+12*60}],
+  morning:[{name:'1st Period',start:7*3600+50*60,end:8*3600+34*60},{name:'2nd Period',start:8*3600+39*60,end:9*3600+22*60},{name:'Event Period',start:9*3600+27*60,end:10*3600+7*60},{name:'3rd Period',start:10*3600+12*60,end:10*3600+55*60},{name:'4th Period',start:11*3600+0*60,end:11*3600+43*60},{name:'Lunch A / Class A',start:11*3600+48*60,end:12*3600+15*60},{name:'Lunch B / Class B',start:12*3600+19*60,end:12*3600+46*60},{name:'5th Period',start:12*3600+51*60,end:13*3600+34*60},{name:'6th Period',start:13*3600+39*60,end:14*3600+22*60},{name:'7th Period',start:14*3600+27*60,end:15*3600+12*60}],
+  afternoon:[{name:'1st Period',start:7*3600+50*60,end:8*3600+34*60},{name:'2nd Period',start:8*3600+39*60,end:9*3600+22*60},{name:'3rd Period',start:9*3600+27*60,end:10*3600+10*60},{name:'4th Period',start:10*3600+15*60,end:10*3600+58*60},{name:'Lunch A / Class A',start:11*3600+3*60,end:11*3600+30*60},{name:'Lunch B / Class B',start:11*3600+34*60,end:12*3600+1*60},{name:'5th Period',start:12*3600+6*60,end:12*3600+49*60},{name:'6th Period',start:12*3600+54*60,end:13*3600+37*60},{name:'7th Period',start:13*3600+42*60,end:14*3600+25*60},{name:'Event Period',start:14*3600+30*60,end:15*3600+12*60}]
+};
+let scheduleType=localStorage.getItem('timerSchedule')||'regular';
+document.getElementById('schedule-select').value=scheduleType;
+function setSchedule(t){scheduleType=t;localStorage.setItem('timerSchedule',t);}
+function toAmPm(s){const h=Math.floor(s/3600)%12||12,m=Math.floor((s%3600)/60);return `${h}:${m.toString().padStart(2,'0')} ${Math.floor(s/3600)<12?'AM':'PM'}`;}
+function pad(n){return n.toString().padStart(2,'0');}
+function tick(){
+  const now=new Date(),day=now.getDay(),ct=now.getHours()*3600+now.getMinutes()*60+now.getSeconds();
+  const dot=document.getElementById('dot'),st=document.getElementById('status-text'),pn=document.getElementById('period-name'),td=document.getElementById('time-display'),et=document.getElementById('end-time'),pf=document.getElementById('progress-fill');
+  if(day===0||day===6){dot.className='dot off';st.textContent='No school today';pn.textContent='Weekend';td.textContent='--:--';et.textContent='';pf.style.width='0%';return;}
+  const sch=schedules[scheduleType];
+  for(let i=0;i<sch.length;i++){
+    const p=sch[i];
+    if(ct>=p.start&&ct<p.end){const rem=p.end-ct,tot=p.end-p.start;dot.className='dot';st.textContent='In session';pn.textContent=p.name;td.textContent=`${pad(Math.floor(rem/60))}:${pad(rem%60)}`;et.textContent=`Ends at ${toAmPm(p.end)}`;pf.style.width=Math.round(((tot-rem)/tot)*100)+'%';return;}
+    if(i<sch.length-1){const nx=sch[i+1];if(ct>=p.end&&ct<nx.start){const rem=nx.start-ct,tot=nx.start-p.end;dot.className='dot';st.textContent='Passing period';pn.textContent='Passing Period';td.textContent=`${pad(Math.floor(rem/60))}:${pad(rem%60)}`;et.textContent=`${nx.name} starts at ${toAmPm(nx.start)}`;pf.style.width=Math.round(((tot-rem)/tot)*100)+'%';return;}}
+  }
+  if(ct<7*3600+50*60){const rem=7*3600+50*60-ct;dot.className='dot off';st.textContent='Before school';pn.textContent='Before School';td.textContent=`${pad(Math.floor(rem/60))}:${pad(rem%60)}`;et.textContent='School starts at 7:50 AM';pf.style.width='0%';return;}
+  dot.className='dot off';st.textContent='After school';pn.textContent='After School';td.textContent='--:--';et.textContent='School day has ended';pf.style.width='100%';
+}
+tick();setInterval(tick,1000);
+
+let todos=JSON.parse(localStorage.getItem('turkishTimerTodos')||'[]');
+let filter='all';
+function saveTodos(){localStorage.setItem('turkishTimerTodos',JSON.stringify(todos));}
+function setFilter(f,btn){filter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTodos();}
+function addTodo(){const inp=document.getElementById('todo-input'),due=document.getElementById('due-input'),text=inp.value.trim();if(!text){inp.focus();return;}todos.unshift({id:Date.now(),text,done:false,due:due.value||null});inp.value='';due.value='';saveTodos();renderTodos();}
+function toggleTodo(id){const t=todos.find(t=>t.id===id);if(t){t.done=!t.done;saveTodos();renderTodos();}}
+function deleteTodo(id){todos=todos.filter(t=>t.id!==id);saveTodos();renderTodos();}
+function clearDone(){todos=todos.filter(t=>!t.done);saveTodos();renderTodos();}
+
+function getDueInfo(dateStr){
+  if(!dateStr)return null;
+  const now=new Date(),due=new Date(dateStr+'T23:59:59'),diffMs=due-now,diffSec=Math.floor(diffMs/1000);
+  if(diffSec<0)return{text:'Overdue',cls:'overdue'};
+  const days=Math.floor(diffSec/86400),hours=Math.floor((diffSec%86400)/3600),mins=Math.floor((diffSec%3600)/60),secs=diffSec%60;
+  if(days>3){const d=new Date(dateStr+'T00:00:00');return{text:'Due '+d.toLocaleDateString('en-US',{month:'short',day:'numeric'}),cls:'normal'};}
+  if(days>=1)return{text:`${days}d ${pad(hours)}h ${pad(mins)}m`,cls:days<=1?'soon':'normal'};
+  if(hours>=1)return{text:`${hours}h ${pad(mins)}m ${pad(secs)}s`,cls:'soon'};
+  return{text:`${pad(mins)}m ${pad(secs)}s`,cls:'urgent'};
+}
+
+function renderTodos(){
+  const list=document.getElementById('todo-list'),empty=document.getElementById('todo-empty'),countEl=document.getElementById('todo-count');
+  const active=todos.filter(t=>!t.done).length;
+  countEl.textContent=`${active} task${active!==1?'s':''}`;
+  let filtered=todos;
+  if(filter==='active')filtered=todos.filter(t=>!t.done);
+  if(filter==='done')filtered=todos.filter(t=>t.done);
+  list.querySelectorAll('.todo-item').forEach(i=>i.remove());
+  if(filtered.length===0){empty.style.display='block';return;}
+  empty.style.display='none';
+  filtered.forEach(todo=>{
+    const isOverdue=todo.due&&!todo.done&&getDueInfo(todo.due)?.cls==='overdue';
+    const item=document.createElement('div');
+    item.className='todo-item'+(todo.done?' done':'')+(isOverdue?' overdue':'');
+    item.dataset.id=todo.id;
+    const cb=document.createElement('div');cb.className='todo-checkbox'+(todo.done?' checked':'');cb.onclick=()=>toggleTodo(todo.id);
+    const body=document.createElement('div');body.className='todo-body';
+    const txt=document.createElement('div');txt.className='todo-text';txt.textContent=todo.text;body.appendChild(txt);
+    if(todo.due&&!todo.done){const info=getDueInfo(todo.due);if(info){const tag=document.createElement('span');tag.className='todo-due-tag '+info.cls;tag.dataset.due=todo.due;tag.textContent=info.text;body.appendChild(tag);}}
+    else if(todo.due&&todo.done){const d=new Date(todo.due+'T00:00:00');const tag=document.createElement('span');tag.className='todo-due-tag normal';tag.textContent='Was due '+d.toLocaleDateString('en-US',{month:'short',day:'numeric'});body.appendChild(tag);}
+    const del=document.createElement('button');del.className='todo-delete';del.innerHTML='&times;';del.onclick=()=>deleteTodo(todo.id);
+    item.appendChild(cb);item.appendChild(body);item.appendChild(del);list.appendChild(item);
+  });
+}
+
+function tickDue(){
+  document.querySelectorAll('.todo-due-tag[data-due]').forEach(tag=>{
+    const info=getDueInfo(tag.dataset.due);if(!info)return;
+    tag.textContent=info.text;tag.className='todo-due-tag '+info.cls;
+  });
+}
+
+document.getElementById('todo-input').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
+renderTodos();
+setInterval(tickDue,1000);
+
+/* ── LUNA ── */
+(function(){
+const el=document.getElementById('kittyImg');
+const wrap=document.getElementById('kittyWrap');
+const B="https://tpcdn.b-cdn.net/gh/CatHead132/CatHead132.github.io@main/kitty/";
+const I={aware:B+"aware.png",stand:B+"stand.png",sleep1:B+"sleep1.png",sleep2:B+"sleep2.png",scratch1:B+"scratch1.png",scratch2:B+"scratch2.png",cursor:B+"cursor.png",happy:B+":3.png",yawn:B+"yawn.png"};
+const SH=B+"smallheart.gif",BH=B+"bigheart.gif";
+const set=s=>{el.src=s;};
+const rand=(a,b)=>a+Math.random()*b;
+const SLEEP_DELAY=12000,ENTER_DELAY=80,LEAVE_DELAY=60,PET_COOLDOWN=1500,THRESHOLD=6;
+let sleeping=false,petting=false,hovered=false,onCooldown=false,happy=false;
+let lastInteractTime=0,lastAction=null,lastSide=null,awaitingOtherSide=false,strokeCount=0;
+let aT=null,fT=null,enterT=null,leaveT=null,strokeResetT=null,cooldownT=null,happyT=null,cursorDelayT=null;
+const ct=()=>{clearTimeout(aT);clearInterval(fT);aT=fT=null;};
+const fresh=()=>Date.now()-lastInteractTime<SLEEP_DELAY;
+const blocked=()=>sleeping||onCooldown||happy;
+function reset(){ct();clearTimeout(leaveT);clearTimeout(cooldownT);clearTimeout(strokeResetT);clearTimeout(happyT);clearTimeout(cursorDelayT);sleeping=petting=hovered=onCooldown=happy=false;strokeCount=0;lastSide=null;awaitingOtherSide=false;lastAction=null;}
+function showHappy(cb){happy=true;ct();clearTimeout(cursorDelayT);clearTimeout(strokeResetT);set(I.happy);happyT=setTimeout(()=>{happy=false;if(cb)cb();},1200);}
+function heart(big){const h=document.createElement('img');const ts='?t='+Date.now();if(big){h.src=BH+ts;h.style.cssText='position:absolute;width:32px;height:32px;image-rendering:pixelated;pointer-events:none;z-index:99;bottom:calc(100% - 15px);left:50%;transform:translateX(-50%);';}else{const ox=(Math.random()*30-15),oy=(Math.random()*6-3);h.src=SH+ts;h.style.cssText='position:absolute;width:24px;height:24px;image-rendering:pixelated;pointer-events:none;z-index:98;bottom:calc(100% - 8px + '+oy+'px);left:50%;transform:translateX(calc(-50% + '+ox+'px));';}wrap.appendChild(h);setTimeout(()=>h.parentNode&&h.parentNode.removeChild(h),big?800:300);}
+function finishSession(){clearTimeout(strokeResetT);clearTimeout(cursorDelayT);strokeCount=0;lastSide=null;awaitingOtherSide=false;petting=false;hovered=false;if(happy)return;ct();set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);}
+function onSideEnter(side){if(blocked())return;lastInteractTime=Date.now();clearTimeout(strokeResetT);if(side==='right'){clearTimeout(cursorDelayT);cursorDelayT=setTimeout(()=>{if(!happy)set(I.cursor);},180);}if(!petting){petting=true;hovered=false;ct();lastSide=side;awaitingOtherSide=false;return;}if(!awaitingOtherSide||side===lastSide)return;lastSide=side;awaitingOtherSide=false;strokeCount++;if(strokeCount>=THRESHOLD){heart(true);onCooldown=true;clearTimeout(cooldownT);showHappy(()=>{onCooldown=false;petting=false;hovered=false;strokeCount=0;lastSide=null;awaitingOtherSide=false;ct();set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);});return;}heart(false);}
+function onSideExit(side){if(blocked()||!petting)return;lastSide=side;awaitingOtherSide=true;clearTimeout(strokeResetT);strokeResetT=setTimeout(()=>{if(awaitingOtherSide&&!blocked())finishSession();},400);}
+function idleLoop(){if(hovered||petting||happy)return;ct();let c=['sleep','scratch','yawn','stand'][Math.random()<0.35&&!fresh()?0:Math.random()<0.6?1:Math.random()<0.75?2:3];if(c===lastAction&&c!=='stand')c='stand';lastAction=c;if(c==='sleep')doSleep();else if(c==='scratch')doScratch();else if(c==='yawn')doYawn();else{set(I.stand);aT=setTimeout(idleLoop,rand(2000,2000));}}
+function doSleep(){if(hovered||fresh())return idleLoop();set(I.yawn);aT=setTimeout(()=>{if(hovered||fresh())return idleLoop();sleeping=true;let f=0;set(I.sleep1);fT=setInterval(()=>set((++f%2)?I.sleep2:I.sleep1),800);aT=setTimeout(()=>{clearInterval(fT);sleeping=false;set(I.yawn);aT=setTimeout(()=>{set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);},900);},rand(10000,6000));},700);}
+function doScratch(){if(hovered)return idleLoop();let f=0;set(I.scratch1);fT=setInterval(()=>set((++f%2)?I.scratch2:I.scratch1),200);aT=setTimeout(()=>{ct();set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,rand(800,1000));},rand(1800,1200));}
+function doYawn(){if(hovered)return idleLoop();set(I.yawn);aT=setTimeout(()=>{set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,rand(1000,1500));},2200);}
+const pL=document.getElementById('petLeft'),pR=document.getElementById('petRight');
+pL.addEventListener('mouseenter',()=>onSideEnter('left'));
+pL.addEventListener('mouseleave',()=>onSideExit('left'));
+pR.addEventListener('mouseenter',()=>onSideEnter('right'));
+pR.addEventListener('mouseleave',()=>onSideExit('right'));
+el.addEventListener('mouseenter',()=>{clearTimeout(leaveT);if(!petting&&!sleeping&&!happy){enterT=setTimeout(()=>{if(happy)return;hovered=true;lastInteractTime=Date.now();ct();awaitingOtherSide=false;lastSide=null;set(I.aware);},ENTER_DELAY);}});
+el.addEventListener('mouseleave',()=>{clearTimeout(enterT);leaveT=setTimeout(()=>{hovered=false;if(!petting&&!sleeping&&!happy){set(I.stand);lastAction='stand';aT=setTimeout(idleLoop,1000);}},LEAVE_DELAY);});
+wrap.addEventListener('mouseleave',e=>{if(wrap.contains(e.relatedTarget))return;if(!sleeping&&!happy)finishSession();});
+set(I.aware);aT=setTimeout(()=>{set(I.stand);aT=setTimeout(idleLoop,1200);},1500);
+})();
+</script>
+</body>
+</html>
