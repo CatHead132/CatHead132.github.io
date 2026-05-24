@@ -1,134 +1,316 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Toggle</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #111;
-      user-select: none;
-    }
-
-    .switch-track {
-      position: relative;
-      width: 120px;
-      height: 56px;
-      border-radius: 28px;
-      background: #222;
-      border: 2px solid #333;
-      cursor: grab;
-      touch-action: none;
-      transition: background 0.3s, border-color 0.3s;
-    }
-
-    .switch-track.on {
-      background: #1a3a0a;
-      border-color: #4a9a30;
-    }
-
-    .switch-track.dragging { cursor: grabbing; }
-
-    .switch-thumb {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #444;
-      transition: background 0.3s;
-    }
-
-    .switch-track.on .switch-thumb {
-      background: #5ecf35;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rumble</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    color: #fff;
+    user-select: none;
+  }
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 300px;
+  }
+  .indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #888;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #444;
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .dot.connected { background: #5ecf35; }
+  .switch-track {
+    position: relative;
+    width: 120px; height: 56px;
+    border-radius: 28px;
+    background: #222;
+    border: 2px solid #333;
+    cursor: grab;
+    touch-action: none;
+    transition: background 0.3s, border-color 0.3s;
+    align-self: flex-start;
+  }
+  .switch-track.on { background: #1a3a0a; border-color: #4a9a30; }
+  .switch-track.dragging { cursor: grabbing; }
+  .switch-thumb {
+    position: absolute;
+    top: 6px; left: 6px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #444;
+    transition: background 0.3s;
+  }
+  .switch-track.on .switch-thumb { background: #5ecf35; }
+  .timeline-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .timeline-label {
+    font-size: 12px;
+    color: #888;
+  }
+  canvas#tl {
+    display: block;
+    width: 100%;
+    height: 140px;
+    border-radius: 6px;
+    background: #1a1a1a;
+    cursor: crosshair;
+    touch-action: none;
+  }
+</style>
 </head>
 <body>
+<div class="panel">
+  <div class="indicator">
+    <span class="dot" id="dot"></span>
+    <span id="conn-text">No controller</span>
+  </div>
 
   <div class="switch-track" id="track">
     <div class="switch-thumb" id="thumb"></div>
   </div>
 
+  <div class="timeline-wrap">
+    <span class="timeline-label">Draw intensity pattern</span>
+    <canvas id="tl"></canvas>
+  </div>
+</div>
+
 <script>
-  const track = document.getElementById('track');
-  const thumb = document.getElementById('thumb');
+  const track    = document.getElementById('track');
+  const thumb    = document.getElementById('thumb');
+  const dot      = document.getElementById('dot');
+  const connText = document.getElementById('conn-text');
+  const canvas   = document.getElementById('tl');
+  const ctx      = canvas.getContext('2d');
 
-  const PAD   = 6;
-  const MAX_X = 120 - 40 - PAD * 2;
+  const PAD = 6, MAX_X = 120 - 40 - PAD * 2;
+  let isOn = false, dragging = false, startX = 0, startLeft = 0, currentX = 0;
+  let gamepadIdx = null, rumbleTimer = null;
+  let prevButtons = {};
 
-  let isOn     = false;
-  let dragging = false;
-  let startX   = 0;
-  let startLeft = 0;
-  let currentX = 0;
-  function startVibration() {
-    if (!navigator.vibrate) return;
-    navigator.vibrate(Infinity);
+  
+  const COLS = 40;          
+  const LOOP_MS = 4000;     
+  const pattern = new Float32Array(COLS).fill(0.5); 
+  let paintDragging = false;
+
+  function colAt(px) {
+    return Math.max(0, Math.min(COLS - 1, Math.floor(px / (canvas.width / COLS))));
+  }
+  function valAt(py) {
+    return Math.max(0, Math.min(1, 1 - py / canvas.height));
   }
 
-  function stopVibration() {
-    if (navigator.vibrate) navigator.vibrate(0);
+  canvas.addEventListener('mousedown', e => {
+    paintDragging = true;
+    const r = canvas.getBoundingClientRect();
+    const col = colAt(e.clientX - r.left);
+    const val = valAt(e.clientY - r.top);
+    pattern[col] = val;
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!paintDragging) return;
+    const r = canvas.getBoundingClientRect();
+    const col = colAt(e.clientX - r.left);
+    const val = valAt(e.clientY - r.top);
+    pattern[col] = val;
+  });
+  window.addEventListener('mouseup', () => { paintDragging = false; });
+
+  canvas.addEventListener('touchstart', e => {
+    paintDragging = true;
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    pattern[colAt(t.clientX - r.left)] = valAt(t.clientY - r.top);
+    e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchmove', e => {
+    if (!paintDragging) return;
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    pattern[colAt(t.clientX - r.left)] = valAt(t.clientY - r.top);
+    e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchend', () => { paintDragging = false; });
+
+  
+  function drawTimeline(ts) {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const colW = W / COLS;
+    const progress = (ts % LOOP_MS) / LOOP_MS; 
+    const playCol = progress * COLS;
+
+    for (let i = 0; i < COLS; i++) {
+      const val = pattern[i];
+      const x = i * colW + colW / 2;
+      
+      const PAD_V = 10;
+      const cy = H - PAD_V - val * (H - PAD_V * 2);
+      const r = 4 + val * 5;
+
+      const isPast = i < playCol;
+      const alpha = isPast ? 0.3 + val * 0.6 : 0.15 + val * 0.2;
+      ctx.beginPath();
+      ctx.arc(x, cy, r, 0, Math.PI * 2);
+      ctx.fillStyle = isOn
+        ? `rgba(94,207,53,${alpha})`
+        : `rgba(120,120,120,${alpha})`;
+      ctx.fill();
+    }
+
+    
+    const px = (playCol / COLS) * W;
+    ctx.beginPath();
+    ctx.moveTo(px, 0);
+    ctx.lineTo(px, H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  
+  function getCurrentMag(ts) {
+    const progress = (ts % LOOP_MS) / LOOP_MS;
+    const col = Math.floor(progress * COLS) % COLS;
+    return pattern[col];
+  }
+
+  function rumbleTick(ts) {
+    if (!isOn || gamepadIdx == null) return;
+    const gp = navigator.getGamepads()[gamepadIdx];
+    if (!gp || !gp.vibrationActuator) return;
+    const mag = getCurrentMag(ts ?? performance.now());
+    gp.vibrationActuator.playEffect('dual-rumble', {
+      startDelay: 0,
+      duration: 300,
+      weakMagnitude: mag,
+      strongMagnitude: mag
+    }).catch(() => {});
+    rumbleTimer = setTimeout(() => rumbleTick(performance.now()), 100);
+  }
+
+  function startRumble() {
+    clearTimeout(rumbleTimer);
+    rumbleTick(performance.now());
+  }
+
+  function stopRumble() {
+    clearTimeout(rumbleTimer);
+    rumbleTimer = null;
+    if (gamepadIdx != null) {
+      const gp = navigator.getGamepads()[gamepadIdx];
+      if (gp?.vibrationActuator?.reset) gp.vibrationActuator.reset();
+      else if (gp?.vibrationActuator) {
+        gp.vibrationActuator.playEffect('dual-rumble', {
+          startDelay: 0, duration: 0, weakMagnitude: 0, strongMagnitude: 0
+        }).catch(() => {});
+      }
+    }
   }
 
   function setOn(val) {
-    const changed = val !== isOn;
     isOn = val;
     track.classList.toggle('on', isOn);
     thumb.style.transition = 'left 0.2s ease, background 0.3s';
     thumb.style.left = (isOn ? MAX_X : 0) + PAD + 'px';
-    if (changed) {
-      if (isOn) startVibration();
-      else stopVibration();
+    isOn ? startRumble() : stopRumble();
+  }
+
+  
+  function cX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
+  track.addEventListener('mousedown', e => {
+    dragging = true; startX = cX(e); startLeft = isOn ? MAX_X : 0; currentX = startLeft;
+    track.classList.add('dragging'); thumb.style.transition = 'background 0.3s'; e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    currentX = Math.min(MAX_X, Math.max(0, startLeft + cX(e) - startX));
+    thumb.style.left = currentX + PAD + 'px';
+  });
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return; dragging = false; track.classList.remove('dragging'); setOn(currentX > MAX_X / 2);
+  });
+  track.addEventListener('touchstart', e => {
+    dragging = true; startX = cX(e); startLeft = isOn ? MAX_X : 0; currentX = startLeft;
+    track.classList.add('dragging'); thumb.style.transition = 'background 0.3s'; e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    currentX = Math.min(MAX_X, Math.max(0, startLeft + cX(e) - startX));
+    thumb.style.left = currentX + PAD + 'px'; e.preventDefault();
+  }, { passive: false });
+  window.addEventListener('touchend', () => {
+    if (!dragging) return; dragging = false; track.classList.remove('dragging'); setOn(currentX > MAX_X / 2);
+  });
+
+  
+  function scanGamepads() {
+    const gpads = [...(navigator.getGamepads?.() ?? [])].filter(Boolean);
+    if (gpads.length) {
+      gamepadIdx = gpads[0].index;
+      dot.classList.add('connected');
+      const id = gpads[0].id;
+      connText.textContent = id.length > 28 ? id.slice(0, 28) + '…' : id;
+    } else {
+      gamepadIdx = null;
+      dot.classList.remove('connected');
+      connText.textContent = 'No controller';
+      if (isOn) setOn(false);
     }
   }
+  window.addEventListener('gamepadconnected', scanGamepads);
+  window.addEventListener('gamepaddisconnected', scanGamepads);
 
-  function px(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
-
-  function onDown(e) {
-    dragging  = true;
-    startX    = px(e);
-    startLeft = isOn ? MAX_X : 0;
-    currentX  = startLeft;
-    track.classList.add('dragging');
-    thumb.style.transition = 'background 0.3s';
-    e.preventDefault();
+  
+  function loop(ts) {
+    scanGamepads();
+    if (gamepadIdx != null) {
+      const gp = navigator.getGamepads()[gamepadIdx];
+      if (gp) {
+        const btn0 = gp.buttons[0];
+        if (btn0.pressed && !prevButtons[0]) setOn(!isOn);
+        prevButtons[0] = btn0.pressed;
+      }
+    }
+    
+    const rect = canvas.getBoundingClientRect();
+    if (canvas.width !== rect.width || canvas.height !== rect.height) {
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+    drawTimeline(ts);
+    requestAnimationFrame(loop);
   }
-
-  function onMove(e) {
-    if (!dragging) return;
-    currentX = Math.min(MAX_X, Math.max(0, startLeft + px(e) - startX));
-    thumb.style.left = currentX + PAD + 'px';
-    e.preventDefault();
-  }
-
-  function onUp() {
-    if (!dragging) return;
-    dragging = false;
-    track.classList.remove('dragging');
-    setOn(currentX > MAX_X / 2);
-  }
-
-  track.addEventListener('mousedown',  onDown);
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup',   onUp);
-  track.addEventListener('touchstart', onDown, { passive: false });
-  window.addEventListener('touchmove', onMove, { passive: false });
-  window.addEventListener('touchend',  onUp);
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) stopVibration();
-  });
-  window.addEventListener('beforeunload', stopVibration);
 
   thumb.style.left = PAD + 'px';
+  requestAnimationFrame(loop);
+
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopRumble(); });
+  window.addEventListener('beforeunload', stopRumble);
 </script>
 </body>
 </html>
